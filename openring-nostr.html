@@ -47,11 +47,13 @@
       .sidebar {
         display: none;
         position: fixed;
-        top: 0; left: 0; bottom: 0;
-        width: 75vw;
-        max-width: 260px;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 78vw;
+        max-width: 280px;
         z-index: 200;
-        height: 100vh;
+        height: calc(100vh - 56px);
       }
       .sidebar.open { display: flex; }
       .hamburger { display: flex; }
@@ -144,6 +146,13 @@
       line-height: 1.4;
     }
 
+    @media (max-width: 680px) {
+      .nav-item { padding: 0.45rem 1.2rem; font-size: 0.64rem; }
+      .nav-section { padding: 0.4rem 1.2rem 0.2rem; }
+      .sidebar-header { padding: 1rem 1.2rem 0.85rem; }
+      .sidebar-footer { padding: 0.75rem 1.2rem; }
+    }
+
     .nav-item:hover   { color: var(--text); background: #13100A; border-left-color: var(--border2); }
     .nav-item.active  { color: var(--amber); border-left-color: var(--amber); background: #13100A; }
     .nav-item.loading { opacity: 0.4; cursor: wait; }
@@ -187,7 +196,7 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1.25rem;
+      padding: 0 1rem 0 1.25rem;
       height: 56px;
       border-bottom: 1px solid var(--border);
       background: var(--bg2);
@@ -195,7 +204,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 150;
+      z-index: 300;
     }
 
     @media (max-width: 680px) { .topbar { display: flex; } }
@@ -588,28 +597,28 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #1E1A12">
-        <div style="font-size:0.46rem;letter-spacing:0.2em;color:#4A4438;margin-bottom:0.6rem">SUPPORT THIS WORK</div>
-        <div style="font-size:0.6rem;color:#6A6050;line-height:1.6;margin-bottom:0.75rem">If this was useful, send sats.</div>
+      <div style="margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid #1E1A12">
+        <div style="font-size:0.46rem;letter-spacing:0.2em;color:#4A4438;margin-bottom:0.4rem">SUPPORT THIS WORK</div>
+        <div style="font-size:0.58rem;color:#6A6050;line-height:1.5;margin-bottom:0.6rem">If this was useful, send sats.</div>
         <div
           onclick="navigator.clipboard?.writeText('blackfalcon2@primal.net').then(()=>{this.style.borderColor='#70D090';this.querySelector('.ln-addr').style.color='#70D090';setTimeout(()=>{this.style.borderColor='#2A2620';this.querySelector('.ln-addr').style.color='#D4B580';},1800)})"
-          style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.7rem;border:1px solid #2A2620;cursor:pointer;background:#0C0907;transition:border-color 0.2s;margin-bottom:0.75rem"
+          style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.65rem;border:1px solid #2A2620;cursor:pointer;background:#0C0907;transition:border-color 0.2s;margin-bottom:0.6rem"
           title="Tap to copy"
         >
           <span style="font-size:0.75rem">⚡</span>
-          <span class="ln-addr" style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:#D4B580;letter-spacing:0.04em;flex:1">blackfalcon2@primal.net</span>
+          <span class="ln-addr" style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:#D4B580;letter-spacing:0.03em;flex:1">blackfalcon2@primal.net</span>
           <span style="font-size:0.6rem;color:#3A3628">⎘</span>
         </div>
         <div style="text-align:center">
           <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
             alt="Lightning QR"
-            width="140"
-            height="140"
+            width="110"
+            height="110"
             style="display:block;margin:0 auto;border:1px solid #1E1A12"
             onerror="this.style.display='none'"
           />
-          <div style="font-size:0.44rem;color:#3A3628;letter-spacing:0.08em;margin-top:0.4rem">tap address to copy</div>
+          <div style="font-size:0.42rem;color:#3A3628;letter-spacing:0.08em;margin-top:0.35rem">tap address to copy</div>
         </div>
       </div>
       <div class="relay-status">
@@ -722,12 +731,4 @@ function handleEvent(ev) {
     if (dTag === TAG_WHITEPAPER) document.getElementById("nav-whitepaper")?.classList.remove("loading");
     if (dTag === TAG_MANUAL)     document.getElementById("nav-manual")?.classList.remove("loading");
     // Re-render if we are on a view waiting for this
-    if (state.view === "whitepaper" && dTag === TAG_WHITEPAPER) renderView();
-    if (state.view === "manual"     && dTag === TAG_MANUAL)     renderView();
-  }
-
-  if (ev.kind === KIND_NOTE) {
-    if (!state.notes.find(n => n.id === ev.id)) {
-      state.notes.push(ev);
-      state.notes.sort((a,b) => b.created_at - a.created_at);
-  
+    if (state.view ===
