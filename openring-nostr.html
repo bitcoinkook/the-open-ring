@@ -33,7 +33,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--mono); line-height: 1.7; }
+body { background: var(--bg); color: var(--text); font-family: var(--mono); line-height: 1.7; overflow-x: hidden; max-width: 100vw; }
 
 /* ── HEADER ───────────────────────────────────────────────── */
 
@@ -252,7 +252,7 @@ blockquote.pull {
 }
 
 .note-date { font-size: 0.52rem; color: var(--faint); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-.note-body { font-size: 0.72rem; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
+.note-body { font-size: 0.72rem; color: var(--text); line-height: 1.7; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; }
 
 /* ── SUPPORT ──────────────────────────────────────────────── */
 
@@ -400,7 +400,6 @@ footer {
     <a href="#whitepaper">Whitepaper</a>
     <a href="#manual">Pen &amp; Paper</a>
     <a href="#cycle">Field cycle</a>
-    <a href="#notes">Notes</a>
     <a href="#support">Support</a>
   </nav>
 </header>
@@ -557,20 +556,7 @@ footer {
     </div>
   </section>
 
-  <!-- 7. NOTES — recent activity -->
-  <section id="notes">
-    <div class="eyebrow">OPEN RING — NOTES</div>
-    <h1 class="title">Recent notes</h1>
-    <p class="lead" style="color:var(--dim)">Activity from the Open Ring Nostr account. Field updates, cycle results, and framework developments as they happen.</p>
-    <div id="notes-list">
-      <div class="loading" style="margin-top:1rem">
-        <div class="spinner"></div>
-        <div class="loading-text">FETCHING FROM RELAYS</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8. SUPPORT -->
+  <!-- SUPPORT -->
   <section id="support">
     <div class="eyebrow">SUPPORT THIS WORK</div>
     <h1 class="title">Send sats</h1>
@@ -628,7 +614,7 @@ const DEFAULT_RELAYS = [
 ];
 
 const D_WHITEPAPER = "openring-whitepaper";
-const D_MANUAL     = "openring-manual";
+const D_MANUAL     = "openring-manual-v1";
 const D_CYCLE      = "openring-cycle-bitcoin-v1";
 
 // ── LOAD SETTINGS ─────────────────────────────────────────────────────────────
@@ -695,18 +681,6 @@ function renderArticle(dtag, ev) {
   `;
 }
 
-const notes = [];
-
-function renderNotes() {
-  const el = document.getElementById("notes-list");
-  if (!el) return;
-  if (notes.length === 0) return;
-  el.innerHTML = notes.map(n => {
-    const d = new Date(n.created_at * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-    return `<div class="note"><div class="note-date">${d}</div><div class="note-body">${esc(n.content)}</div></div>`;
-  }).join("");
-}
-
 // ── NOSTR CONNECTION ──────────────────────────────────────────────────────────
 
 const articles = {};  // dtag -> event (keep newest)
@@ -727,18 +701,11 @@ function handleEvent(ev) {
 
   if (ev.kind === 30023) {
     const dtag = tag(ev, "d") || ev.id;
+    console.log("Article received, d-tag:", dtag, "title:", tag(ev, "title"));
     if (!articles[dtag] || ev.created_at > articles[dtag].created_at) {
       articles[dtag] = ev;
       if ([D_WHITEPAPER, D_MANUAL, D_CYCLE].includes(dtag)) renderArticle(dtag, ev);
     }
-  }
-
-  if (ev.kind === 1) {
-    if (notes.find(n => n.id === ev.id)) return;
-    notes.push(ev);
-    notes.sort((a, b) => b.created_at - a.created_at);
-    if (notes.length > 10) notes.length = 10;
-    renderNotes();
   }
 }
 
@@ -762,7 +729,6 @@ function connect() {
           opened++;
           if (opened === 1) setStatus("on");
           ws.send(JSON.stringify(["REQ", "a", { kinds: [30023], authors: [hex], limit: 20 }]));
-          ws.send(JSON.stringify(["REQ", "n", { kinds: [1],     authors: [hex], limit: 10 }]));
         } catch {}
       };
 
