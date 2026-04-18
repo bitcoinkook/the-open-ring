@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Ring — on Nostr</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+    :root {
+      --bg:       #0A0907;
+      --bg1:      #100D08;
+      --bg2:      #0C0A07;
+      --border:   #1E1A12;
+      --border2:  #2A2620;
+      --text:     #D8D0BC;
+      --text-dim: #8A8270;
+      --text-xs:  #4A4638;
+      --amber:    #D4B580;
+      --amber-dim:#6A5A38;
+      --blue:     #60B5E5;
+      --green:    #70D090;
+      --mono:     'JetBrains Mono', monospace;
+      --serif:    'Libre Baskerville', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 680px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .sidebar.open { display: flex; position: fixed; inset: 0; z-index: 100; width: 260px; }
+      .hamburger { display: flex; }
+    }
+
+    /* ── SIDEBAR ────────────────────────────────────────────── */
+
+    .sidebar {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 1.75rem 1.4rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-eyebrow {
+      font-size: 0.48rem;
+      letter-spacing: 0.28em;
+      color: var(--text-xs);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-title {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #E8E0CC;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+
+    .sidebar-sub {
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .sidebar-tag {
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      color: var(--green);
+      background: #0C180C;
+      border: 1px solid #1A2A1A;
+      padding: 0.2rem 0.55rem;
+      display: inline-block;
+      margin-top: 0.6rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+    }
+
+    .nav-section {
+      padding: 0.6rem 1.4rem 0.25rem;
+      font-size: 0.46rem;
+      letter-spacing: 0.22em;
+      color: var(--text-xs);
+    }
+
+    .nav-item {
+      display: block;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.66rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all 0.1s;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+      letter-spacing: 0.03em;
+      line-height: 1.4;
+    }
+
+    .nav-item:hover   { color: var(--text); background: #13100A; border-left-color: var(--border2); }
+    .nav-item.active  { color: var(--amber); border-left-color: var(--amber); background: #13100A; }
+    .nav-item.loading { opacity: 0.4; cursor: wait; }
+
+    .sidebar-footer {
+      padding: 1rem 1.4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .relay-status {
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+      color: var(--text-xs);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .relay-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #3A3628;
+      flex-shrink: 0;
+    }
+
+    .relay-dot.connected { background: var(--green); animation: pulse 2s ease-in-out infinite; }
+    .relay-dot.error     { background: #D88870; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── MAIN ───────────────────────────────────────────────── */
+
+    .main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    @media (max-width: 680px) { .topbar { display: flex; } }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--text-dim);
+    }
+
+    .content {
+      flex: 1;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    /* ── STATES ─────────────────────────────────────────────── */
+
+    .state-panel {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .state-eyebrow {
+      font-size: 0.52rem;
+      letter-spacing: 0.2em;
+      color: var(--text-xs);
+      margin-bottom: 1rem;
+    }
+
+    .state-title {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-style: italic;
+      color: #E8E0CC;
+      margin-bottom: 0.75rem;
+    }
+
+    .state-body {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--border2);
+      border-top-color: var(--amber);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── CONFIG FORM ─────────────────────────────────────────── */
+
+    .config-card {
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .config-label {
+      font-size: 0.52rem;
+      letter-spacing: 0.18em;
+      color: var(--amber-dim);
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .config-hint {
+      font-size: 0.62rem;
+      color: var(--text-xs);
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .config-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.65rem 0.9rem;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 1rem;
+    }
+
+    .config-input:focus { border-color: var(--amber-dim); }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.15em;
+      padding: 0.65rem 1.4rem;
+      border: 1px solid;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.1s;
+    }
+
+    .btn-amber { border-color: var(--amber); color: var(--amber); }
+    .btn-amber:hover { background: #D4B58015; }
+    .btn-dim   { border-color: var(--border2); color: var(--amber-dim); }
+    .btn-dim:hover { border-color: #4A4438; color: #8A7858; }
+
+    /* ── ARTICLE ─────────────────────────────────────────────── */
+
+    .article-header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-eyebrow {
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      color: var(--text-xs);
+      margin-bottom: 0.85rem;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #E8E0CC;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .article-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .article-meta-item {
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      color: var(--text-xs);
+    }
+
+    .article-meta-item span {
+      color: var(--amber-dim);
+    }
+
+    /* ── MARKDOWN CONTENT ────────────────────────────────────── */
+
+    .article-body { font-size: 0.82rem; line-height: 1.85; color: #C8C0B0; }
+
+    .article-body h1 {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #E8E0CC;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .article-body h2 {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #D8D0BC;
+      margin: 2rem 0 0.75rem;
+    }
+
+    .article-body h3 {
+      font-size: 0.66rem;
+      letter-spacing: 0.18em;
+      color: var(--amber-dim);
+      text-transform: uppercase;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .article-body p { margin-bottom: 1.1rem; }
+
+    .article-body strong { color: #D8C8A0; font-weight: 500; }
+
+    .article-body em { color: #B8B090; font-style: italic; }
+
+    .article-body a { color: var(--amber); text-decoration: underline; text-underline-offset: 2px; }
+    .article-body a:hover { color: #E8C890; }
+
+    .article-body blockquote {
+      border-left: 2px solid var(--amber-dim);
+      padding: 0.75rem 1.1rem;
+      margin: 1.25rem 0;
+      background: var(--bg1);
+      color: #A89878;
+      font-style: italic;
+    }
+
+    .article-body code {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: #130F08;
+      border: 1px solid var(--border2);
+      padding: 0.1rem 0.35rem;
+      color: #C8B890;
+    }
+
+    .article-body pre {
+      background: #0C0907;
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      font-size: 0.72rem;
+      line-height: 1.7;
+      color: #A89878;
+    }
+
+    .article-body pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .article-body ul, .article-body ol {
+      margin: 0.5rem 0 1.1rem 1.5rem;
+    }
+
+    .article-body li { margin-bottom: 0.35rem; }
+
+    .article-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    .article-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.76rem;
+    }
+
+    .article-body th {
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      color: var(--amber-dim);
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .article-body td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: #B8B098;
+    }
+
+    /* ── TOOLS SECTION ───────────────────────────────────────── */
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 500px) { .tools-grid { grid-template-columns: 1fr; } }
+
+    .tool-card {
+      background: var(--bg1);
+      padding: 1.25rem;
+    }
+
+    .tool-name {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-style: italic;
+      color: #D8D0BC;
+      margin-bottom: 0.35rem;
+    }
+
+    .tool-desc {
+      font-size: 0.64rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-bottom: 0.85rem;
+    }
+
+    .tool-tag {
+      font-size: 0.48rem;
+      letter-spacing: 0.14em;
+      padding: 0.18rem 0.45rem;
+      border: 1px solid;
+    }
+
+    .tag-api  { border-color: #D4B58040; color: var(--amber-dim); }
+    .tag-mech { border-color: #70D09040; color: #5A9A70; }
+
+    /* ── NOSTR NOTE ──────────────────────────────────────────── */
+
+    .nostr-note {
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      padding: 1.1rem;
+      margin-bottom: 1px;
+    }
+
+    .nostr-note-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .nostr-note-date {
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+      color: var(--text-xs);
+    }
+
+    .nostr-note-body {
+      font-size: 0.72rem;
+      color: #B8B098;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-eyebrow">openring</div>
+      <div class="sidebar-title">Open Ring</div>
+      <div class="sidebar-sub">A diagnostic for structures where the wrong things are fixed.</div>
+      <div class="sidebar-tag">ON NOSTR</div>
+    </div>
+
+    <nav class="sidebar-nav" id="nav">
+      <div class="nav-section">DOCUMENTS</div>
+      <button class="nav-item active" data-view="home">Overview</button>
+      <button class="nav-item loading" data-view="whitepaper" id="nav-whitepaper">Whitepaper</button>
+      <button class="nav-item loading" data-view="manual"    id="nav-manual">Pen &amp; Paper Guide</button>
+
+      <div class="nav-section" style="margin-top:0.75rem">INSTRUMENTS</div>
+      <button class="nav-item" data-view="tools">The Open Ring</button>
+
+      <div class="nav-section" style="margin-top:0.75rem">FIELD</div>
+      <button class="nav-item loading" data-view="notes" id="nav-notes">Notes</button>
+
+      <div class="nav-section" style="margin-top:0.75rem">SETTINGS</div>
+      <button class="nav-item" data-view="config">Configure</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="relay-status">
+        <div class="relay-dot" id="relay-dot"></div>
+        <span id="relay-label">not connected</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- MOBILE TOPBAR -->
+    <div class="topbar">
+      <div style="font-family:var(--serif);font-size:1rem;font-style:italic;color:#E8E0CC">Open Ring</div>
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="content" id="content">
+      <!-- Views injected here -->
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+
+const DEFAULT_RELAYS = [
+  "wss://relay.damus.io",
+  "wss://relay.nostr.band",
+  "wss://nos.lol",
+];
+
+// Replace with the actual Open Ring Nostr public key (npub or hex)
+const DEFAULT_PUBKEY = "";
+
+// NIP-23 event kind
+const KIND_ARTICLE = 30023;
+const KIND_NOTE    = 1;
+
+// Tag identifiers for known documents
+const TAG_WHITEPAPER = "openring-whitepaper";
+const TAG_MANUAL     = "openring-manual";
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+
+const state = {
+  relays:    JSON.parse(localStorage.getItem("oc_relays")  || JSON.stringify(DEFAULT_RELAYS)),
+  pubkey:    localStorage.getItem("oc_pubkey") || DEFAULT_PUBKEY,
+  view:      "home",
+  articles:  {},   // d-tag → event
+  notes:     [],
+  connected: false,
+  sockets:   [],
+};
+
+// ── NOSTR CONNECTION ─────────────────────────────────────────────────────────
+
+function connectRelays() {
+  state.sockets.forEach(s => { try { s.close(); } catch {} });
+  state.sockets = [];
+  setRelayStatus("connecting");
+
+  if (!state.pubkey) { setRelayStatus("no-pubkey"); return; }
+
+  let connected = 0;
+  state.relays.forEach(url => {
+    try {
+      const ws = new WebSocket(url);
+      state.sockets.push(ws);
+
+      ws.onopen = () => {
+        connected++;
+        if (connected === 1) setRelayStatus("connected");
+        // Subscribe to NIP-23 articles by pubkey
+        ws.send(JSON.stringify(["REQ", "articles", { kinds:[KIND_ARTICLE], authors:[normalisePubkey(state.pubkey)], limit:20 }]));
+        // Subscribe to recent notes
+        ws.send(JSON.stringify(["REQ", "notes", { kinds:[KIND_NOTE], authors:[normalisePubkey(state.pubkey)], limit:10 }]));
+      };
+
+      ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg[0] === "EVENT") handleEvent(msg[2]);
+        } catch {}
+      };
+
+      ws.onerror = () => { if (connected === 0 && state.sockets.every(s => s.readyState > 1)) setRelayStatus("error"); };
+    } catch {}
+  });
+}
+
+function handleEvent(ev) {
+  if (!ev || !ev.kind) return;
+
+  if (ev.kind === KIND_ARTICLE) {
+    const dTag = (ev.tags?.find(t => t[0] === "d") || [])[1] || ev.id;
+    state.articles[dTag] = ev;
+    // Update nav items once known docs arrive
+    if (dTag === TAG_WHITEPAPER) document.getElementById("nav-whitepaper")?.classList.remove("loading");
+    if (dTag === TAG_MANUAL)     document.getElementById("nav-manual")?.classList.remove("loading");
+    // Re-render if we are on a view waiting for this
+    if (state.view === "whitepaper" && dTag === TAG_WHITEPAPER) renderView();
+    if (state.view === "manual"     && dTag === TAG_MANUAL)     renderView();
+  }
+
+  if (ev.kind === KIND_NOTE) {
+    if (!state.notes.find(n => n.id === ev.id)) {
+      state.notes.push(ev);
+      state.notes.sort((a,b) => b.created_at - a.created_at);
+      document.getElementById("nav-notes")?.classList.remove("loading");
+      if (state.view === "notes") renderView();
+    }
+  }
+}
+
+// ── PUBKEY HELPERS ───────────────────────────────────────────────────────────
+
+function normalisePubkey(raw) {
+  if (!raw) return "";
+  // Accept hex directly
+  if (/^[0-9a-f]{64}$/i.test(raw.trim())) return raw.trim().toLowerCase();
+  // Basic npub decode (bech32 — simplified; proper lib recommended for production)
+  try {
+    const decoded = bech32Decode(raw.trim());
+    return decoded;
+  } catch { return raw.trim(); }
+}
+
+// Minimal bech32 decode for npub → hex (covers the common case)
+function bech32Decode(npub) {
+  const CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+  if (!npub.startsWith("npub1")) throw new Error("not npub");
+  const data = npub.slice(5).toLowerCase().split("").map(c => CHARSET.indexOf(c));
+  // Convert 5-bit groups to 8-bit
+  let bits = 0, value = 0;
+  const bytes = [];
+  for (let i = 0; i < data.length - 6; i++) { // -6 for checksum
+    value = (value << 5) | data[i];
+    bits += 5;
+    if (bits >= 8) { bytes.push((value >> (bits - 8)) & 255); bits -= 8; }
+  }
+  return bytes.map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+function setRelayStatus(status) {
+  const dot   = document.getElementById("relay-dot");
+  const label = document.getElementById("relay-label");
+  if (!dot || !label) return;
+  dot.className = "relay-dot";
+  if (status === "connected")  { dot.classList.add("connected"); label.textContent = `${state.relays.length} relays`; state.connected = true; }
+  if (status === "connecting") { label.textContent = "connecting..."; }
+  if (status === "error")      { dot.classList.add("error"); label.textContent = "connection failed"; }
+  if (status === "no-pubkey")  { label.textContent = "no pubkey set"; }
+}
+
+// ── ROUTER ───────────────────────────────────────────────────────────────────
+
+document.querySelectorAll(".nav-item").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const view = btn.dataset.view;
+    if (!view) return;
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.view = view;
+    renderView();
+    // Close mobile sidebar
+    document.getElementById("sidebar")?.classList.remove("open");
+  });
+});
+
+function toggleSidebar() {
+  document.getElementById("sidebar")?.classList.toggle("open");
+}
+
+function renderView() {
+  const el = document.getElementById("content");
+  if (!el) return;
+
+  switch (state.view) {
+    case "home":       el.innerHTML = viewHome();       break;
+    case "whitepaper": el.innerHTML = viewArticle(TAG_WHITEPAPER, "Whitepaper");   break;
+    case "manual":     el.innerHTML = viewArticle(TAG_MANUAL,     "Pen & Paper Guide"); break;
+    case "tools":      el.innerHTML = viewTools();      break;
+    case "no
