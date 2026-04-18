@@ -406,18 +406,18 @@ body { background: #0A0907; color: #D8D0BC; font-family: 'JetBrains Mono', monos
 
   <nav class="sb-nav">
     <div class="sb-section">DOCUMENTS</div>
-    <button class="nav-btn active" onclick="showView('home')">Overview</button>
-    <button class="nav-btn loading" id="nav-whitepaper" onclick="showView('whitepaper')">Whitepaper</button>
-    <button class="nav-btn loading" id="nav-manual"     onclick="showView('manual')">Pen &amp; Paper Guide</button>
+    <button class="nav-btn active" data-view="home" onclick="showView('home')">Overview</button>
+    <button class="nav-btn loading" data-view="whitepaper" id="nav-whitepaper" onclick="showView('whitepaper')">Whitepaper</button>
+    <button class="nav-btn loading" data-view="manual" id="nav-manual" onclick="showView('manual')">Pen &amp; Paper Guide</button>
 
     <div class="sb-section" style="margin-top:0.5rem">INSTRUMENTS</div>
-    <button class="nav-btn" onclick="showView('tools')">The Open Ring</button>
+    <button class="nav-btn" data-view="tools" onclick="showView('tools')">The Open Ring</button>
 
     <div class="sb-section" style="margin-top:0.5rem">FIELD</div>
-    <button class="nav-btn loading" id="nav-notes" onclick="showView('notes')">Notes</button>
+    <button class="nav-btn loading" data-view="notes" id="nav-notes" onclick="showView('notes')">Notes</button>
 
     <div class="sb-section" style="margin-top:0.5rem">SETTINGS</div>
-    <button class="nav-btn" onclick="showView('config')">Configure</button>
+    <button class="nav-btn" data-view="config" onclick="showView('config')">Configure</button>
   </nav>
 
   <div class="sb-footer">
@@ -444,12 +444,7 @@ body { background: #0A0907; color: #D8D0BC; font-family: 'JetBrains Mono', monos
 
 <!-- MAIN -->
 <main id="main">
-  <div id="content">
-    <div class="state-box">
-      <div class="spinner"></div>
-      <span class="c-eyebrow">LOADING</span>
-    </div>
-  </div>
+  <div id="content"></div>
 </main>
 
 <script>
@@ -505,10 +500,9 @@ function showView(view) {
   S.view = view;
 
   // Update nav active state
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  const map = { home:"home", whitepaper:"whitepaper", manual:"manual", tools:"tools", notes:"notes", config:"config" };
   document.querySelectorAll(".nav-btn").forEach(b => {
-    if (b.getAttribute("onclick")?.includes(`'${view}'`)) b.classList.add("active");
+    if (b.dataset.view === view) b.classList.add("active");
+    else b.classList.remove("active");
   });
 
   // Render
@@ -583,4 +577,6 @@ function htmlTools() {
       <div class="tool-card"><div class="tool-name">Open Ring — AI</div><div class="tool-desc">Claude reasons about the structure using the framework. Best for first contact and exploration.</div><div class="tool-tag tag-ai">AI-ASSISTED</div></div>
       <div class="tool-card"><div class="tool-name">Open Ring — Mechanical</div><div class="tool-desc">No AI. You provide all intelligence. Best when you know the structure deeply and want maximum precision.</div><div class="tool-tag tag-mech">SELF-HOSTED</div></div>
       <div class="tool-card"><div class="tool-name">Pen &amp; Paper</div><div class="tool-desc">No technology. A printed worksheet. The full framework, zero dependencies.</div><div class="tool-tag tag-mech">PRINTABLE</div></div>
-      <div class="tool-card"><div class="tool-name">Field Records</div><div class="tool-desc">Shared across all versions. The cycle builds evidence wi
+      <div class="tool-card"><div class="tool-name">Field Records</div><div class="tool-desc">Shared across all versions. The cycle builds evidence with each completed run.</div><div class="tool-tag tag-ai">COMMONS</div></div>
+    </div>
+    <div style="margin-top:1.5rem;padding:0.85rem 1rem;background:#100D08;border:1px solid #1E1A12;border-left:2p
