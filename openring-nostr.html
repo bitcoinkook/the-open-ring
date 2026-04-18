@@ -45,8 +45,9 @@
     @media (max-width: 680px) {
       .shell { grid-template-columns: 1fr; }
       .sidebar { display: none; }
-      .sidebar.open { display: flex; position: fixed; inset: 0; z-index: 100; width: 260px; }
+      .sidebar.open { display: flex; position: fixed; inset: 0; z-index: 100; width: 80vw; max-width: 280px; box-shadow: 4px 0 24px rgba(0,0,0,0.6); }
       .hamburger { display: flex; }
+      .content { padding: 1.5rem 1.25rem 5rem; padding-top: calc(56px + 1.5rem); }
     }
 
     /* ── SIDEBAR ────────────────────────────────────────────── */
@@ -174,11 +175,14 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
+      padding: 0 1.25rem;
+      height: 56px;
       border-bottom: 1px solid var(--border);
       background: var(--bg2);
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 50;
     }
 
@@ -208,6 +212,16 @@
       margin: 0 auto;
       padding: 3rem 2rem 6rem;
     }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+
+    .sidebar-backdrop.open { display: block; }
 
     /* ── STATES ─────────────────────────────────────────────── */
 
@@ -533,6 +547,9 @@
 
 <div class="shell">
 
+  <!-- SIDEBAR BACKDROP -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -559,6 +576,30 @@
     </nav>
 
     <div class="sidebar-footer">
+      <div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #1E1A12">
+        <div style="font-size:0.46rem;letter-spacing:0.2em;color:#4A4438;margin-bottom:0.6rem">SUPPORT THIS WORK</div>
+        <div style="font-size:0.6rem;color:#6A6050;line-height:1.6;margin-bottom:0.75rem">If this was useful, send sats.</div>
+        <div
+          onclick="navigator.clipboard?.writeText('blackfalcon2@primal.net').then(()=>{this.style.borderColor='#70D090';this.querySelector('.ln-addr').style.color='#70D090';setTimeout(()=>{this.style.borderColor='#2A2620';this.querySelector('.ln-addr').style.color='#D4B580';},1800)})"
+          style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.7rem;border:1px solid #2A2620;cursor:pointer;background:#0C0907;transition:border-color 0.2s;margin-bottom:0.75rem"
+          title="Tap to copy"
+        >
+          <span style="font-size:0.75rem">⚡</span>
+          <span class="ln-addr" style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:#D4B580;letter-spacing:0.04em;flex:1">blackfalcon2@primal.net</span>
+          <span style="font-size:0.6rem;color:#3A3628">⎘</span>
+        </div>
+        <div style="text-align:center">
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
+            alt="Lightning QR"
+            width="140"
+            height="140"
+            style="display:block;margin:0 auto;border:1px solid #1E1A12"
+            onerror="this.style.display='none'"
+          />
+          <div style="font-size:0.44rem;color:#3A3628;letter-spacing:0.08em;margin-top:0.4rem">tap address to copy</div>
+        </div>
+      </div>
       <div class="relay-status">
         <div class="relay-dot" id="relay-dot"></div>
         <span id="relay-label">not connected</span>
@@ -681,63 +722,4 @@ function handleEvent(ev) {
 
 // ── PUBKEY HELPERS ───────────────────────────────────────────────────────────
 
-function normalisePubkey(raw) {
-  if (!raw) return "";
-  // Accept hex directly
-  if (/^[0-9a-f]{64}$/i.test(raw.trim())) return raw.trim().toLowerCase();
-  // Basic npub decode (bech32 — simplified; proper lib recommended for production)
-  try {
-    const decoded = bech32Decode(raw.trim());
-    return decoded;
-  } catch { return raw.trim(); }
-}
-
-// Minimal bech32 decode for npub → hex (covers the common case)
-function bech32Decode(npub) {
-  const CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-  if (!npub.startsWith("npub1")) throw new Error("not npub");
-  const data = npub.slice(5).toLowerCase().split("").map(c => CHARSET.indexOf(c));
-  // Convert 5-bit groups to 8-bit
-  let bits = 0, value = 0;
-  const bytes = [];
-  for (let i = 0; i < data.length - 6; i++) { // -6 for checksum
-    value = (value << 5) | data[i];
-    bits += 5;
-    if (bits >= 8) { bytes.push((value >> (bits - 8)) & 255); bits -= 8; }
-  }
-  return bytes.map(b => b.toString(16).padStart(2,"0")).join("");
-}
-
-function setRelayStatus(status) {
-  const dot   = document.getElementById("relay-dot");
-  const label = document.getElementById("relay-label");
-  if (!dot || !label) return;
-  dot.className = "relay-dot";
-  if (status === "connected")  { dot.classList.add("connected"); label.textContent = `${state.relays.length} relays`; state.connected = true; }
-  if (status === "connecting") { label.textContent = "connecting..."; }
-  if (status === "error")      { dot.classList.add("error"); label.textContent = "connection failed"; }
-  if (status === "no-pubkey")  { label.textContent = "no pubkey set"; }
-}
-
-// ── ROUTER ───────────────────────────────────────────────────────────────────
-
-document.querySelectorAll(".nav-item").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const view = btn.dataset.view;
-    if (!view) return;
-    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    state.view = view;
-    renderView();
-    // Close mobile sidebar
-    document.getElementById("sidebar")?.classList.remove("open");
-  });
-});
-
-function toggleSidebar() {
-  document.getElementById("sidebar")?.classList.toggle("open");
-}
-
-function renderView() {
-  const el = document.getElementById("content");
- 
+function normalisePubkey
