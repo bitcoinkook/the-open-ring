@@ -697,10 +697,10 @@ const TAG_MANUAL     = "openring-manual";
 // ── STATE ────────────────────────────────────────────────────────────────────
 
 const state = {
-  relays:    JSON.parse(localStorage.getItem("oc_relays")  || JSON.stringify(DEFAULT_RELAYS)),
-  pubkey:    localStorage.getItem("oc_pubkey") || DEFAULT_PUBKEY,
+  relays: (() => { try { return JSON.parse(localStorage.getItem("oc_relays") || "null") || DEFAULT_RELAYS; } catch { return DEFAULT_RELAYS; } })(),
+  pubkey: (() => { try { return localStorage.getItem("oc_pubkey") || DEFAULT_PUBKEY; } catch { return DEFAULT_PUBKEY; } })(),
   view:      "home",
-  articles:  {},   // d-tag → event
+  articles:  {},
   notes:     [],
   connected: false,
   sockets:   [],
@@ -737,4 +737,4 @@ function connectRelays() {
         } catch {}
       };
 
-      ws.onerror = () => { if (connected === 0 && state.sockets.every(s => s.readyState > 1)) setRelayStatus("error");
+      ws.onerror = () =>
