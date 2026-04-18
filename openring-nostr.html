@@ -80,11 +80,6 @@
         display: flex;
       }
 
-      .content {
-        padding: 1.5rem 1.25rem 5rem;
-        margin-top: 56px;
-      }
-
       .sidebar-nav { flex: 0 !important; padding: 0.5rem 0; }
       .nav-item { padding: 0.45rem 1.2rem; font-size: 0.64rem; }
       .nav-section { padding: 0.4rem 1.2rem 0.2rem; }
@@ -253,6 +248,13 @@
       width: 100%;
       margin: 0 auto;
       padding: 3rem 2rem 6rem;
+    }
+
+    @media (max-width: 680px) {
+      .content {
+        padding: 1.5rem 1.25rem 5rem;
+        margin-top: 56px;
+      }
     }
 
     .sidebar-backdrop {
@@ -734,7 +736,4 @@ function connectRelays() {
         try {
           const msg = JSON.parse(e.data);
           if (msg[0] === "EVENT") handleEvent(msg[2]);
-        } catch {}
-      };
-
-      ws.onerror = () =>
+        } catch
