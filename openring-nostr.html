@@ -43,11 +43,22 @@
     }
 
     @media (max-width: 680px) {
-      .shell { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      .sidebar.open { display: flex; position: fixed; inset: 0; z-index: 100; width: 80vw; max-width: 280px; box-shadow: 4px 0 24px rgba(0,0,0,0.6); }
+      .shell { grid-template-columns: 1fr; display: block; }
+      .sidebar {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        width: 75vw;
+        max-width: 260px;
+        z-index: 200;
+        height: 100vh;
+      }
+      .sidebar.open { display: flex; }
       .hamburger { display: flex; }
-      .content { padding: 1.5rem 1.25rem 5rem; padding-top: calc(56px + 1.5rem); }
+      .content {
+        padding: 1.5rem 1.25rem 5rem;
+        margin-top: 56px;
+      }
     }
 
     /* ── SIDEBAR ────────────────────────────────────────────── */
@@ -57,10 +68,11 @@
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      position: sticky;
-      top: 0;
       height: 100vh;
       overflow-y: auto;
+      position: sticky;
+      top: 0;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.5);
     }
 
     .sidebar-header {
@@ -183,7 +195,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 50;
+      z-index: 150;
     }
 
     @media (max-width: 680px) { .topbar { display: flex; } }
@@ -217,8 +229,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 99;
+      background: rgba(0,0,0,0.6);
+      z-index: 190;
     }
 
     .sidebar-backdrop.open { display: block; }
@@ -635,6 +647,10 @@ const DEFAULT_RELAYS = [
   "wss://relay.damus.io",
   "wss://relay.nostr.band",
   "wss://nos.lol",
+  "wss://relay.primal.net",
+  "wss://purplepag.es",
+  "wss://relay.yakihonne.com",
+  "wss://relay.snort.social",
 ];
 
 // Replace with the actual Open Ring Nostr public key (npub or hex)
@@ -714,12 +730,4 @@ function handleEvent(ev) {
     if (!state.notes.find(n => n.id === ev.id)) {
       state.notes.push(ev);
       state.notes.sort((a,b) => b.created_at - a.created_at);
-      document.getElementById("nav-notes")?.classList.remove("loading");
-      if (state.view === "notes") renderView();
-    }
-  }
-}
-
-// ── PUBKEY HELPERS ───────────────────────────────────────────────────────────
-
-function normalisePubkey
+  
