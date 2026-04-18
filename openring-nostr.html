@@ -3,580 +3,499 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Open Ring — on Nostr</title>
+<title>Open Ring — Find what's locked in place and change it</title>
+<meta name="description" content="Open Ring is a diagnostic framework that identifies when markets, institutions and products have their fixed and variable elements incorrectly arranged — and names the minimum intervention to correct it. MIT licensed. Free to use and share.">
+<meta name="keywords" content="open ring, capture diagnostic, market capture, minimum intervention, seed crystal, nostr, bitcoin sovereignty">
+<meta property="og:title" content="Open Ring — Find what's locked in place and change it">
+<meta property="og:description" content="A diagnostic framework for identifying capture in markets, institutions and products. Names the minimum intervention to release it.">
+<meta property="og:type" content="website">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0A0907; color: #D8D0BC; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
 
-/* ── MOBILE-FIRST LAYOUT ── */
-
-/* Topbar — always fixed at top */
-#topbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 52px;
-  background: #0C0A07;
-  border-bottom: 1px solid #1E1A12;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-  z-index: 1000;
+:root {
+  --bg:     #0A0907;
+  --bg1:    #100D08;
+  --bg2:    #0C0A07;
+  --border: #1E1A12;
+  --line:   #2A2620;
+  --text:   #C8C0B0;
+  --dim:    #6A6050;
+  --faint:  #3A3628;
+  --amber:  #D4B580;
+  --amber2: #6A5A38;
+  --green:  #70D090;
+  --mono:   'JetBrains Mono', monospace;
+  --serif:  'Libre Baskerville', serif;
 }
 
-#topbar-title {
-  font-family: 'Libre Baskerville', serif;
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--mono); line-height: 1.7; }
+
+/* ── HEADER ───────────────────────────────────────────────── */
+
+header {
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  padding: 0.85rem 1rem 0;
+}
+
+.site-title {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #E8E0CC;
+  margin-bottom: 0.6rem;
+}
+
+.anchors {
+  display: flex;
+  gap: 1.1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 0.7rem;
+  scrollbar-width: none;
+}
+.anchors::-webkit-scrollbar { display: none; }
+
+.anchors a {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  color: var(--dim);
+  text-decoration: none;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.anchors a:hover { color: var(--amber); border-bottom-color: var(--amber2); }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+section {
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 90px;
+}
+
+section:last-of-type { border-bottom: none; }
+
+.eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+  margin-bottom: 0.85rem;
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-style: italic;
+  font-weight: 400;
+  color: #E8E0CC;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 680px) { h1.title { font-size: 2.3rem; } }
+
+.meta {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.meta-item { font-size: 0.56rem; letter-spacing: 0.1em; color: var(--faint); }
+.meta-item span { color: var(--amber2); }
+
+.lead {
+  font-size: 0.78rem;
+  line-height: 1.9;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.prose { font-size: 0.76rem; line-height: 1.9; color: var(--text); }
+.prose p { margin-bottom: 1rem; }
+.prose h1 { font-family: var(--serif); font-size: 1.4rem; font-style: italic; font-weight: 400; color: #E8E0CC; margin: 2.25rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+.prose h2 { font-family: var(--serif); font-size: 1.1rem; font-style: italic; font-weight: 400; color: #D8D0BC; margin: 1.75rem 0 0.6rem; }
+.prose h3 { font-size: 0.6rem; letter-spacing: 0.18em; color: var(--amber2); text-transform: uppercase; margin: 1.25rem 0 0.4rem; }
+.prose strong { color: #D8C8A0; font-weight: 500; }
+.prose em { color: #A89878; }
+.prose blockquote { border-left: 2px solid var(--amber2); padding: 0.6rem 1rem; margin: 1rem 0; background: var(--bg1); color: #A89878; font-style: italic; }
+.prose code { font-family: var(--mono); font-size: 0.74rem; background: #130F08; border: 1px solid var(--line); padding: 0.08rem 0.28rem; color: #C8B890; }
+.prose pre { background: var(--bg2); border: 1px solid var(--border); padding: 0.85rem 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.68rem; line-height: 1.65; color: #A89878; }
+.prose pre code { background: none; border: none; padding: 0; }
+.prose ul, .prose ol { margin: 0.5rem 0 1rem 1.4rem; }
+.prose li { margin-bottom: 0.3rem; }
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.72rem; }
+.prose th { font-size: 0.52rem; letter-spacing: 0.12em; color: var(--amber2); text-align: left; padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--line); }
+.prose td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--border); color: #A89878; }
+.prose a { color: var(--amber); text-underline-offset: 2px; }
+
+blockquote.pull {
+  border-left: 2px solid var(--amber2);
+  padding: 0.8rem 1.1rem;
+  margin: 1.25rem 0;
+  background: var(--bg1);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.88rem;
+  color: #D8C8A0;
+  line-height: 1.65;
+}
+
+/* ── LOADING STATE ────────────────────────────────────────── */
+
+.loading {
+  padding: 1.75rem 0;
+  text-align: center;
+}
+
+.loading .spinner {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--line);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 0.85rem;
+}
+
+.loading-text {
+  font-size: 0.54rem;
+  letter-spacing: 0.2em;
+  color: var(--faint);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TOOLS GRID ───────────────────────────────────────────── */
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 500px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
+
+.tool {
+  background: var(--bg1);
+  padding: 1.2rem;
+}
+
+.tool-name {
+  font-family: var(--serif);
   font-size: 1rem;
   font-style: italic;
-  color: #E8E0CC;
+  color: #D8D0BC;
+  margin-bottom: 0.35rem;
 }
 
-#topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+.tool-desc { font-size: 0.66rem; color: var(--dim); line-height: 1.7; margin-bottom: 0.85rem; }
 
-#btn-configure {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.52rem;
-  letter-spacing: 0.14em;
-  color: #6A5A38;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.3rem 0;
-}
-
-#btn-hamburger {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0.3rem;
-}
-
-#btn-hamburger span {
-  display: block;
-  width: 20px;
-  height: 1px;
-  background: #8A8270;
-}
-
-/* Backdrop */
-#backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  z-index: 1001;
-}
-
-#backdrop.open { display: block; }
-
-/* Sidebar */
-#sidebar {
-  display: none;
-  position: fixed;
-  top: 52px;
-  left: 0;
-  bottom: 0;
-  width: 80vw;
-  max-width: 280px;
-  background: #0C0A07;
-  border-right: 1px solid #1E1A12;
-  flex-direction: column;
-  overflow-y: auto;
-  z-index: 1002;
-}
-
-#sidebar.open { display: flex; }
-
-/* Main content */
-#main {
-  padding-top: 52px;
-  min-height: 100vh;
-}
-
-#content {
-  padding: 2rem 1.25rem 5rem;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-/* ── DESKTOP ── */
-@media (min-width: 680px) {
-  #topbar { display: none; }
-  #btn-hamburger { display: none; }
-
-  body {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    grid-template-rows: auto;
-  }
-
-  #sidebar {
-    display: flex;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    width: 260px;
-  }
-
-  #main {
-    padding-top: 0;
-  }
-
-  #content {
-    padding: 3rem 2.5rem 6rem;
-  }
-}
-
-/* ── SIDEBAR INTERNALS ── */
-
-.sb-header {
-  padding: 1.5rem 1.2rem 1rem;
-  border-bottom: 1px solid #1E1A12;
-  flex-shrink: 0;
-}
-
-.sb-eyebrow {
-  font-size: 0.46rem;
-  letter-spacing: 0.28em;
-  color: #3A3628;
-  margin-bottom: 0.5rem;
-}
-
-.sb-title {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.3rem;
-  font-style: italic;
-  color: #E8E0CC;
-  margin-bottom: 0.3rem;
-}
-
-.sb-sub {
-  font-size: 0.58rem;
-  color: #6A6050;
-  line-height: 1.55;
-}
-
-.sb-tag {
+.tool-tag {
   display: inline-block;
-  margin-top: 0.5rem;
   font-size: 0.48rem;
   letter-spacing: 0.14em;
-  color: #70D090;
-  background: #0C180C;
-  border: 1px solid #1A2A1A;
-  padding: 0.18rem 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid;
 }
 
-.sb-nav {
-  padding: 0.6rem 0;
-  flex-shrink: 0;
+.tag-ai   { border-color: #D4B58040; color: var(--amber2); }
+.tag-mech { border-color: #70D09040; color: #5A9A70; }
+
+.source-note {
+  margin-top: 1.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--line);
+  font-size: 0.66rem;
+  color: var(--dim);
 }
 
-.sb-section {
-  padding: 0.5rem 1.2rem 0.2rem;
-  font-size: 0.44rem;
-  letter-spacing: 0.22em;
-  color: #3A3628;
+.source-note .label { font-size: 0.5rem; letter-spacing: 0.18em; color: var(--amber2); margin-bottom: 0.3rem; }
+
+/* ── NOTES ────────────────────────────────────────────────── */
+
+#notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 1.25rem;
 }
 
-.nav-btn {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 0.5rem 1.2rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.63rem;
-  color: #6A6050;
-  background: transparent;
-  border: none;
-  border-left: 2px solid transparent;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: all 0.1s;
+.note {
+  background: var(--bg1);
+  padding: 0.95rem 1.1rem;
 }
 
-.nav-btn:hover { color: #D8D0BC; background: #13100A; border-left-color: #2A2620; }
-.nav-btn.active { color: #D4B580; border-left-color: #D4B580; background: #13100A; }
-.nav-btn.loading { opacity: 0.35; cursor: default; }
+.note-date { font-size: 0.52rem; color: var(--faint); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.note-body { font-size: 0.72rem; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
 
-.sb-footer {
-  padding: 0.85rem 1.2rem;
-  border-top: 1px solid #1E1A12;
-  flex-shrink: 0;
-  margin-top: auto;
+/* ── SUPPORT ──────────────────────────────────────────────── */
+
+.ln-card {
+  margin-top: 1.25rem;
+  padding: 1.4rem;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  text-align: center;
 }
 
 .ln-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.65rem;
-  border: 1px solid #2A2620;
-  background: #0A0907;
+  gap: 0.65rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  background: var(--bg2);
   cursor: pointer;
-  margin: 0.5rem 0;
+  margin: 0.85rem auto;
+  max-width: 340px;
   transition: border-color 0.2s;
 }
 
-.ln-row:active { border-color: #70D090; }
+.ln-row:active { border-color: var(--green); }
 
 .ln-addr {
-  font-size: 0.52rem;
-  color: #D4B580;
-  letter-spacing: 0.03em;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--amber);
+  letter-spacing: 0.04em;
   flex: 1;
+  text-align: left;
 }
 
-.relay-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.6rem;
+.ln-hint { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.1em; margin-top: 0.4rem; }
+
+.ln-qr {
+  display: block;
+  margin: 1.2rem auto 0;
+  padding: 0.6rem;
+  background: #F0E8D0;
+  border: 1px solid var(--border);
+  width: 180px;
+  height: 180px;
 }
 
-.relay-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: #3A3628;
-  flex-shrink: 0;
+.ln-qr img, .ln-qr canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.relay-dot.on  { background: #70D090; animation: blink 2s ease-in-out infinite; }
-.relay-dot.err { background: #D88870; }
+/* ── CONFIGURE (collapsible) ──────────────────────────────── */
 
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-.relay-label { font-size: 0.5rem; color: #3A3628; letter-spacing: 0.06em; }
-
-/* ── CONTENT STYLES ── */
-
-.c-eyebrow {
-  font-size: 0.5rem;
-  letter-spacing: 0.22em;
-  color: #3A3628;
-  margin-bottom: 0.75rem;
+details.config {
+  margin-top: 1.5rem;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  padding: 0;
 }
 
-.c-title {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.8rem;
-  font-style: italic;
-  font-weight: 400;
-  color: #E8E0CC;
-  line-height: 1.15;
-  margin-bottom: 0.6rem;
+details.config > summary {
+  cursor: pointer;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.56rem;
+  letter-spacing: 0.18em;
+  color: var(--dim);
+  list-style: none;
 }
 
-.c-meta {
-  display: flex;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #1E1A12;
+details.config > summary::-webkit-details-marker { display: none; }
+details.config > summary::after { content: "▾"; float: right; color: var(--faint); transition: transform 0.2s; }
+details.config[open] > summary::after { transform: rotate(180deg); display: inline-block; }
+
+.config-body { padding: 0 1.1rem 1.1rem; }
+
+.config-label { display: block; font-size: 0.52rem; letter-spacing: 0.16em; color: var(--amber2); margin: 1rem 0 0.3rem; }
+.config-hint  { font-size: 0.6rem; color: var(--faint); line-height: 1.5; margin-bottom: 0.5rem; }
+.config-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 0.55rem 0.8rem;
+  color: var(--text);
+  outline: none;
+  resize: vertical;
+  line-height: 1.65;
 }
-
-.c-meta-item { font-size: 0.54rem; letter-spacing: 0.08em; color: #3A3628; }
-.c-meta-item span { color: #6A5A38; }
-
-.c-body { font-size: 0.8rem; line-height: 1.85; color: #C0B8A8; }
-.c-body h1 { font-family: 'Libre Baskerville', serif; font-size: 1.4rem; font-style: italic; font-weight: 400; color: #E8E0CC; margin: 2rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid #1E1A12; }
-.c-body h2 { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-style: italic; font-weight: 400; color: #D8D0BC; margin: 1.75rem 0 0.6rem; }
-.c-body h3 { font-size: 0.62rem; letter-spacing: 0.16em; color: #6A5A38; text-transform: uppercase; margin: 1.25rem 0 0.4rem; }
-.c-body p { margin-bottom: 1rem; }
-.c-body strong { color: #D8C8A0; font-weight: 500; }
-.c-body em { color: #A89870; }
-.c-body blockquote { border-left: 2px solid #6A5A38; padding: 0.6rem 1rem; margin: 1rem 0; background: #100D08; color: #A89870; font-style: italic; }
-.c-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; background: #130F08; border: 1px solid #2A2620; padding: 0.1rem 0.3rem; color: #C8B890; }
-.c-body pre { background: #0C0907; border: 1px solid #1E1A12; padding: 0.9rem 1.1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.7rem; line-height: 1.65; color: #A89870; }
-.c-body pre code { background: none; border: none; padding: 0; }
-.c-body ul, .c-body ol { margin: 0.4rem 0 1rem 1.4rem; }
-.c-body li { margin-bottom: 0.3rem; }
-.c-body hr { border: none; border-top: 1px solid #1E1A12; margin: 1.75rem 0; }
-.c-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.74rem; }
-.c-body th { font-size: 0.54rem; letter-spacing: 0.1em; color: #6A5A38; text-align: left; padding: 0.4rem 0.65rem; border-bottom: 1px solid #2A2620; }
-.c-body td { padding: 0.4rem 0.65rem; border-bottom: 1px solid #1E1A12; color: #A89878; }
-.c-body a { color: #D4B580; text-underline-offset: 2px; }
-
-.spinner {
-  width: 18px; height: 18px;
-  border: 1px solid #2A2620;
-  border-top-color: #D4B580;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 1.25rem;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.state-box { text-align: center; padding: 4rem 1.5rem; }
-.state-box .c-eyebrow { display: block; margin-bottom: 0.75rem; }
-.state-box .c-title { font-size: 1.4rem; margin-bottom: 0.6rem; }
-.state-body { font-size: 0.68rem; color: #6A6050; line-height: 1.8; margin-bottom: 1.5rem; }
+.config-input:focus { border-color: var(--amber2); }
 
 .btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
   letter-spacing: 0.14em;
-  padding: 0.6rem 1.2rem;
+  padding: 0.55rem 1.1rem;
   border: 1px solid;
   cursor: pointer;
   background: transparent;
-  transition: all 0.1s;
+  margin-top: 0.85rem;
+  margin-right: 0.5rem;
 }
 
-.btn-amber { border-color: #D4B580; color: #D4B580; }
+.btn-amber { border-color: var(--amber); color: var(--amber); }
 .btn-amber:hover { background: #D4B58015; }
-.btn-dim { border-color: #2A2620; color: #6A5A38; }
-.btn-dim:hover { border-color: #4A4030; color: #8A7858; }
+.btn-dim { border-color: var(--line); color: var(--amber2); }
+.btn-dim:hover { border-color: var(--dim); color: var(--dim); }
 
-.tools-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: #1E1A12;
-  border: 1px solid #1E1A12;
-  margin-top: 1.25rem;
+.config-msg { margin-top: 0.7rem; font-size: 0.58rem; color: var(--amber2); letter-spacing: 0.05em; }
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+
+footer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.tool-card { background: #100D08; padding: 1.1rem; }
-.tool-name { font-family: 'Libre Baskerville', serif; font-size: 0.9rem; font-style: italic; color: #D8D0BC; margin-bottom: 0.3rem; }
-.tool-desc { font-size: 0.6rem; color: #6A6050; line-height: 1.6; margin-bottom: 0.7rem; }
-.tool-tag { font-size: 0.46rem; letter-spacing: 0.12em; padding: 0.15rem 0.4rem; border: 1px solid; }
-.tag-ai   { border-color: #D4B58040; color: #6A5A38; }
-.tag-mech { border-color: #70D09040; color: #4A7A60; }
+.relay-status { display: flex; align-items: center; gap: 0.4rem; }
+.relay-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--faint); }
+.relay-dot.on  { background: var(--green); animation: blink 2s ease-in-out infinite; }
+.relay-dot.err { background: #D88870; }
+.relay-label { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.08em; }
+.license { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.1em; }
 
-.note-card { background: #100D08; border: 1px solid #1E1A12; padding: 0.9rem; margin-bottom: 1px; }
-.note-date { font-size: 0.5rem; color: #3A3628; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-.note-body { font-size: 0.7rem; color: #A8A090; line-height: 1.65; }
-
-.cfg-label { font-size: 0.5rem; letter-spacing: 0.16em; color: #6A5A38; display: block; margin-bottom: 0.25rem; }
-.cfg-hint  { font-size: 0.6rem; color: #3A3628; line-height: 1.5; margin-bottom: 0.5rem; }
-.cfg-input {
-  width: 100%;
-  background: #0A0907;
-  border: 1px solid #2A2620;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  padding: 0.6rem 0.85rem;
-  color: #D8D0BC;
-  outline: none;
-  display: block;
-  margin-bottom: 0.85rem;
-}
-.cfg-input:focus { border-color: #4A4030; }
-.cfg-card { background: #100D08; border: 1px solid #1E1A12; padding: 1.25rem; margin-bottom: 1rem; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
 </style>
 </head>
 <body>
 
-<!-- MOBILE TOPBAR -->
-<div id="topbar">
-  <div id="topbar-title">Open Ring</div>
-  <div id="topbar-right">
-    <button id="btn-configure" onclick="showView('config')">CONFIGURE</button>
-    <button id="btn-hamburger" onclick="toggleSidebar()">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</div>
-
-<!-- BACKDROP -->
-<div id="backdrop" onclick="toggleSidebar()"></div>
-
-<!-- SIDEBAR -->
-<aside id="sidebar">
-  <div class="sb-header">
-    <div class="sb-eyebrow">openring</div>
-    <div class="sb-title">Open Ring</div>
-    <div class="sb-sub">A diagnostic for structures where the wrong things are fixed.</div>
-    <div class="sb-tag">ON NOSTR</div>
-  </div>
-
-  <nav class="sb-nav">
-    <div class="sb-section">DOCUMENTS</div>
-    <button class="nav-btn active" data-view="home" onclick="showView('home')">Overview</button>
-    <button class="nav-btn loading" data-view="whitepaper" id="nav-whitepaper" onclick="showView('whitepaper')">Whitepaper</button>
-    <button class="nav-btn loading" data-view="manual" id="nav-manual" onclick="showView('manual')">Pen &amp; Paper Guide</button>
-
-    <div class="sb-section" style="margin-top:0.5rem">INSTRUMENTS</div>
-    <button class="nav-btn" data-view="tools" onclick="showView('tools')">The Open Ring</button>
-
-    <div class="sb-section" style="margin-top:0.5rem">FIELD</div>
-    <button class="nav-btn loading" data-view="notes" id="nav-notes" onclick="showView('notes')">Notes</button>
-
-    <div class="sb-section" style="margin-top:0.5rem">SETTINGS</div>
-    <button class="nav-btn" data-view="config" onclick="showView('config')">Configure</button>
+<header>
+  <div class="site-title">Open Ring</div>
+  <nav class="anchors">
+    <a href="#start">Start here</a>
+    <a href="#run">Run it</a>
+    <a href="#framework">Framework</a>
+    <a href="#whitepaper">Whitepaper</a>
+    <a href="#manual">Pen &amp; Paper</a>
+    <a href="#cycle">Field cycle</a>
+    <a href="#notes">Notes</a>
+    <a href="#support">Support</a>
   </nav>
+</header>
 
-  <div class="sb-footer">
-    <div style="font-size:0.44rem;letter-spacing:0.18em;color:#3A3628;margin-bottom:0.35rem">SUPPORT THIS WORK</div>
-    <div style="font-size:0.56rem;color:#5A5040;margin-bottom:0.4rem">If this was useful, send sats.</div>
-    <div class="ln-row" onclick="copyLN(this)">
-      <span style="font-size:0.8rem">⚡</span>
-      <span class="ln-addr">blackfalcon2@primal.net</span>
-      <span style="font-size:0.6rem;color:#3A3628">⎘</span>
+<main>
+
+  <!-- 1. HOOK — concrete example first, no framework language -->
+  <section id="start">
+    <div class="eyebrow">OPEN RING — START HERE</div>
+    <h1 class="title">Something feels wrong with how this works.</h1>
+
+    <p class="lead">Surf fins are sold in sets of three. Not because surfers need three — but because that format serves the manufacturer. The surfer pays for what they don't use and can't buy what they actually need. The industry is stable, profitable, and delivering the wrong product.</p>
+
+    <p class="lead">Bitcoin sits on exchanges because the interface layer presents custodianship as the normal path. Users bear counterparty risk on every unit they hold. The protocol was built for the opposite arrangement — but the interface layer was captured before most users arrived.</p>
+
+    <p class="lead">This pattern appears across sectors with no surface relation to each other. A structure delivers systematically inferior outcomes while remaining stable. The people who benefit from that arrangement are the same people who control the conditions that prevent it from changing.</p>
+
+    <blockquote class="pull">Open Ring names what is locked in place, finds where the information chain breaks, and identifies the minimum action to change it.</blockquote>
+
+    <p class="lead">It does not require bad actors. It requires only misaligned incentives — and those are everywhere.</p>
+
+    <div style="margin-top:2rem;padding:1.25rem;background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--amber2)">
+      <div class="eyebrow" style="margin-bottom:0.75rem">WHICH VERSION IS RIGHT FOR YOU</div>
+
+      <div style="display:flex;flex-direction:column;gap:0.85rem">
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:var(--amber);letter-spacing:0.08em;margin-bottom:0.3rem">EXPLORING — not sure what's wrong yet</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the AI version. You describe what you know. Claude reasons about the structure and produces a verdict, a seed crystal, and a break point. Takes about 10 minutes. Best for first contact.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:var(--amber2)">→ Open Ring AI — github.com/bitcoinkook/the-open-ring</div>
+        </div>
+
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:#90C8A0;letter-spacing:0.08em;margin-bottom:0.3rem">DEEP EXPERT — years inside this structure, you know what's wrong</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the Mechanical version. No AI. You answer every diagnostic question from direct knowledge. The framework applies the logic. Takes 45–60 minutes and produces sharper output — every blank field is a visible gap.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#5A9A70">→ Open Ring Mechanical — github.com/bitcoinkook/the-open-ring</div>
+        </div>
+
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:#8AB8D8;letter-spacing:0.08em;margin-bottom:0.3rem">NO TECHNOLOGY — want to work through it with a pen</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the pen and paper guide. Print it. Fill it in. Same framework, same output, zero dependencies. The guide is below — scroll to Pen & Paper.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#4A6A80">→ Scroll to Pen &amp; Paper below, or download from this page</div>
+        </div>
+      </div>
+
+      <p style="font-size:0.65rem;color:var(--dim);margin-top:1rem;line-height:1.7">One prerequisite across all versions: direct experience inside the structure you are analysing. The framework organises what you already know. It does not replace knowing.</p>
     </div>
-    <div style="text-align:center">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
-           width="110" height="110"
-           style="display:block;margin:0 auto;border:1px solid #1E1A12"
-           onerror="this.style.display='none'" alt="Lightning QR">
-      <div style="font-size:0.4rem;color:#3A3628;margin-top:0.3rem">tap address to copy</div>
-    </div>
-    <div class="relay-row">
-      <div class="relay-dot" id="relay-dot"></div>
-      <span class="relay-label" id="relay-label">not connected</span>
-    </div>
-  </div>
-</aside>
+  </section>
 
-<!-- MAIN -->
-<main id="main">
-  <div id="content"></div>
-</main>
-
-<script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
-
-const PUBKEY = "npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh";
-
-const RELAYS = [
-  "wss://relay.damus.io",
-  "wss://relay.nostr.band",
-  "wss://nos.lol",
-  "wss://relay.primal.net",
-  "wss://purplepag.es",
-  "wss://relay.yakihonne.com",
-  "wss://relay.snort.social",
-];
-
-const D_WHITEPAPER = "openring-whitepaper";
-const D_MANUAL     = "openring-manual";
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
-
-const S = {
-  view:     "home",
-  articles: {},
-  notes:    [],
-  relays:   [],
-  pubkey:   "",
-};
-
-// Load saved settings or use defaults
-try { S.relays = JSON.parse(localStorage.getItem("or_relays")) || RELAYS; } catch { S.relays = RELAYS; }
-try { S.pubkey = localStorage.getItem("or_pubkey") || PUBKEY; } catch { S.pubkey = PUBKEY; }
-
-// ── SIDEBAR ───────────────────────────────────────────────────────────────────
-
-function toggleSidebar() {
-  const sb = document.getElementById("sidebar");
-  const bd = document.getElementById("backdrop");
-  const open = sb.classList.toggle("open");
-  if (open) bd.classList.add("open"); else bd.classList.remove("open");
-}
-
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("backdrop").classList.remove("open");
-}
-
-// ── ROUTER ────────────────────────────────────────────────────────────────────
-
-function showView(view) {
-  closeSidebar();
-  S.view = view;
-
-  // Update nav active state
-  document.querySelectorAll(".nav-btn").forEach(b => {
-    if (b.dataset.view === view) b.classList.add("active");
-    else b.classList.remove("active");
-  });
-
-  // Render
-  const el = document.getElementById("content");
-  if (!el) return;
-
-  switch (view) {
-    case "home":       el.innerHTML = htmlHome();        break;
-    case "whitepaper": el.innerHTML = htmlArticle(D_WHITEPAPER, "Whitepaper"); break;
-    case "manual":     el.innerHTML = htmlArticle(D_MANUAL, "Pen & Paper Guide"); break;
-    case "tools":      el.innerHTML = htmlTools();       break;
-    case "notes":      el.innerHTML = htmlNotes();       break;
-    case "config":     el.innerHTML = htmlConfig(); bindConfig(); break;
-    default:           el.innerHTML = htmlHome();
-  }
-}
-
-// ── VIEWS ─────────────────────────────────────────────────────────────────────
-
-function htmlHome() {
-  return `
-    <span class="c-eyebrow">OPEN RING — ON NOSTR</span>
-    <h1 class="c-title">Open Ring</h1>
-    <div class="c-meta">
-      <div class="c-meta-item">framework <span>v1</span></div>
-      <div class="c-meta-item">license <span>MIT</span></div>
-      <div class="c-meta-item">distribution <span>Nostr / open</span></div>
-    </div>
-    <div class="c-body">
-      <p>Open Ring is a diagnostic framework for identifying where structures — markets, technologies, practices, institutions — have their fixed and variable elements incorrectly arranged, and what the minimum intervention is to correct that.</p>
-      <p>The name comes from the function: a compass does not tell you the terrain is easy or how far you have to walk. It tells you whether you are facing the right direction.</p>
-      <h2>The core condition</h2>
-      <p>Information about any variable element only exists when a constant reference is holding still — and a reference point is only genuinely constant when falsifying it would be both expensive and detectable. If either condition fails, the reference point only appears stable. It is actually drifting.</p>
-      <blockquote>A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
-      <h2>What is here</h2>
-      <p>This reader pulls content published to Nostr by the Open Ring project. Everything here is on open relays, distributable without permission, and unmodifiable by any single actor once published.</p>
-      <p>Use the navigation to read the whitepaper, the pen and paper guide, or access the diagnostic instruments. Tap the menu icon to open navigation.</p>
-      <h2>The four ways capture holds</h2>
-      <p>A locked arrangement stays locked through four mechanisms: <strong>Knowledge</strong> (the better option is not known, because those who would lose from change control what gets taught), <strong>Access</strong> (the better option cannot be reached, because distribution runs through controlled channels), <strong>Money</strong> (the better option cannot be funded, because capital is allocated by those who benefit from the status quo), and <strong>Authority</strong> (the better option lacks legitimacy, because certification belongs to incumbents).</p>
-      <p>The diagnostic checks all four.</p>
-    </div>
-  `;
-}
-
-function htmlArticle(dtag, title) {
-  const ev = S.articles[dtag];
-  if (!ev) {
-    return `<div class="state-box"><div class="spinner"></div><span class="c-eyebrow">FETCHING FROM RELAYS</span><h1 class="c-title">${h(title)}</h1><p class="state-body">Waiting for relays to return this document. If it does not appear after 30 seconds, try Configure to add more relays.</p></div>`;
-  }
-  const t   = tag(ev, "title") || title;
-  const sum = tag(ev, "summary") || "";
-  const dt  = ev.created_at ? new Date(ev.created_at*1000).toISOString().slice(0,10) : "";
-  const body = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${h(ev.content||"")}</pre>`;
-  return `
-    <span class="c-eyebrow">OPEN RING — DOCUMENT</span>
-    <h1 class="c-title">${h(t)}</h1>
-    ${sum ? `<p style="font-size:0.68rem;color:#6A6050;margin-bottom:0.6rem;line-height:1.7">${h(sum)}</p>` : ""}
-    <div class="c-meta">
-      ${dt ? `<div class="c-meta-item">published <span>${dt}</span></div>` : ""}
-      <div class="c-meta-item">event <span>${(ev.id||"").slice(0,12)}…</span></div>
-    </div>
-    <div class="c-body">${body}</div>
-  `;
-}
-
-function htmlTools() {
-  return `
-    <span class="c-eyebrow">OPEN RING — INSTRUMENTS</span>
-    <h1 class="c-title">The Open Ring</h1>
-    <p style="font-size:0.68rem;color:#6A6050;line-height:1.7;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #1E1A12">Three instruments in one cycle. Gradient finds the inversion. SignalChain locates the break. Field records the outcome.</p>
+  <!-- 2. RUN IT — tool cards with links -->
+  <section id="run">
+    <div class="eyebrow">OPEN RING — INSTRUMENTS</div>
+    <h1 class="title">Run it</h1>
+    <p class="lead">Three instruments in one cycle. The Gradient finds the inversion and names the seed crystal. SignalChain locates the break point. Field records what happened when you acted.</p>
     <div class="tools-grid">
-      <div class="tool-card"><div class="tool-name">Open Ring — AI</div><div class="tool-desc">Claude reasons about the structure using the framework. Best for first contact and exploration.</div><div class="tool-tag tag-ai">AI-ASSISTED</div></div>
-      <div class="tool-card"><div class="tool-name">Open Ring — Mechanical</div><div class="tool-desc">No AI. You provide all intelligence. Best when you know the structure deeply and want maximum precision.</div><div class="tool-tag tag-mech">SELF-HOSTED</div></div>
-      <div class="tool-card"><div class="tool-name">Pen &amp; Paper</div><div class="tool-desc">No technology. A printed worksheet. The full framework, zero dependencies.</div><div class="tool-tag tag-mech">PRINTABLE</div></div>
-      <div class="tool-card"><div class="tool-name">Field Records</div><div class="tool-desc">Shared across all versions. The cycle builds evidence with each completed run.</div><div class="tool-tag tag-ai">COMMONS</div></div>
+      <div class="tool">
+        <div class="tool-name">Open Ring — AI</div>
+        <div class="tool-desc">Claude reasons about the structure. You supply context. Best for exploration and first contact with a structure. Takes about 10 minutes to Act.</div>
+        <div class="tool-tag tag-ai">AI-ASSISTED</div>
+      </div>
+      <div class="tool">
+        <div class="tool-name">Open Ring — Mechanical</div>
+        <div class="tool-desc">No AI. You answer every question from direct knowledge. Sharper output for deep domain experts. Takes 45–60 minutes. Every blank is visible.</div>
+        <div class="tool-tag tag-mech">SELF-HOSTED</div>
+      </div>
+      <div class="tool">
+        <div class="tool-name">Pen &amp; Paper</div>
+        <div class="tool-desc">No technology required. Print the guide below, work through it with a pen. The same framework, the same output, zero dependencies.</div>
+        <div class="tool-tag tag-mech">PRINTABLE</div>
+      </div>
+      <div class="tool">
+        <div class="tool-name">Field — the commons</div>
+        <div class="tool-desc">Submit what happened when you acted. Records are visible to all users. No identity collected — only structure, action, outcome, experience level.</div>
+        <div class="tool-tag tag-ai">SHARED DATASET</div>
+      </div>
     </div>
-    <div style="margin-top:1.5rem;padding:0.85rem 1rem;background:#100D08;border:1px solid #1E1A12;border-left:2p
+    <div class="source-note">
+      <div class="label">SOURCE — MIT LICENSE</div>
+      <div>github.com/bitcoinkook/the-open-ring</div>
+    </div>
+  </section>
+
+  <!-- 3. FRAMEWORK — the logic, for people who want depth -->
+  <section id="framework">
+    <div class="eyebrow">OPEN RING — THE FRAMEWORK</div>
+    <h1 class="title">How it works</h1>
+    <p class="lead">Every system has things locked in place and things allowed to vary. That arrangement is not neutral. When what is locked serves the people running the system, and the cost falls on the people using it, the arrangement is inverted.</p>
+    <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
+    <div class="prose">
+      <p>The framework checks whether the fixed element is genuinely fixed — meaning that falsifying it would be both expensive and visible. If either condition fails, the element only appears stable. It is actually drifting, and the arrangement can be shifted with less effort than it appears.</p>
+      <h2>The four ways a locked arrangement stays locked</h2>
+      <p><strong>Knowledge.</strong> The better option is not known, because those who would lose from change control what gets taught, published, or discussed. Medical education funded by pharmaceutical companies. Financial literacy produced by financial institutions.</p>
+      <p><strong>Access.</strong> Even when people know a better option exists, they cannot reach it — because distribution runs through channels owned by the incumbent. Surfboards through brand-controlled shops. Bitcoin through regulated custodians.</p>
+      <p><strong>Money.</strong> Alternatives cannot be funded — because the institutions that allocate capital benefit from the current arrangement and do not finance what would replace it.</p>
+      <p><strong>Authority.</strong> Even when an alternative exists and people can access it, it lacks legitimacy — because the bodies that certify, approve, or endorse are the same ones that benefit from the status quo.</p>
+      <h2>The diagnostic checks all four</h2>
+      <p>If all four return No — the structure may be approaching capture immunity. If any return Yes — there is maintenance energy holding the arrangement in place. The framework locates the exact node where information stops flowing and names the minimum action at that specific point. Not a disruption. A seed crystal.</p>
+      <h2>Known limits</h2>
+      <p>The framewor
