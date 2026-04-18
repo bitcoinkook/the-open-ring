@@ -42,27 +42,6 @@
       min-height: 100vh;
     }
 
-    @media (max-width: 680px) {
-      .shell { grid-template-columns: 1fr; display: block; }
-      .sidebar {
-        display: none;
-        position: fixed;
-        top: 56px;
-        left: 0;
-        bottom: 0;
-        width: 78vw;
-        max-width: 280px;
-        z-index: 200;
-        height: calc(100vh - 56px);
-      }
-      .sidebar.open { display: flex; }
-      .hamburger { display: flex; }
-      .content {
-        padding: 1.5rem 1.25rem 5rem;
-        margin-top: 56px;
-      }
-    }
-
     /* ── SIDEBAR ────────────────────────────────────────────── */
 
     .sidebar {
@@ -74,7 +53,43 @@
       overflow-y: auto;
       position: sticky;
       top: 0;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* Mobile overrides — must come after .sidebar so they win */
+    @media (max-width: 680px) {
+      .shell {
+        display: block;
+      }
+
+      .sidebar {
+        display: none;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 78vw;
+        max-width: 280px;
+        height: calc(100vh - 56px);
+        z-index: 200;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+        /* Override sticky/height from desktop */
+        sticky: unset;
+      }
+
+      .sidebar.open {
+        display: flex;
+      }
+
+      .content {
+        padding: 1.5rem 1.25rem 5rem;
+        margin-top: 56px;
+      }
+
+      .sidebar-nav { flex: 0 !important; padding: 0.5rem 0; }
+      .nav-item { padding: 0.45rem 1.2rem; font-size: 0.64rem; }
+      .nav-section { padding: 0.4rem 1.2rem 0.2rem; }
+      .sidebar-header { padding: 1rem 1.2rem 0.85rem; }
+      .sidebar-footer { padding: 0.75rem 1.2rem; }
     }
 
     .sidebar-header {
@@ -119,6 +134,10 @@
     .sidebar-nav {
       flex: 1;
       padding: 1rem 0;
+    }
+
+    @media (max-width: 680px) {
+      .sidebar-nav { flex: 0; padding: 0.5rem 0; }
     }
 
     .nav-section {
@@ -196,7 +215,7 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1rem 0 1.25rem;
+      padding: 0 0.75rem 0 1rem;
       height: 56px;
       border-bottom: 1px solid var(--border);
       background: var(--bg2);
@@ -218,6 +237,8 @@
       cursor: pointer;
       padding: 0.25rem;
     }
+
+    @media (max-width: 680px) { .hamburger { display: flex; } }
 
     .hamburger span {
       display: block;
@@ -716,19 +737,4 @@ function connectRelays() {
         } catch {}
       };
 
-      ws.onerror = () => { if (connected === 0 && state.sockets.every(s => s.readyState > 1)) setRelayStatus("error"); };
-    } catch {}
-  });
-}
-
-function handleEvent(ev) {
-  if (!ev || !ev.kind) return;
-
-  if (ev.kind === KIND_ARTICLE) {
-    const dTag = (ev.tags?.find(t => t[0] === "d") || [])[1] || ev.id;
-    state.articles[dTag] = ev;
-    // Update nav items once known docs arrive
-    if (dTag === TAG_WHITEPAPER) document.getElementById("nav-whitepaper")?.classList.remove("loading");
-    if (dTag === TAG_MANUAL)     document.getElementById("nav-manual")?.classList.remove("loading");
-    // Re-render if we are on a view waiting for this
-    if (state.view ===
+      ws.onerror = () => { if (connected === 0 && state.sockets.every(s => s.readyState > 1)) setRelayStatus("error");
