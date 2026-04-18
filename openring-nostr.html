@@ -84,9 +84,7 @@ main {
   padding: 0 1.25rem;
 }
 
-section {
-  padding: 3rem 0;
-  border-bottom: 1px solid var(--border);
+section, details.section-fold {
   scroll-margin-top: 110px;
 }
 
@@ -306,7 +304,57 @@ blockquote.pull {
   height: 100% !important;
 }
 
-/* ── CONFIGURE (collapsible) ──────────────────────────────── */
+/* ── COLLAPSIBLE SECTIONS ─────────────────────────────────── */
+
+details.section-fold {
+  border-bottom: 1px solid var(--border);
+}
+
+details.section-fold > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.75rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.section-fold > summary::-webkit-details-marker { display: none; }
+
+details.section-fold > summary .fold-title {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 400;
+  color: #E8E0CC;
+  line-height: 1.15;
+}
+
+@media (min-width: 680px) {
+  details.section-fold > summary .fold-title { font-size: 2rem; }
+}
+
+details.section-fold > summary .fold-hint {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+details.section-fold[open] > summary .fold-hint { color: var(--amber2); }
+
+details.section-fold > summary .fold-eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+  margin-bottom: 0.5rem;
+}
+
+.fold-body {
+  padding-bottom: 3rem;
+}
 
 details.config {
   margin-top: 1.5rem;
@@ -481,80 +529,108 @@ footer {
     </div>
   </section>
 
-  <!-- 3. FRAMEWORK — the logic, for people who want depth -->
-  <section id="framework">
-    <div class="eyebrow">OPEN RING — THE FRAMEWORK</div>
-    <h1 class="title">How it works</h1>
-    <p class="lead">Every system has things locked in place and things allowed to vary. That arrangement is not neutral. When what is locked serves the people running the system, and the cost falls on the people using it, the arrangement is inverted.</p>
-    <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
-    <div class="prose">
-      <p>The framework checks whether the fixed element is genuinely fixed — meaning that falsifying it would be both expensive and visible. If either condition fails, the element only appears stable. It is actually drifting, and the arrangement can be shifted with less effort than it appears.</p>
-      <h2>The four ways a locked arrangement stays locked</h2>
-      <p><strong>Knowledge.</strong> The better option is not known, because those who would lose from change control what gets taught, published, or discussed. Medical education funded by pharmaceutical companies. Financial literacy produced by financial institutions.</p>
-      <p><strong>Access.</strong> Even when people know a better option exists, they cannot reach it — because distribution runs through channels owned by the incumbent. Surfboards through brand-controlled shops. Bitcoin through regulated custodians.</p>
-      <p><strong>Money.</strong> Alternatives cannot be funded — because the institutions that allocate capital benefit from the current arrangement and do not finance what would replace it.</p>
-      <p><strong>Authority.</strong> Even when an alternative exists and people can access it, it lacks legitimacy — because the bodies that certify, approve, or endorse are the same ones that benefit from the status quo.</p>
-      <h2>The diagnostic checks all four</h2>
-      <p>If all four return No — the structure may be approaching capture immunity. If any return Yes — there is maintenance energy holding the arrangement in place. The framework locates the exact node where information stops flowing and names the minimum action at that specific point. Not a disruption. A seed crystal.</p>
-      <h2>Known limits</h2>
-      <p>The framework has three documented failure modes: mixed equilibria (some structures have no single natural arrangement), rotated capture (a seed crystal can release one inversion and create another), and the wrong-layer escape hatch (when a seed crystal fails, it is always possible to say the fixed element was mis-specified — which protects the framework from falsification). All three are documented in the whitepaper.</p>
-    </div>
-  </section>
-
-  <!-- 4. WHITEPAPER — fetched from Nostr -->
-  <section id="whitepaper">
-    <div class="eyebrow">OPEN RING — DOCUMENT</div>
-    <div id="whitepaper-content">
-      <h1 class="title">Whitepaper</h1>
-      <p class="lead" style="color:var(--dim)">Full framework document — the core condition, all five sectors analysed, the three known limits, and the falsification condition.</p>
+  <!-- 3. FRAMEWORK — collapsible -->
+  <details class="section-fold" id="framework">
+    <summary>
+      <div>
+        <div class="fold-eyebrow">OPEN RING — THE FRAMEWORK</div>
+        <div class="fold-title">How it works</div>
+      </div>
+      <span class="fold-hint">READ ▾</span>
+    </summary>
+    <div class="fold-body">
+      <p class="lead">Every system has things locked in place and things allowed to vary. That arrangement is not neutral. When what is locked serves the people running the system, and the cost falls on the people using it, the arrangement is inverted.</p>
+      <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
       <div class="prose">
-        <p>The whitepaper covers the mathematical basis of the framework (grounded in Becker 1968 and Spence 1973), the five sectors where the capture pattern has been identified through direct domain experience, and three documented limits of the framework — mixed equilibria, rotated capture, and the wrong-layer escape hatch.</p>
-        <p>It also states the falsification condition: if five clean cycles are run and the seed crystal consistently fails to produce movement, the framework is wrong and should be revised or retired.</p>
-      </div>
-      <div class="loading" style="margin-top:1.5rem">
-        <div class="spinner"></div>
-        <div class="loading-text">LOADING FULL DOCUMENT FROM RELAYS</div>
+        <p>The framework checks whether the fixed element is genuinely fixed — meaning that falsifying it would be both expensive and visible. If either condition fails, the element only appears stable. It is actually drifting, and the arrangement can be shifted with less effort than it appears.</p>
+        <h2>The four ways a locked arrangement stays locked</h2>
+        <p><strong>Knowledge.</strong> The better option is not known, because those who would lose from change control what gets taught, published, or discussed. Medical education funded by pharmaceutical companies. Financial literacy produced by financial institutions.</p>
+        <p><strong>Access.</strong> Even when people know a better option exists, they cannot reach it — because distribution runs through channels owned by the incumbent. Surfboards through brand-controlled shops. Bitcoin through regulated custodians.</p>
+        <p><strong>Money.</strong> Alternatives cannot be funded — because the institutions that allocate capital benefit from the current arrangement and do not finance what would replace it.</p>
+        <p><strong>Authority.</strong> Even when an alternative exists and people can access it, it lacks legitimacy — because the bodies that certify, approve, or endorse are the same ones that benefit from the status quo.</p>
+        <h2>The diagnostic checks all four</h2>
+        <p>If all four return No — the structure may be approaching capture immunity. If any return Yes — there is maintenance energy holding the arrangement in place. The framework locates the exact node where information stops flowing and names the minimum action at that specific point. Not a disruption. A seed crystal.</p>
+        <h2>Known limits</h2>
+        <p>The framework has three documented failure modes: mixed equilibria (some structures have no single natural arrangement), rotated capture (a seed crystal can release one inversion and create another), and the wrong-layer escape hatch (when a seed crystal fails, it is always possible to say the fixed element was mis-specified — which protects the framework from falsification). All three are documented in the whitepaper.</p>
       </div>
     </div>
-  </section>
+  </details>
 
-  <!-- 5. PEN AND PAPER GUIDE — fetched from Nostr -->
-  <section id="manual">
-    <div class="eyebrow">OPEN RING — DOCUMENT</div>
-    <div id="manual-content">
-      <h1 class="title">Pen &amp; Paper Guide</h1>
-      <p class="lead" style="color:var(--dim)">The complete diagnostic worksheet. Print it, fill it in. No technology required.</p>
-      <div class="prose">
-        <p>The guide walks through the full Open Ring cycle on paper — Pre-Check, Gradient, SignalChain, Act, and Field. Each section has fill-in spaces, checkbox selects, and the same question framing as the digital tool. The verdict logic and chain state are written out as decision tables the user applies themselves.</p>
-        <p>It works identically to the AI and Mechanical versions. The only difference is you are the computer. The output format is the same. A record completed on paper can be submitted to the shared Field dataset.</p>
-        <p style="color:var(--amber2)">Read the orientation section — Before You Begin — before starting. It takes three minutes and explains the prerequisite clearly.</p>
+  <!-- 4. WHITEPAPER — collapsible, fetched from Nostr -->
+  <details class="section-fold" id="whitepaper">
+    <summary>
+      <div>
+        <div class="fold-eyebrow">OPEN RING — DOCUMENT</div>
+        <div class="fold-title">Whitepaper</div>
       </div>
-      <div class="loading" style="margin-top:1.5rem">
-        <div class="spinner"></div>
-        <div class="loading-text">LOADING FULL GUIDE FROM RELAYS</div>
+      <span class="fold-hint">READ ▾</span>
+    </summary>
+    <div class="fold-body">
+      <div id="whitepaper-content">
+        <p class="lead" style="color:var(--dim)">Full framework document — the core condition, all five sectors analysed, the three known limits, and the falsification condition.</p>
+        <div class="prose">
+          <p>The whitepaper covers the mathematical basis of the framework (grounded in Becker 1968 and Spence 1973), the five sectors where the capture pattern has been identified through direct domain experience, and three documented limits of the framework — mixed equilibria, rotated capture, and the wrong-layer escape hatch.</p>
+          <p>It also states the falsification condition: if five clean cycles are run and the seed crystal consistently fails to produce movement, the framework is wrong and should be revised or retired.</p>
+        </div>
+        <div class="loading" style="margin-top:1.5rem">
+          <div class="spinner"></div>
+          <div class="loading-text">LOADING FULL DOCUMENT FROM RELAYS</div>
+        </div>
       </div>
     </div>
-  </section>
+  </details>
 
-  <!-- 6. FIELD CYCLE — first real completed cycle -->
-  <section id="cycle">
-    <div class="eyebrow">OPEN RING — FIRST COMPLETED CYCLE</div>
-    <div id="cycle-content">
-      <h1 class="title">Bitcoin interface layer</h1>
-      <p class="lead" style="color:var(--dim)">The first real completed cycle. What the diagnostic found, what action was taken, and what happened.</p>
-      <div class="prose">
-        <p><strong>Structure:</strong> Bitcoin interface layer — the layer of exchanges, custodians, and on-ramps that sits between the protocol and the user.</p>
-        <p><strong>Verdict:</strong> Inversion confirmed. Institutional intermediation is fixed as the default. User sovereignty over their holdings is the variable bearing all counterparty risk. The protocol layer is approaching capture immune — the 21M cap is enforced by proof-of-work and cannot be falsified cheaply. The interface layer above it is inverted.</p>
-        <p><strong>Break point:</strong> Channel. The signal that self-custody is superior is intact and well-documented. The channel is severely asymmetric — exchange marketing budgets, mainstream media, and regulatory framing carry the intermediation message at orders of magnitude greater reach than self-custody education.</p>
-        <p><strong>Action taken:</strong> Published the Sovereignty, Veil, Hydra whitepaper — three properties of the correct Bitcoin arrangement, in plain language, on Nostr. A seed crystal placed in the channel that the incumbent cannot suppress.</p>
-        <p><strong>Outcome:</strong> Moving toward correct orientation. Purchasing power preserved for users who act on it. The correct arrangement is also the one the protocol was designed for.</p>
+  <!-- 5. PEN AND PAPER — collapsible, fetched from Nostr -->
+  <details class="section-fold" id="manual">
+    <summary>
+      <div>
+        <div class="fold-eyebrow">OPEN RING — DOCUMENT</div>
+        <div class="fold-title">Pen &amp; Paper Guide</div>
       </div>
-      <div class="loading" style="margin-top:1.5rem">
-        <div class="spinner"></div>
-        <div class="loading-text">LOADING FULL CYCLE RECORD FROM RELAYS</div>
+      <span class="fold-hint">READ ▾</span>
+    </summary>
+    <div class="fold-body">
+      <div id="manual-content">
+        <p class="lead" style="color:var(--dim)">The complete diagnostic worksheet. Print it, fill it in. No technology required.</p>
+        <div class="prose">
+          <p>The guide walks through the full Open Ring cycle on paper — Pre-Check, Gradient, SignalChain, Act, and Field. Each section has fill-in spaces, checkbox selects, and the same question framing as the digital tool. The verdict logic and chain state are written out as decision tables the user applies themselves.</p>
+          <p>It works identically to the AI and Mechanical versions. The only difference is you are the computer. The output format is the same. A record completed on paper can be submitted to the shared Field dataset.</p>
+          <p style="color:var(--amber2)">Read the orientation section — Before You Begin — before starting. It takes three minutes and explains the prerequisite clearly.</p>
+        </div>
+        <div class="loading" style="margin-top:1.5rem">
+          <div class="spinner"></div>
+          <div class="loading-text">LOADING FULL GUIDE FROM RELAYS</div>
+        </div>
       </div>
     </div>
-  </section>
+  </details>
+
+  <!-- 6. FIELD CYCLE — collapsible -->
+  <details class="section-fold" id="cycle">
+    <summary>
+      <div>
+        <div class="fold-eyebrow">OPEN RING — FIRST COMPLETED CYCLE</div>
+        <div class="fold-title">Bitcoin interface layer</div>
+      </div>
+      <span class="fold-hint">READ ▾</span>
+    </summary>
+    <div class="fold-body">
+      <div id="cycle-content">
+        <p class="lead" style="color:var(--dim)">The first real completed cycle. What the diagnostic found, what action was taken, and what happened.</p>
+        <div class="prose">
+          <p><strong>Structure:</strong> Bitcoin interface layer — the layer of exchanges, custodians, and on-ramps that sits between the protocol and the user.</p>
+          <p><strong>Verdict:</strong> Inversion confirmed. Institutional intermediation is fixed as the default. User sovereignty over their holdings is the variable bearing all counterparty risk. The protocol layer is approaching capture immune — the 21M cap is enforced by proof-of-work and cannot be falsified cheaply. The interface layer above it is inverted.</p>
+          <p><strong>Break point:</strong> Channel. The signal that self-custody is superior is intact and well-documented. The channel is severely asymmetric — exchange marketing budgets, mainstream media, and regulatory framing carry the intermediation message at orders of magnitude greater reach than self-custody education.</p>
+          <p><strong>Action taken:</strong> Published the Sovereignty, Veil, Hydra whitepaper — three properties of the correct Bitcoin arrangement, in plain language, on Nostr. A seed crystal placed in the channel that the incumbent cannot suppress.</p>
+          <p><strong>Outcome:</strong> Moving toward correct orientation. Purchasing power preserved for users who act on it. The correct arrangement is also the one the protocol was designed for.</p>
+        </div>
+        <div class="loading" style="margin-top:1.5rem">
+          <div class="spinner"></div>
+          <div class="loading-text">LOADING FULL CYCLE RECORD FROM RELAYS</div>
+        </div>
+      </div>
+    </div>
+  </details>
 
   <!-- SUPPORT -->
   <section id="support">
@@ -598,7 +674,6 @@ footer {
   <div class="license">MIT license — share freely</div>
 </footer>
 
-<div id="dbg" style="position:fixed;bottom:0;left:0;right:0;background:#1A0;color:#fff;font-size:0.55rem;padding:0.5rem;max-height:120px;overflow-y:auto;z-index:9999;white-space:pre;opacity:0.92">D-TAGS RECEIVED:\n</div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -614,10 +689,6 @@ const DEFAULT_RELAYS = [
   "wss://relay.yakihonne.com",
   "wss://relay.snort.social",
 ];
-
-const D_WHITEPAPER = "openring-whitepaper";
-const D_MANUAL     = "openring-manual-v1";
-const D_CYCLE      = "openring-cycle-bitcoin-v1";
 
 // ── LOAD SETTINGS ─────────────────────────────────────────────────────────────
 
@@ -657,23 +728,27 @@ function pubhex(raw) {
 
 // ── RENDER ARTICLES ───────────────────────────────────────────────────────────
 
-function renderArticle(dtag, ev) {
-  const idMap = {
-    [D_WHITEPAPER]: "whitepaper-content",
-    [D_MANUAL]:     "manual-content",
-    [D_CYCLE]:      "cycle-content",
-  };
-  const el = document.getElementById(idMap[dtag]);
+function titleToSection(t) {
+  if (!t) return null;
+  const l = t.toLowerCase();
+  if (l.includes("whitepaper") || l.includes("diagnostic framework") || l.includes("wrong things are fixed")) return "whitepaper-content";
+  if (l.includes("pen") && (l.includes("paper") || l.includes("manual"))) return "manual-content";
+  if (l.includes("bitcoin") || l.includes("interface layer")) return "cycle-content";
+  return null;
+}
+
+function renderArticle(ev) {
+  const t    = tag(ev, "title") || "";
+  const dest = titleToSection(t);
+  const el   = dest ? document.getElementById(dest) : null;
   if (!el) return;
 
-  const t    = tag(ev, "title") || "Document";
   const sum  = tag(ev, "summary");
   const date = ev.created_at ? new Date(ev.created_at * 1000).toISOString().slice(0, 10) : "";
   const body = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${esc(ev.content || "")}</pre>`;
 
-  // Replace entire section content with the full fetched article
   el.innerHTML = `
-    <h1 class="title">${esc(t)}</h1>
+    <h1 class="title">${esc(t || "Document")}</h1>
     ${sum ? `<p class="lead" style="color:var(--dim)">${esc(sum)}</p>` : ""}
     <div class="meta">
       ${date ? `<div class="meta-item">published <span>${date}</span></div>` : ""}
@@ -703,13 +778,11 @@ function handleEvent(ev) {
 
   if (ev.kind === 30023) {
     const dtag = tag(ev, "d") || ev.id;
-    console.log("Article received, d-tag:", dtag, "title:", tag(ev, "title"));
-    // Show d-tags visibly for debugging
-    const dbg = document.getElementById("dbg");
-    if (dbg) dbg.textContent += (dtag + "\n");
+    const t    = tag(ev, "title");
+    console.log("Article:", dtag, "|", t);
     if (!articles[dtag] || ev.created_at > articles[dtag].created_at) {
       articles[dtag] = ev;
-      if ([D_WHITEPAPER, D_MANUAL, D_CYCLE].includes(dtag)) renderArticle(dtag, ev);
+      renderArticle(ev);
     }
   }
 }
