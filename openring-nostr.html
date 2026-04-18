@@ -598,6 +598,8 @@ footer {
   <div class="license">MIT license — share freely</div>
 </footer>
 
+<div id="dbg" style="position:fixed;bottom:0;left:0;right:0;background:#1A0;color:#fff;font-size:0.55rem;padding:0.5rem;max-height:120px;overflow-y:auto;z-index:9999;white-space:pre;opacity:0.92">D-TAGS RECEIVED:\n</div>
+
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 
@@ -702,6 +704,9 @@ function handleEvent(ev) {
   if (ev.kind === 30023) {
     const dtag = tag(ev, "d") || ev.id;
     console.log("Article received, d-tag:", dtag, "title:", tag(ev, "title"));
+    // Show d-tags visibly for debugging
+    const dbg = document.getElementById("dbg");
+    if (dbg) dbg.textContent += (dtag + "\n");
     if (!articles[dtag] || ev.created_at > articles[dtag].created_at) {
       articles[dtag] = ev;
       if ([D_WHITEPAPER, D_MANUAL, D_CYCLE].includes(dtag)) renderArticle(dtag, ev);
