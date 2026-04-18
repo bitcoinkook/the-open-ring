@@ -1,681 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Open Ring — on Nostr</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
-
-    :root {
-      --bg:       #0A0907;
-      --bg1:      #100D08;
-      --bg2:      #0C0A07;
-      --border:   #1E1A12;
-      --border2:  #2A2620;
-      --text:     #D8D0BC;
-      --text-dim: #8A8270;
-      --text-xs:  #4A4638;
-      --amber:    #D4B580;
-      --amber-dim:#6A5A38;
-      --blue:     #60B5E5;
-      --green:    #70D090;
-      --mono:     'JetBrains Mono', monospace;
-      --serif:    'Libre Baskerville', serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
-      min-height: 100vh;
-    }
-
-    /* ── LAYOUT ─────────────────────────────────────────────── */
-
-    .shell {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      min-height: 100vh;
-    }
-
-    /* ── SIDEBAR ────────────────────────────────────────────── */
-
-    .sidebar {
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow-y: auto;
-      position: sticky;
-      top: 0;
-    }
-
-    /* Mobile overrides — must come after .sidebar so they win */
-    @media (max-width: 680px) {
-      .shell {
-        display: block;
-      }
-
-      .sidebar {
-        display: none;
-        position: fixed;
-        top: 56px;
-        left: 0;
-        bottom: 0;
-        width: 78vw;
-        max-width: 280px;
-        height: calc(100vh - 56px);
-        z-index: 200;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.6);
-        /* Override sticky/height from desktop */
-        sticky: unset;
-      }
-
-      .sidebar.open {
-        display: flex;
-      }
-
-      .sidebar-nav { flex: 0 !important; padding: 0.5rem 0; }
-      .nav-item { padding: 0.45rem 1.2rem; font-size: 0.64rem; }
-      .nav-section { padding: 0.4rem 1.2rem 0.2rem; }
-      .sidebar-header { padding: 1rem 1.2rem 0.85rem; }
-      .sidebar-footer { padding: 0.75rem 1.2rem; }
-    }
-
-    .sidebar-header {
-      padding: 1.75rem 1.4rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar-eyebrow {
-      font-size: 0.48rem;
-      letter-spacing: 0.28em;
-      color: var(--text-xs);
-      margin-bottom: 0.5rem;
-    }
-
-    .sidebar-title {
-      font-family: var(--serif);
-      font-size: 1.4rem;
-      font-weight: 400;
-      font-style: italic;
-      color: #E8E0CC;
-      line-height: 1.1;
-      margin-bottom: 0.35rem;
-    }
-
-    .sidebar-sub {
-      font-size: 0.6rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    .sidebar-tag {
-      font-size: 0.5rem;
-      letter-spacing: 0.15em;
-      color: var(--green);
-      background: #0C180C;
-      border: 1px solid #1A2A1A;
-      padding: 0.2rem 0.55rem;
-      display: inline-block;
-      margin-top: 0.6rem;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 1rem 0;
-    }
-
-    @media (max-width: 680px) {
-      .sidebar-nav { flex: 0; padding: 0.5rem 0; }
-    }
-
-    .nav-section {
-      padding: 0.6rem 1.4rem 0.25rem;
-      font-size: 0.46rem;
-      letter-spacing: 0.22em;
-      color: var(--text-xs);
-    }
-
-    .nav-item {
-      display: block;
-      padding: 0.55rem 1.4rem;
-      font-size: 0.66rem;
-      color: var(--text-dim);
-      cursor: pointer;
-      border-left: 2px solid transparent;
-      transition: all 0.1s;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      border-top: none;
-      border-right: none;
-      border-bottom: none;
-      letter-spacing: 0.03em;
-      line-height: 1.4;
-    }
-
-    @media (max-width: 680px) {
-      .nav-item { padding: 0.45rem 1.2rem; font-size: 0.64rem; }
-      .nav-section { padding: 0.4rem 1.2rem 0.2rem; }
-      .sidebar-header { padding: 1rem 1.2rem 0.85rem; }
-      .sidebar-footer { padding: 0.75rem 1.2rem; }
-    }
-
-    .nav-item:hover   { color: var(--text); background: #13100A; border-left-color: var(--border2); }
-    .nav-item.active  { color: var(--amber); border-left-color: var(--amber); background: #13100A; }
-    .nav-item.loading { opacity: 0.4; cursor: wait; }
-
-    .sidebar-footer {
-      padding: 1rem 1.4rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .relay-status {
-      font-size: 0.52rem;
-      letter-spacing: 0.08em;
-      color: var(--text-xs);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .relay-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #3A3628;
-      flex-shrink: 0;
-    }
-
-    .relay-dot.connected { background: var(--green); animation: pulse 2s ease-in-out infinite; }
-    .relay-dot.error     { background: #D88870; }
-
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-    /* ── MAIN ───────────────────────────────────────────────── */
-
-    .main {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .topbar {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 0.75rem 0 1rem;
-      height: 56px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 300;
-    }
-
-    @media (max-width: 680px) { .topbar { display: flex; } }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 4px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem;
-    }
-
-    @media (max-width: 680px) { .hamburger { display: flex; } }
-
-    .hamburger span {
-      display: block;
-      width: 18px;
-      height: 1px;
-      background: var(--text-dim);
-    }
-
-    .content {
-      flex: 1;
-      max-width: 720px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 3rem 2rem 6rem;
-    }
-
-    @media (max-width: 680px) {
-      .content {
-        padding: 1.5rem 1.25rem 5rem;
-        margin-top: 56px;
-      }
-    }
-
-    .sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 190;
-    }
-
-    .sidebar-backdrop.open { display: block; }
-
-    /* ── STATES ─────────────────────────────────────────────── */
-
-    .state-panel {
-      text-align: center;
-      padding: 5rem 2rem;
-    }
-
-    .state-eyebrow {
-      font-size: 0.52rem;
-      letter-spacing: 0.2em;
-      color: var(--text-xs);
-      margin-bottom: 1rem;
-    }
-
-    .state-title {
-      font-family: var(--serif);
-      font-size: 1.6rem;
-      font-style: italic;
-      color: #E8E0CC;
-      margin-bottom: 0.75rem;
-    }
-
-    .state-body {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      line-height: 1.8;
-      max-width: 400px;
-      margin: 0 auto 2rem;
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 1px solid var(--border2);
-      border-top-color: var(--amber);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 1.5rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── CONFIG FORM ─────────────────────────────────────────── */
-
-    .config-card {
-      background: var(--bg1);
-      border: 1px solid var(--border);
-      padding: 1.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .config-label {
-      font-size: 0.52rem;
-      letter-spacing: 0.18em;
-      color: var(--amber-dim);
-      margin-bottom: 0.35rem;
-      display: block;
-    }
-
-    .config-hint {
-      font-size: 0.62rem;
-      color: var(--text-xs);
-      margin-bottom: 0.6rem;
-      line-height: 1.5;
-    }
-
-    .config-input {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border2);
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      padding: 0.65rem 0.9rem;
-      color: var(--text);
-      outline: none;
-      margin-bottom: 1rem;
-    }
-
-    .config-input:focus { border-color: var(--amber-dim); }
-
-    .btn {
-      font-family: var(--mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.15em;
-      padding: 0.65rem 1.4rem;
-      border: 1px solid;
-      cursor: pointer;
-      background: transparent;
-      transition: all 0.1s;
-    }
-
-    .btn-amber { border-color: var(--amber); color: var(--amber); }
-    .btn-amber:hover { background: #D4B58015; }
-    .btn-dim   { border-color: var(--border2); color: var(--amber-dim); }
-    .btn-dim:hover { border-color: #4A4438; color: #8A7858; }
-
-    /* ── ARTICLE ─────────────────────────────────────────────── */
-
-    .article-header {
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .article-eyebrow {
-      font-size: 0.52rem;
-      letter-spacing: 0.22em;
-      color: var(--text-xs);
-      margin-bottom: 0.85rem;
-    }
-
-    .article-title {
-      font-family: var(--serif);
-      font-size: 2rem;
-      font-weight: 400;
-      font-style: italic;
-      color: #E8E0CC;
-      line-height: 1.2;
-      margin-bottom: 0.75rem;
-    }
-
-    .article-meta {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .article-meta-item {
-      font-size: 0.56rem;
-      letter-spacing: 0.1em;
-      color: var(--text-xs);
-    }
-
-    .article-meta-item span {
-      color: var(--amber-dim);
-    }
-
-    /* ── MARKDOWN CONTENT ────────────────────────────────────── */
-
-    .article-body { font-size: 0.82rem; line-height: 1.85; color: #C8C0B0; }
-
-    .article-body h1 {
-      font-family: var(--serif);
-      font-size: 1.6rem;
-      font-weight: 400;
-      font-style: italic;
-      color: #E8E0CC;
-      margin: 2.5rem 0 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .article-body h2 {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      font-weight: 400;
-      font-style: italic;
-      color: #D8D0BC;
-      margin: 2rem 0 0.75rem;
-    }
-
-    .article-body h3 {
-      font-size: 0.66rem;
-      letter-spacing: 0.18em;
-      color: var(--amber-dim);
-      text-transform: uppercase;
-      margin: 1.5rem 0 0.5rem;
-    }
-
-    .article-body p { margin-bottom: 1.1rem; }
-
-    .article-body strong { color: #D8C8A0; font-weight: 500; }
-
-    .article-body em { color: #B8B090; font-style: italic; }
-
-    .article-body a { color: var(--amber); text-decoration: underline; text-underline-offset: 2px; }
-    .article-body a:hover { color: #E8C890; }
-
-    .article-body blockquote {
-      border-left: 2px solid var(--amber-dim);
-      padding: 0.75rem 1.1rem;
-      margin: 1.25rem 0;
-      background: var(--bg1);
-      color: #A89878;
-      font-style: italic;
-    }
-
-    .article-body code {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      background: #130F08;
-      border: 1px solid var(--border2);
-      padding: 0.1rem 0.35rem;
-      color: #C8B890;
-    }
-
-    .article-body pre {
-      background: #0C0907;
-      border: 1px solid var(--border);
-      padding: 1rem 1.25rem;
-      margin: 1.25rem 0;
-      overflow-x: auto;
-      font-size: 0.72rem;
-      line-height: 1.7;
-      color: #A89878;
-    }
-
-    .article-body pre code {
-      background: none;
-      border: none;
-      padding: 0;
-      color: inherit;
-    }
-
-    .article-body ul, .article-body ol {
-      margin: 0.5rem 0 1.1rem 1.5rem;
-    }
-
-    .article-body li { margin-bottom: 0.35rem; }
-
-    .article-body hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-
-    .article-body table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.25rem 0;
-      font-size: 0.76rem;
-    }
-
-    .article-body th {
-      font-size: 0.56rem;
-      letter-spacing: 0.12em;
-      color: var(--amber-dim);
-      text-align: left;
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid var(--border2);
-    }
-
-    .article-body td {
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-      color: #B8B098;
-    }
-
-    /* ── TOOLS SECTION ───────────────────────────────────────── */
-
-    .tools-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      margin-top: 1.5rem;
-    }
-
-    @media (max-width: 500px) { .tools-grid { grid-template-columns: 1fr; } }
-
-    .tool-card {
-      background: var(--bg1);
-      padding: 1.25rem;
-    }
-
-    .tool-name {
-      font-family: var(--serif);
-      font-size: 1rem;
-      font-style: italic;
-      color: #D8D0BC;
-      margin-bottom: 0.35rem;
-    }
-
-    .tool-desc {
-      font-size: 0.64rem;
-      color: var(--text-dim);
-      line-height: 1.65;
-      margin-bottom: 0.85rem;
-    }
-
-    .tool-tag {
-      font-size: 0.48rem;
-      letter-spacing: 0.14em;
-      padding: 0.18rem 0.45rem;
-      border: 1px solid;
-    }
-
-    .tag-api  { border-color: #D4B58040; color: var(--amber-dim); }
-    .tag-mech { border-color: #70D09040; color: #5A9A70; }
-
-    /* ── NOSTR NOTE ──────────────────────────────────────────── */
-
-    .nostr-note {
-      background: var(--bg1);
-      border: 1px solid var(--border);
-      padding: 1.1rem;
-      margin-bottom: 1px;
-    }
-
-    .nostr-note-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-    }
-
-    .nostr-note-date {
-      font-size: 0.52rem;
-      letter-spacing: 0.08em;
-      color: var(--text-xs);
-    }
-
-    .nostr-note-body {
-      font-size: 0.72rem;
-      color: #B8B098;
-      line-height: 1.7;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Ring — on Nostr</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0A0907; color: #D8D0BC; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+
+/* ── MOBILE-FIRST LAYOUT ── */
+
+/* Topbar — always fixed at top */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: #0C0A07;
+  border-bottom: 1px solid #1E1A12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  z-index: 1000;
+}
+
+#topbar-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: #E8E0CC;
+}
+
+#topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+#btn-configure {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: #6A5A38;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0;
+}
+
+#btn-hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.3rem;
+}
+
+#btn-hamburger span {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: #8A8270;
+}
+
+/* Backdrop */
+#backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 1001;
+}
+
+#backdrop.open { display: block; }
+
+/* Sidebar */
+#sidebar {
+  display: none;
+  position: fixed;
+  top: 52px;
+  left: 0;
+  bottom: 0;
+  width: 80vw;
+  max-width: 280px;
+  background: #0C0A07;
+  border-right: 1px solid #1E1A12;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 1002;
+}
+
+#sidebar.open { display: flex; }
+
+/* Main content */
+#main {
+  padding-top: 52px;
+  min-height: 100vh;
+}
+
+#content {
+  padding: 2rem 1.25rem 5rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ── DESKTOP ── */
+@media (min-width: 680px) {
+  #topbar { display: none; }
+  #btn-hamburger { display: none; }
+
+  body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: auto;
+  }
+
+  #sidebar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+  }
+
+  #main {
+    padding-top: 0;
+  }
+
+  #content {
+    padding: 3rem 2.5rem 6rem;
+  }
+}
+
+/* ── SIDEBAR INTERNALS ── */
+
+.sb-header {
+  padding: 1.5rem 1.2rem 1rem;
+  border-bottom: 1px solid #1E1A12;
+  flex-shrink: 0;
+}
+
+.sb-eyebrow {
+  font-size: 0.46rem;
+  letter-spacing: 0.28em;
+  color: #3A3628;
+  margin-bottom: 0.5rem;
+}
+
+.sb-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  color: #E8E0CC;
+  margin-bottom: 0.3rem;
+}
+
+.sb-sub {
+  font-size: 0.58rem;
+  color: #6A6050;
+  line-height: 1.55;
+}
+
+.sb-tag {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  color: #70D090;
+  background: #0C180C;
+  border: 1px solid #1A2A1A;
+  padding: 0.18rem 0.5rem;
+}
+
+.sb-nav {
+  padding: 0.6rem 0;
+  flex-shrink: 0;
+}
+
+.sb-section {
+  padding: 0.5rem 1.2rem 0.2rem;
+  font-size: 0.44rem;
+  letter-spacing: 0.22em;
+  color: #3A3628;
+}
+
+.nav-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.63rem;
+  color: #6A6050;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.1s;
+}
+
+.nav-btn:hover { color: #D8D0BC; background: #13100A; border-left-color: #2A2620; }
+.nav-btn.active { color: #D4B580; border-left-color: #D4B580; background: #13100A; }
+.nav-btn.loading { opacity: 0.35; cursor: default; }
+
+.sb-footer {
+  padding: 0.85rem 1.2rem;
+  border-top: 1px solid #1E1A12;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.ln-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #2A2620;
+  background: #0A0907;
+  cursor: pointer;
+  margin: 0.5rem 0;
+  transition: border-color 0.2s;
+}
+
+.ln-row:active { border-color: #70D090; }
+
+.ln-addr {
+  font-size: 0.52rem;
+  color: #D4B580;
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+
+.relay-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.relay-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #3A3628;
+  flex-shrink: 0;
+}
+
+.relay-dot.on  { background: #70D090; animation: blink 2s ease-in-out infinite; }
+.relay-dot.err { background: #D88870; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.relay-label { font-size: 0.5rem; color: #3A3628; letter-spacing: 0.06em; }
+
+/* ── CONTENT STYLES ── */
+
+.c-eyebrow {
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  color: #3A3628;
+  margin-bottom: 0.75rem;
+}
+
+.c-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 1.8rem;
+  font-style: italic;
+  font-weight: 400;
+  color: #E8E0CC;
+  line-height: 1.15;
+  margin-bottom: 0.6rem;
+}
+
+.c-meta {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #1E1A12;
+}
+
+.c-meta-item { font-size: 0.54rem; letter-spacing: 0.08em; color: #3A3628; }
+.c-meta-item span { color: #6A5A38; }
+
+.c-body { font-size: 0.8rem; line-height: 1.85; color: #C0B8A8; }
+.c-body h1 { font-family: 'Libre Baskerville', serif; font-size: 1.4rem; font-style: italic; font-weight: 400; color: #E8E0CC; margin: 2rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid #1E1A12; }
+.c-body h2 { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-style: italic; font-weight: 400; color: #D8D0BC; margin: 1.75rem 0 0.6rem; }
+.c-body h3 { font-size: 0.62rem; letter-spacing: 0.16em; color: #6A5A38; text-transform: uppercase; margin: 1.25rem 0 0.4rem; }
+.c-body p { margin-bottom: 1rem; }
+.c-body strong { color: #D8C8A0; font-weight: 500; }
+.c-body em { color: #A89870; }
+.c-body blockquote { border-left: 2px solid #6A5A38; padding: 0.6rem 1rem; margin: 1rem 0; background: #100D08; color: #A89870; font-style: italic; }
+.c-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; background: #130F08; border: 1px solid #2A2620; padding: 0.1rem 0.3rem; color: #C8B890; }
+.c-body pre { background: #0C0907; border: 1px solid #1E1A12; padding: 0.9rem 1.1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.7rem; line-height: 1.65; color: #A89870; }
+.c-body pre code { background: none; border: none; padding: 0; }
+.c-body ul, .c-body ol { margin: 0.4rem 0 1rem 1.4rem; }
+.c-body li { margin-bottom: 0.3rem; }
+.c-body hr { border: none; border-top: 1px solid #1E1A12; margin: 1.75rem 0; }
+.c-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.74rem; }
+.c-body th { font-size: 0.54rem; letter-spacing: 0.1em; color: #6A5A38; text-align: left; padding: 0.4rem 0.65rem; border-bottom: 1px solid #2A2620; }
+.c-body td { padding: 0.4rem 0.65rem; border-bottom: 1px solid #1E1A12; color: #A89878; }
+.c-body a { color: #D4B580; text-underline-offset: 2px; }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 1px solid #2A2620;
+  border-top-color: #D4B580;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1.25rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.state-box { text-align: center; padding: 4rem 1.5rem; }
+.state-box .c-eyebrow { display: block; margin-bottom: 0.75rem; }
+.state-box .c-title { font-size: 1.4rem; margin-bottom: 0.6rem; }
+.state-body { font-size: 0.68rem; color: #6A6050; line-height: 1.8; margin-bottom: 1.5rem; }
+
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.1s;
+}
+
+.btn-amber { border-color: #D4B580; color: #D4B580; }
+.btn-amber:hover { background: #D4B58015; }
+.btn-dim { border-color: #2A2620; color: #6A5A38; }
+.btn-dim:hover { border-color: #4A4030; color: #8A7858; }
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #1E1A12;
+  border: 1px solid #1E1A12;
+  margin-top: 1.25rem;
+}
+
+.tool-card { background: #100D08; padding: 1.1rem; }
+.tool-name { font-family: 'Libre Baskerville', serif; font-size: 0.9rem; font-style: italic; color: #D8D0BC; margin-bottom: 0.3rem; }
+.tool-desc { font-size: 0.6rem; color: #6A6050; line-height: 1.6; margin-bottom: 0.7rem; }
+.tool-tag { font-size: 0.46rem; letter-spacing: 0.12em; padding: 0.15rem 0.4rem; border: 1px solid; }
+.tag-ai   { border-color: #D4B58040; color: #6A5A38; }
+.tag-mech { border-color: #70D09040; color: #4A7A60; }
+
+.note-card { background: #100D08; border: 1px solid #1E1A12; padding: 0.9rem; margin-bottom: 1px; }
+.note-date { font-size: 0.5rem; color: #3A3628; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.note-body { font-size: 0.7rem; color: #A8A090; line-height: 1.65; }
+
+.cfg-label { font-size: 0.5rem; letter-spacing: 0.16em; color: #6A5A38; display: block; margin-bottom: 0.25rem; }
+.cfg-hint  { font-size: 0.6rem; color: #3A3628; line-height: 1.5; margin-bottom: 0.5rem; }
+.cfg-input {
+  width: 100%;
+  background: #0A0907;
+  border: 1px solid #2A2620;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.6rem 0.85rem;
+  color: #D8D0BC;
+  outline: none;
+  display: block;
+  margin-bottom: 0.85rem;
+}
+.cfg-input:focus { border-color: #4A4030; }
+.cfg-card { background: #100D08; border: 1px solid #1E1A12; padding: 1.25rem; margin-bottom: 1rem; }
+</style>
 </head>
 <body>
 
-<div class="shell">
-
-  <!-- SIDEBAR BACKDROP -->
-  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-eyebrow">openring</div>
-      <div class="sidebar-title">Open Ring</div>
-      <div class="sidebar-sub">A diagnostic for structures where the wrong things are fixed.</div>
-      <div class="sidebar-tag">ON NOSTR</div>
-    </div>
-
-    <nav class="sidebar-nav" id="nav">
-      <div class="nav-section">DOCUMENTS</div>
-      <button class="nav-item active" data-view="home">Overview</button>
-      <button class="nav-item loading" data-view="whitepaper" id="nav-whitepaper">Whitepaper</button>
-      <button class="nav-item loading" data-view="manual"    id="nav-manual">Pen &amp; Paper Guide</button>
-
-      <div class="nav-section" style="margin-top:0.75rem">INSTRUMENTS</div>
-      <button class="nav-item" data-view="tools">The Open Ring</button>
-
-      <div class="nav-section" style="margin-top:0.75rem">FIELD</div>
-      <button class="nav-item loading" data-view="notes" id="nav-notes">Notes</button>
-
-      <div class="nav-section" style="margin-top:0.75rem">SETTINGS</div>
-      <button class="nav-item" data-view="config">Configure</button>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div style="margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid #1E1A12">
-        <div style="font-size:0.46rem;letter-spacing:0.2em;color:#4A4438;margin-bottom:0.4rem">SUPPORT THIS WORK</div>
-        <div style="font-size:0.58rem;color:#6A6050;line-height:1.5;margin-bottom:0.6rem">If this was useful, send sats.</div>
-        <div
-          onclick="navigator.clipboard?.writeText('blackfalcon2@primal.net').then(()=>{this.style.borderColor='#70D090';this.querySelector('.ln-addr').style.color='#70D090';setTimeout(()=>{this.style.borderColor='#2A2620';this.querySelector('.ln-addr').style.color='#D4B580';},1800)})"
-          style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.65rem;border:1px solid #2A2620;cursor:pointer;background:#0C0907;transition:border-color 0.2s;margin-bottom:0.6rem"
-          title="Tap to copy"
-        >
-          <span style="font-size:0.75rem">⚡</span>
-          <span class="ln-addr" style="font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:#D4B580;letter-spacing:0.03em;flex:1">blackfalcon2@primal.net</span>
-          <span style="font-size:0.6rem;color:#3A3628">⎘</span>
-        </div>
-        <div style="text-align:center">
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
-            alt="Lightning QR"
-            width="110"
-            height="110"
-            style="display:block;margin:0 auto;border:1px solid #1E1A12"
-            onerror="this.style.display='none'"
-          />
-          <div style="font-size:0.42rem;color:#3A3628;letter-spacing:0.08em;margin-top:0.35rem">tap address to copy</div>
-        </div>
-      </div>
-      <div class="relay-status">
-        <div class="relay-dot" id="relay-dot"></div>
-        <span id="relay-label">not connected</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- MOBILE TOPBAR -->
-    <div class="topbar">
-      <div style="font-family:var(--serif);font-size:1rem;font-style:italic;color:#E8E0CC">Open Ring</div>
-      <div style="display:flex;align-items:center;gap:0.75rem">
-        <button onclick="navigate('config')" style="background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:0.52rem;letter-spacing:0.12em;color:var(--amber-dim);padding:0.25rem 0">CONFIGURE</button>
-        <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-
-    <div class="content" id="content">
-      <!-- Views injected here -->
-    </div>
-
-  </main>
+<!-- MOBILE TOPBAR -->
+<div id="topbar">
+  <div id="topbar-title">Open Ring</div>
+  <div id="topbar-right">
+    <button id="btn-configure" onclick="showView('config')">CONFIGURE</button>
+    <button id="btn-hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </div>
 
-<script>
-// ── CONFIG ───────────────────────────────────────────────────────────────────
+<!-- BACKDROP -->
+<div id="backdrop" onclick="toggleSidebar()"></div>
 
-const DEFAULT_RELAYS = [
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-header">
+    <div class="sb-eyebrow">openring</div>
+    <div class="sb-title">Open Ring</div>
+    <div class="sb-sub">A diagnostic for structures where the wrong things are fixed.</div>
+    <div class="sb-tag">ON NOSTR</div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">DOCUMENTS</div>
+    <button class="nav-btn active" onclick="showView('home')">Overview</button>
+    <button class="nav-btn loading" id="nav-whitepaper" onclick="showView('whitepaper')">Whitepaper</button>
+    <button class="nav-btn loading" id="nav-manual"     onclick="showView('manual')">Pen &amp; Paper Guide</button>
+
+    <div class="sb-section" style="margin-top:0.5rem">INSTRUMENTS</div>
+    <button class="nav-btn" onclick="showView('tools')">The Open Ring</button>
+
+    <div class="sb-section" style="margin-top:0.5rem">FIELD</div>
+    <button class="nav-btn loading" id="nav-notes" onclick="showView('notes')">Notes</button>
+
+    <div class="sb-section" style="margin-top:0.5rem">SETTINGS</div>
+    <button class="nav-btn" onclick="showView('config')">Configure</button>
+  </nav>
+
+  <div class="sb-footer">
+    <div style="font-size:0.44rem;letter-spacing:0.18em;color:#3A3628;margin-bottom:0.35rem">SUPPORT THIS WORK</div>
+    <div style="font-size:0.56rem;color:#5A5040;margin-bottom:0.4rem">If this was useful, send sats.</div>
+    <div class="ln-row" onclick="copyLN(this)">
+      <span style="font-size:0.8rem">⚡</span>
+      <span class="ln-addr">blackfalcon2@primal.net</span>
+      <span style="font-size:0.6rem;color:#3A3628">⎘</span>
+    </div>
+    <div style="text-align:center">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=lightning:blackfalcon2@primal.net&bgcolor=0A0907&color=D4B580&qzone=1"
+           width="110" height="110"
+           style="display:block;margin:0 auto;border:1px solid #1E1A12"
+           onerror="this.style.display='none'" alt="Lightning QR">
+      <div style="font-size:0.4rem;color:#3A3628;margin-top:0.3rem">tap address to copy</div>
+    </div>
+    <div class="relay-row">
+      <div class="relay-dot" id="relay-dot"></div>
+      <span class="relay-label" id="relay-label">not connected</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+  <div id="content">
+    <div class="state-box">
+      <div class="spinner"></div>
+      <span class="c-eyebrow">LOADING</span>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+
+const PUBKEY = "npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh";
+
+const RELAYS = [
   "wss://relay.damus.io",
   "wss://relay.nostr.band",
   "wss://nos.lol",
@@ -685,55 +467,120 @@ const DEFAULT_RELAYS = [
   "wss://relay.snort.social",
 ];
 
-// Replace with the actual Open Ring Nostr public key (npub or hex)
-const DEFAULT_PUBKEY = "npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh";
+const D_WHITEPAPER = "openring-whitepaper";
+const D_MANUAL     = "openring-manual";
 
-// NIP-23 event kind
-const KIND_ARTICLE = 30023;
-const KIND_NOTE    = 1;
+// ── STATE ─────────────────────────────────────────────────────────────────────
 
-// Tag identifiers for known documents
-const TAG_WHITEPAPER = "openring-whitepaper";
-const TAG_MANUAL     = "openring-manual";
-
-// ── STATE ────────────────────────────────────────────────────────────────────
-
-const state = {
-  relays: (() => { try { return JSON.parse(localStorage.getItem("oc_relays") || "null") || DEFAULT_RELAYS; } catch { return DEFAULT_RELAYS; } })(),
-  pubkey: (() => { try { return localStorage.getItem("oc_pubkey") || DEFAULT_PUBKEY; } catch { return DEFAULT_PUBKEY; } })(),
-  view:      "home",
-  articles:  {},
-  notes:     [],
-  connected: false,
-  sockets:   [],
+const S = {
+  view:     "home",
+  articles: {},
+  notes:    [],
+  relays:   [],
+  pubkey:   "",
 };
 
-// ── NOSTR CONNECTION ─────────────────────────────────────────────────────────
+// Load saved settings or use defaults
+try { S.relays = JSON.parse(localStorage.getItem("or_relays")) || RELAYS; } catch { S.relays = RELAYS; }
+try { S.pubkey = localStorage.getItem("or_pubkey") || PUBKEY; } catch { S.pubkey = PUBKEY; }
 
-function connectRelays() {
-  state.sockets.forEach(s => { try { s.close(); } catch {} });
-  state.sockets = [];
-  setRelayStatus("connecting");
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
 
-  if (!state.pubkey) { setRelayStatus("no-pubkey"); return; }
+function toggleSidebar() {
+  const sb = document.getElementById("sidebar");
+  const bd = document.getElementById("backdrop");
+  const open = sb.classList.toggle("open");
+  if (open) bd.classList.add("open"); else bd.classList.remove("open");
+}
 
-  let connected = 0;
-  state.relays.forEach(url => {
-    try {
-      const ws = new WebSocket(url);
-      state.sockets.push(ws);
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("backdrop").classList.remove("open");
+}
 
-      ws.onopen = () => {
-        connected++;
-        if (connected === 1) setRelayStatus("connected");
-        // Subscribe to NIP-23 articles by pubkey
-        ws.send(JSON.stringify(["REQ", "articles", { kinds:[KIND_ARTICLE], authors:[normalisePubkey(state.pubkey)], limit:20 }]));
-        // Subscribe to recent notes
-        ws.send(JSON.stringify(["REQ", "notes", { kinds:[KIND_NOTE], authors:[normalisePubkey(state.pubkey)], limit:10 }]));
-      };
+// ── ROUTER ────────────────────────────────────────────────────────────────────
 
-      ws.onmessage = (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg[0] === "EVENT") handleEvent(msg[2]);
-        } catch
+function showView(view) {
+  closeSidebar();
+  S.view = view;
+
+  // Update nav active state
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  const map = { home:"home", whitepaper:"whitepaper", manual:"manual", tools:"tools", notes:"notes", config:"config" };
+  document.querySelectorAll(".nav-btn").forEach(b => {
+    if (b.getAttribute("onclick")?.includes(`'${view}'`)) b.classList.add("active");
+  });
+
+  // Render
+  const el = document.getElementById("content");
+  if (!el) return;
+
+  switch (view) {
+    case "home":       el.innerHTML = htmlHome();        break;
+    case "whitepaper": el.innerHTML = htmlArticle(D_WHITEPAPER, "Whitepaper"); break;
+    case "manual":     el.innerHTML = htmlArticle(D_MANUAL, "Pen & Paper Guide"); break;
+    case "tools":      el.innerHTML = htmlTools();       break;
+    case "notes":      el.innerHTML = htmlNotes();       break;
+    case "config":     el.innerHTML = htmlConfig(); bindConfig(); break;
+    default:           el.innerHTML = htmlHome();
+  }
+}
+
+// ── VIEWS ─────────────────────────────────────────────────────────────────────
+
+function htmlHome() {
+  return `
+    <span class="c-eyebrow">OPEN RING — ON NOSTR</span>
+    <h1 class="c-title">Open Ring</h1>
+    <div class="c-meta">
+      <div class="c-meta-item">framework <span>v1</span></div>
+      <div class="c-meta-item">license <span>MIT</span></div>
+      <div class="c-meta-item">distribution <span>Nostr / open</span></div>
+    </div>
+    <div class="c-body">
+      <p>Open Ring is a diagnostic framework for identifying where structures — markets, technologies, practices, institutions — have their fixed and variable elements incorrectly arranged, and what the minimum intervention is to correct that.</p>
+      <p>The name comes from the function: a compass does not tell you the terrain is easy or how far you have to walk. It tells you whether you are facing the right direction.</p>
+      <h2>The core condition</h2>
+      <p>Information about any variable element only exists when a constant reference is holding still — and a reference point is only genuinely constant when falsifying it would be both expensive and detectable. If either condition fails, the reference point only appears stable. It is actually drifting.</p>
+      <blockquote>A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
+      <h2>What is here</h2>
+      <p>This reader pulls content published to Nostr by the Open Ring project. Everything here is on open relays, distributable without permission, and unmodifiable by any single actor once published.</p>
+      <p>Use the navigation to read the whitepaper, the pen and paper guide, or access the diagnostic instruments. Tap the menu icon to open navigation.</p>
+      <h2>The four ways capture holds</h2>
+      <p>A locked arrangement stays locked through four mechanisms: <strong>Knowledge</strong> (the better option is not known, because those who would lose from change control what gets taught), <strong>Access</strong> (the better option cannot be reached, because distribution runs through controlled channels), <strong>Money</strong> (the better option cannot be funded, because capital is allocated by those who benefit from the status quo), and <strong>Authority</strong> (the better option lacks legitimacy, because certification belongs to incumbents).</p>
+      <p>The diagnostic checks all four.</p>
+    </div>
+  `;
+}
+
+function htmlArticle(dtag, title) {
+  const ev = S.articles[dtag];
+  if (!ev) {
+    return `<div class="state-box"><div class="spinner"></div><span class="c-eyebrow">FETCHING FROM RELAYS</span><h1 class="c-title">${h(title)}</h1><p class="state-body">Waiting for relays to return this document. If it does not appear after 30 seconds, try Configure to add more relays.</p></div>`;
+  }
+  const t   = tag(ev, "title") || title;
+  const sum = tag(ev, "summary") || "";
+  const dt  = ev.created_at ? new Date(ev.created_at*1000).toISOString().slice(0,10) : "";
+  const body = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${h(ev.content||"")}</pre>`;
+  return `
+    <span class="c-eyebrow">OPEN RING — DOCUMENT</span>
+    <h1 class="c-title">${h(t)}</h1>
+    ${sum ? `<p style="font-size:0.68rem;color:#6A6050;margin-bottom:0.6rem;line-height:1.7">${h(sum)}</p>` : ""}
+    <div class="c-meta">
+      ${dt ? `<div class="c-meta-item">published <span>${dt}</span></div>` : ""}
+      <div class="c-meta-item">event <span>${(ev.id||"").slice(0,12)}…</span></div>
+    </div>
+    <div class="c-body">${body}</div>
+  `;
+}
+
+function htmlTools() {
+  return `
+    <span class="c-eyebrow">OPEN RING — INSTRUMENTS</span>
+    <h1 class="c-title">The Open Ring</h1>
+    <p style="font-size:0.68rem;color:#6A6050;line-height:1.7;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid #1E1A12">Three instruments in one cycle. Gradient finds the inversion. SignalChain locates the break. Field records the outcome.</p>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tool-name">Open Ring — AI</div><div class="tool-desc">Claude reasons about the structure using the framework. Best for first contact and exploration.</div><div class="tool-tag tag-ai">AI-ASSISTED</div></div>
+      <div class="tool-card"><div class="tool-name">Open Ring — Mechanical</div><div class="tool-desc">No AI. You provide all intelligence. Best when you know the structure deeply and want maximum precision.</div><div class="tool-tag tag-mech">SELF-HOSTED</div></div>
+      <div class="tool-card"><div class="tool-name">Pen &amp; Paper</div><div class="tool-desc">No technology. A printed worksheet. The full framework, zero dependencies.</div><div class="tool-tag tag-mech">PRINTABLE</div></div>
+      <div class="tool-card"><div class="tool-name">Field Records</div><div class="tool-desc">Shared across all versions. The cycle builds evidence wi
