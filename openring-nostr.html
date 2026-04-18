@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Open Ring — on Nostr</title>
+<title>Open Ring — Find what's locked in place and change it</title>
+<meta name="description" content="Open Ring is a diagnostic framework that identifies when markets, institutions and products have their fixed and variable elements incorrectly arranged — and names the minimum intervention to correct it. MIT licensed. Free to use and share.">
+<meta name="keywords" content="open ring, capture diagnostic, market capture, minimum intervention, seed crystal, nostr, bitcoin sovereignty">
+<meta property="og:title" content="Open Ring — Find what's locked in place and change it">
+<meta property="og:description" content="A diagnostic framework for identifying capture in markets, institutions and products. Names the minimum intervention to release it.">
+<meta property="og:type" content="website">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -81,7 +87,7 @@ main {
 section {
   padding: 3rem 0;
   border-bottom: 1px solid var(--border);
-  scroll-margin-top: 90px;
+  scroll-margin-top: 110px;
 }
 
 section:last-of-type { border-bottom: none; }
@@ -286,11 +292,18 @@ blockquote.pull {
 
 .ln-qr {
   display: block;
-  margin: 1rem auto 0;
+  margin: 1.2rem auto 0;
+  padding: 0.6rem;
+  background: #F0E8D0;
   border: 1px solid var(--border);
-  max-width: 150px;
-  width: 100%;
-  height: auto;
+  width: 180px;
+  height: 180px;
+}
+
+.ln-qr img, .ln-qr canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* ── CONFIGURE (collapsible) ──────────────────────────────── */
@@ -381,10 +394,12 @@ footer {
 <header>
   <div class="site-title">Open Ring</div>
   <nav class="anchors">
-    <a href="#overview">Overview</a>
+    <a href="#start">Start here</a>
+    <a href="#run">Run it</a>
+    <a href="#framework">Framework</a>
     <a href="#whitepaper">Whitepaper</a>
     <a href="#manual">Pen &amp; Paper</a>
-    <a href="#tools">Tools</a>
+    <a href="#cycle">Field cycle</a>
     <a href="#notes">Notes</a>
     <a href="#support">Support</a>
   </nav>
@@ -392,97 +407,170 @@ footer {
 
 <main>
 
-  <!-- OVERVIEW -->
-  <section id="overview">
-    <div class="eyebrow">OPEN RING — ON NOSTR</div>
-    <h1 class="title">Open Ring</h1>
-    <div class="meta">
-      <div class="meta-item">framework <span>v1</span></div>
-      <div class="meta-item">license <span>MIT</span></div>
-      <div class="meta-item">distribution <span>Nostr / open</span></div>
-    </div>
-    <p class="lead">Open Ring is a diagnostic framework for identifying where structures — markets, technologies, practices, institutions — have their fixed and variable elements incorrectly arranged, and what the minimum intervention is to correct that.</p>
-    <p class="lead">The name comes from the function: a compass does not tell you the terrain is easy or how far you have to walk. It tells you whether you are facing the right direction.</p>
-    <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
-    <div class="prose">
-      <p>Capture happens when what is locked in place serves the people running a system, and the cost of that lockdown falls on the people using it. It does not require bad actors — only misaligned incentives. The people who would lose from change are usually the same people who control the conditions that prevent it. That is sufficient to keep broken arrangements stable for a very long time.</p>
-      <p>A locked arrangement stays locked through four mechanisms: <strong>Knowledge</strong> (the better option is not known, because those who would lose from change control what gets taught), <strong>Access</strong> (the better option cannot be reached, because distribution runs through controlled channels), <strong>Money</strong> (the better option cannot be funded, because capital is allocated by those who benefit from the status quo), and <strong>Authority</strong> (the better option lacks legitimacy, because certification belongs to incumbents).</p>
-      <p>The diagnostic checks all four.</p>
-    </div>
-  </section>
+  <!-- 1. HOOK — concrete example first, no framework language -->
+  <section id="start">
+    <div class="eyebrow">OPEN RING — START HERE</div>
+    <h1 class="title">Something feels wrong with how this works.</h1>
 
-  <!-- WHITEPAPER -->
-  <section id="whitepaper">
-    <div class="eyebrow">OPEN RING — DOCUMENT</div>
-    <div id="whitepaper-content">
-      <h1 class="title">Whitepaper</h1>
-      <div class="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">FETCHING FROM RELAYS</div>
+    <p class="lead">Surf fins are sold in sets of three. Not because surfers need three — but because that format serves the manufacturer. The surfer pays for what they don't use and can't buy what they actually need. The industry is stable, profitable, and delivering the wrong product.</p>
+
+    <p class="lead">Bitcoin sits on exchanges because the interface layer presents custodianship as the normal path. Users bear counterparty risk on every unit they hold. The protocol was built for the opposite arrangement — but the interface layer was captured before most users arrived.</p>
+
+    <p class="lead">This pattern appears across sectors with no surface relation to each other. A structure delivers systematically inferior outcomes while remaining stable. The people who benefit from that arrangement are the same people who control the conditions that prevent it from changing.</p>
+
+    <blockquote class="pull">Open Ring names what is locked in place, finds where the information chain breaks, and identifies the minimum action to change it.</blockquote>
+
+    <p class="lead">It does not require bad actors. It requires only misaligned incentives — and those are everywhere.</p>
+
+    <div style="margin-top:2rem;padding:1.25rem;background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--amber2)">
+      <div class="eyebrow" style="margin-bottom:0.75rem">WHICH VERSION IS RIGHT FOR YOU</div>
+
+      <div style="display:flex;flex-direction:column;gap:0.85rem">
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:var(--amber);letter-spacing:0.08em;margin-bottom:0.3rem">EXPLORING — not sure what's wrong yet</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the AI version. You describe what you know. Claude reasons about the structure and produces a verdict, a seed crystal, and a break point. Takes about 10 minutes. Best for first contact.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:var(--amber2)">→ Open Ring AI — github.com/bitcoinkook/the-open-ring</div>
+        </div>
+
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:#90C8A0;letter-spacing:0.08em;margin-bottom:0.3rem">DEEP EXPERT — years inside this structure, you know what's wrong</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the Mechanical version. No AI. You answer every diagnostic question from direct knowledge. The framework applies the logic. Takes 45–60 minutes and produces sharper output — every blank field is a visible gap.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#5A9A70">→ Open Ring Mechanical — github.com/bitcoinkook/the-open-ring</div>
+        </div>
+
+        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
+          <div style="font-size:0.62rem;color:#8AB8D8;letter-spacing:0.08em;margin-bottom:0.3rem">NO TECHNOLOGY — want to work through it with a pen</div>
+          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the pen and paper guide. Print it. Fill it in. Same framework, same output, zero dependencies. The guide is below — scroll to Pen & Paper.</div>
+          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#4A6A80">→ Scroll to Pen &amp; Paper below, or download from this page</div>
+        </div>
       </div>
+
+      <p style="font-size:0.65rem;color:var(--dim);margin-top:1rem;line-height:1.7">One prerequisite across all versions: direct experience inside the structure you are analysing. The framework organises what you already know. It does not replace knowing.</p>
     </div>
   </section>
 
-  <!-- MANUAL -->
-  <section id="manual">
-    <div class="eyebrow">OPEN RING — DOCUMENT</div>
-    <div id="manual-content">
-      <h1 class="title">Pen &amp; Paper Guide</h1>
-      <div class="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">FETCHING FROM RELAYS</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TOOLS -->
-  <section id="tools">
+  <!-- 2. RUN IT — tool cards with links -->
+  <section id="run">
     <div class="eyebrow">OPEN RING — INSTRUMENTS</div>
-    <h1 class="title">The Open Ring</h1>
-    <p class="lead">Three instruments in one cycle. Gradient finds the inversion. SignalChain locates the break. Field records the outcome.</p>
+    <h1 class="title">Run it</h1>
+    <p class="lead">Three instruments in one cycle. The Gradient finds the inversion and names the seed crystal. SignalChain locates the break point. Field records what happened when you acted.</p>
     <div class="tools-grid">
       <div class="tool">
         <div class="tool-name">Open Ring — AI</div>
-        <div class="tool-desc">Claude reasons about the structure using the framework. Best for first contact and exploration.</div>
+        <div class="tool-desc">Claude reasons about the structure. You supply context. Best for exploration and first contact with a structure. Takes about 10 minutes to Act.</div>
         <div class="tool-tag tag-ai">AI-ASSISTED</div>
       </div>
       <div class="tool">
         <div class="tool-name">Open Ring — Mechanical</div>
-        <div class="tool-desc">No AI. You provide all intelligence. Best when you know the structure deeply and want maximum precision.</div>
+        <div class="tool-desc">No AI. You answer every question from direct knowledge. Sharper output for deep domain experts. Takes 45–60 minutes. Every blank is visible.</div>
         <div class="tool-tag tag-mech">SELF-HOSTED</div>
       </div>
       <div class="tool">
         <div class="tool-name">Pen &amp; Paper</div>
-        <div class="tool-desc">No technology. A printed worksheet. The full framework, zero dependencies.</div>
+        <div class="tool-desc">No technology required. Print the guide below, work through it with a pen. The same framework, the same output, zero dependencies.</div>
         <div class="tool-tag tag-mech">PRINTABLE</div>
       </div>
       <div class="tool">
-        <div class="tool-name">Field Records</div>
-        <div class="tool-desc">Shared across all versions. The cycle builds evidence with each completed run.</div>
-        <div class="tool-tag tag-ai">COMMONS</div>
+        <div class="tool-name">Field — the commons</div>
+        <div class="tool-desc">Submit what happened when you acted. Records are visible to all users. No identity collected — only structure, action, outcome, experience level.</div>
+        <div class="tool-tag tag-ai">SHARED DATASET</div>
       </div>
     </div>
     <div class="source-note">
-      <div class="label">SOURCE</div>
+      <div class="label">SOURCE — MIT LICENSE</div>
       <div>github.com/bitcoinkook/the-open-ring</div>
     </div>
   </section>
 
-  <!-- NOTES -->
-  <section id="notes">
-    <div class="eyebrow">OPEN RING — NOTES</div>
-    <h1 class="title">Recent Notes</h1>
-    <div id="notes-list">
-      <div class="note">
-        <div class="loading">
-          <div class="spinner"></div>
-          <div class="loading-text">FETCHING FROM RELAYS</div>
-        </div>
+  <!-- 3. FRAMEWORK — the logic, for people who want depth -->
+  <section id="framework">
+    <div class="eyebrow">OPEN RING — THE FRAMEWORK</div>
+    <h1 class="title">How it works</h1>
+    <p class="lead">Every system has things locked in place and things allowed to vary. That arrangement is not neutral. When what is locked serves the people running the system, and the cost falls on the people using it, the arrangement is inverted.</p>
+    <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
+    <div class="prose">
+      <p>The framework checks whether the fixed element is genuinely fixed — meaning that falsifying it would be both expensive and visible. If either condition fails, the element only appears stable. It is actually drifting, and the arrangement can be shifted with less effort than it appears.</p>
+      <h2>The four ways a locked arrangement stays locked</h2>
+      <p><strong>Knowledge.</strong> The better option is not known, because those who would lose from change control what gets taught, published, or discussed. Medical education funded by pharmaceutical companies. Financial literacy produced by financial institutions.</p>
+      <p><strong>Access.</strong> Even when people know a better option exists, they cannot reach it — because distribution runs through channels owned by the incumbent. Surfboards through brand-controlled shops. Bitcoin through regulated custodians.</p>
+      <p><strong>Money.</strong> Alternatives cannot be funded — because the institutions that allocate capital benefit from the current arrangement and do not finance what would replace it.</p>
+      <p><strong>Authority.</strong> Even when an alternative exists and people can access it, it lacks legitimacy — because the bodies that certify, approve, or endorse are the same ones that benefit from the status quo.</p>
+      <h2>The diagnostic checks all four</h2>
+      <p>If all four return No — the structure may be approaching capture immunity. If any return Yes — there is maintenance energy holding the arrangement in place. The framework locates the exact node where information stops flowing and names the minimum action at that specific point. Not a disruption. A seed crystal.</p>
+      <h2>Known limits</h2>
+      <p>The framework has three documented failure modes: mixed equilibria (some structures have no single natural arrangement), rotated capture (a seed crystal can release one inversion and create another), and the wrong-layer escape hatch (when a seed crystal fails, it is always possible to say the fixed element was mis-specified — which protects the framework from falsification). All three are documented in the whitepaper.</p>
+    </div>
+  </section>
+
+  <!-- 4. WHITEPAPER — fetched from Nostr -->
+  <section id="whitepaper">
+    <div class="eyebrow">OPEN RING — DOCUMENT</div>
+    <div id="whitepaper-content">
+      <h1 class="title">Whitepaper</h1>
+      <p class="lead" style="color:var(--dim)">Full framework document — the core condition, all five sectors analysed, the three known limits, and the falsification condition.</p>
+      <div class="prose">
+        <p>The whitepaper covers the mathematical basis of the framework (grounded in Becker 1968 and Spence 1973), the five sectors where the capture pattern has been identified through direct domain experience, and three documented limits of the framework — mixed equilibria, rotated capture, and the wrong-layer escape hatch.</p>
+        <p>It also states the falsification condition: if five clean cycles are run and the seed crystal consistently fails to produce movement, the framework is wrong and should be revised or retired.</p>
+      </div>
+      <div class="loading" style="margin-top:1.5rem">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING FULL DOCUMENT FROM RELAYS</div>
       </div>
     </div>
   </section>
 
-  <!-- SUPPORT -->
+  <!-- 5. PEN AND PAPER GUIDE — fetched from Nostr -->
+  <section id="manual">
+    <div class="eyebrow">OPEN RING — DOCUMENT</div>
+    <div id="manual-content">
+      <h1 class="title">Pen &amp; Paper Guide</h1>
+      <p class="lead" style="color:var(--dim)">The complete diagnostic worksheet. Print it, fill it in. No technology required.</p>
+      <div class="prose">
+        <p>The guide walks through the full Open Ring cycle on paper — Pre-Check, Gradient, SignalChain, Act, and Field. Each section has fill-in spaces, checkbox selects, and the same question framing as the digital tool. The verdict logic and chain state are written out as decision tables the user applies themselves.</p>
+        <p>It works identically to the AI and Mechanical versions. The only difference is you are the computer. The output format is the same. A record completed on paper can be submitted to the shared Field dataset.</p>
+        <p style="color:var(--amber2)">Read the orientation section — Before You Begin — before starting. It takes three minutes and explains the prerequisite clearly.</p>
+      </div>
+      <div class="loading" style="margin-top:1.5rem">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING FULL GUIDE FROM RELAYS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FIELD CYCLE — first real completed cycle -->
+  <section id="cycle">
+    <div class="eyebrow">OPEN RING — FIRST COMPLETED CYCLE</div>
+    <div id="cycle-content">
+      <h1 class="title">Bitcoin interface layer</h1>
+      <p class="lead" style="color:var(--dim)">The first real completed cycle. What the diagnostic found, what action was taken, and what happened.</p>
+      <div class="prose">
+        <p><strong>Structure:</strong> Bitcoin interface layer — the layer of exchanges, custodians, and on-ramps that sits between the protocol and the user.</p>
+        <p><strong>Verdict:</strong> Inversion confirmed. Institutional intermediation is fixed as the default. User sovereignty over their holdings is the variable bearing all counterparty risk. The protocol layer is approaching capture immune — the 21M cap is enforced by proof-of-work and cannot be falsified cheaply. The interface layer above it is inverted.</p>
+        <p><strong>Break point:</strong> Channel. The signal that self-custody is superior is intact and well-documented. The channel is severely asymmetric — exchange marketing budgets, mainstream media, and regulatory framing carry the intermediation message at orders of magnitude greater reach than self-custody education.</p>
+        <p><strong>Action taken:</strong> Published the Sovereignty, Veil, Hydra whitepaper — three properties of the correct Bitcoin arrangement, in plain language, on Nostr. A seed crystal placed in the channel that the incumbent cannot suppress.</p>
+        <p><strong>Outcome:</strong> Moving toward correct orientation. Purchasing power preserved for users who act on it. The correct arrangement is also the one the protocol was designed for.</p>
+      </div>
+      <div class="loading" style="margin-top:1.5rem">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING FULL CYCLE RECORD FROM RELAYS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. NOTES — recent activity -->
+  <section id="notes">
+    <div class="eyebrow">OPEN RING — NOTES</div>
+    <h1 class="title">Recent notes</h1>
+    <p class="lead" style="color:var(--dim)">Activity from the Open Ring Nostr account. Field updates, cycle results, and framework developments as they happen.</p>
+    <div id="notes-list">
+      <div class="loading" style="margin-top:1rem">
+        <div class="spinner"></div>
+        <div class="loading-text">FETCHING FROM RELAYS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. SUPPORT -->
   <section id="support">
     <div class="eyebrow">SUPPORT THIS WORK</div>
     <h1 class="title">Send sats</h1>
@@ -495,24 +583,20 @@ footer {
         <span style="font-size:0.65rem;color:var(--faint)">⎘</span>
       </div>
       <div class="ln-hint">tap address to copy</div>
-      <img class="ln-qr" alt="Lightning QR" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=lightning:blackfalcon2@primal.net&bgcolor=100D08&color=D4B580&qzone=1" onerror="this.style.display='none'">
+      <div id="ln-qr" class="ln-qr"></div>
     </div>
 
     <details class="config">
       <summary>CONFIGURE RELAYS</summary>
       <div class="config-body">
         <div class="config-hint" style="margin-top:0.85rem">Settings are saved in this browser only. The reader connects automatically on load.</div>
-
         <label class="config-label">NOSTR PUBKEY</label>
         <input class="config-input" id="cfg-pk" type="text" placeholder="npub1...">
-
         <label class="config-label">RELAYS</label>
         <div class="config-hint">One per line (wss://)</div>
         <textarea class="config-input" id="cfg-rl" rows="6"></textarea>
-
         <button class="btn btn-amber" onclick="saveConfig()">SAVE &amp; RECONNECT</button>
         <button class="btn btn-dim" onclick="resetConfig()">RESET DEFAULTS</button>
-
         <div class="config-msg" id="cfg-msg"></div>
       </div>
     </details>
@@ -545,6 +629,7 @@ const DEFAULT_RELAYS = [
 
 const D_WHITEPAPER = "openring-whitepaper";
 const D_MANUAL     = "openring-manual";
+const D_CYCLE      = "openring-cycle-bitcoin-v1";
 
 // ── LOAD SETTINGS ─────────────────────────────────────────────────────────────
 
@@ -585,17 +670,205 @@ function pubhex(raw) {
 // ── RENDER ARTICLES ───────────────────────────────────────────────────────────
 
 function renderArticle(dtag, ev) {
-  const containerId = dtag === D_WHITEPAPER ? "whitepaper-content" : "manual-content";
-  const el = document.getElementById(containerId);
+  const idMap = {
+    [D_WHITEPAPER]: "whitepaper-content",
+    [D_MANUAL]:     "manual-content",
+    [D_CYCLE]:      "cycle-content",
+  };
+  const el = document.getElementById(idMap[dtag]);
   if (!el) return;
 
-  const title   = tag(ev, "title") || "Document";
-  const summary = tag(ev, "summary");
-  const date    = ev.created_at ? new Date(ev.created_at * 1000).toISOString().slice(0, 10) : "";
-  const body    = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${esc(ev.content || "")}</pre>`;
+  const t    = tag(ev, "title") || "Document";
+  const sum  = tag(ev, "summary");
+  const date = ev.created_at ? new Date(ev.created_at * 1000).toISOString().slice(0, 10) : "";
+  const body = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${esc(ev.content || "")}</pre>`;
 
+  // Replace entire section content with the full fetched article
   el.innerHTML = `
-    <h1 class="title">${esc(title)}</h1>
-    ${summary ? `<p class="lead" style="color:var(--dim)">${esc(summary)}</p>` : ""}
+    <h1 class="title">${esc(t)}</h1>
+    ${sum ? `<p class="lead" style="color:var(--dim)">${esc(sum)}</p>` : ""}
     <div class="meta">
-      ${date ? `<div class="meta-item">published <span>${da
+      ${date ? `<div class="meta-item">published <span>${date}</span></div>` : ""}
+      <div class="meta-item">event <span>${esc((ev.id || "").slice(0, 12))}…</span></div>
+    </div>
+    <div class="prose">${body}</div>
+  `;
+}
+
+const notes = [];
+
+function renderNotes() {
+  const el = document.getElementById("notes-list");
+  if (!el) return;
+  if (notes.length === 0) return;
+  el.innerHTML = notes.map(n => {
+    const d = new Date(n.created_at * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return `<div class="note"><div class="note-date">${d}</div><div class="note-body">${esc(n.content)}</div></div>`;
+  }).join("");
+}
+
+// ── NOSTR CONNECTION ──────────────────────────────────────────────────────────
+
+const articles = {};  // dtag -> event (keep newest)
+let sockets = [];
+
+function setStatus(state) {
+  const dot = document.getElementById("relay-dot");
+  const lbl = document.getElementById("relay-label");
+  if (!dot || !lbl) return;
+  dot.className = "relay-dot";
+  if (state === "on")  { dot.classList.add("on");  lbl.textContent = relays.length + " relays"; }
+  if (state === "err") { dot.classList.add("err"); lbl.textContent = "connection failed"; }
+  if (state === "...") lbl.textContent = "connecting...";
+}
+
+function handleEvent(ev) {
+  if (!ev || !ev.kind) return;
+
+  if (ev.kind === 30023) {
+    const dtag = tag(ev, "d") || ev.id;
+    if (!articles[dtag] || ev.created_at > articles[dtag].created_at) {
+      articles[dtag] = ev;
+      if ([D_WHITEPAPER, D_MANUAL, D_CYCLE].includes(dtag)) renderArticle(dtag, ev);
+    }
+  }
+
+  if (ev.kind === 1) {
+    if (notes.find(n => n.id === ev.id)) return;
+    notes.push(ev);
+    notes.sort((a, b) => b.created_at - a.created_at);
+    if (notes.length > 10) notes.length = 10;
+    renderNotes();
+  }
+}
+
+function connect() {
+  sockets.forEach(ws => { try { ws.close(); } catch {} });
+  sockets = [];
+  setStatus("...");
+
+  const hex = pubhex(pubkey);
+  if (!hex) { setStatus("err"); return; }
+
+  let opened = 0;
+
+  relays.forEach(url => {
+    try {
+      const ws = new WebSocket(url);
+      sockets.push(ws);
+
+      ws.onopen = () => {
+        try {
+          opened++;
+          if (opened === 1) setStatus("on");
+          ws.send(JSON.stringify(["REQ", "a", { kinds: [30023], authors: [hex], limit: 20 }]));
+          ws.send(JSON.stringify(["REQ", "n", { kinds: [1],     authors: [hex], limit: 10 }]));
+        } catch {}
+      };
+
+      ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg[0] === "EVENT") handleEvent(msg[2]);
+        } catch {}
+      };
+
+      ws.onerror = () => {
+        try {
+          if (opened === 0 && sockets.every(s => s.readyState > 1)) setStatus("err");
+        } catch {}
+      };
+    } catch {}
+  });
+}
+
+// ── CONFIG UI ─────────────────────────────────────────────────────────────────
+
+function saveConfig() {
+  const pk = (document.getElementById("cfg-pk").value || "").trim();
+  const rl = (document.getElementById("cfg-rl").value || "")
+    .split("\n").map(s => s.trim()).filter(s => s.startsWith("wss://"));
+
+  const msg = document.getElementById("cfg-msg");
+  if (!pk) { msg.textContent = "Pubkey required."; return; }
+  if (rl.length === 0) { msg.textContent = "At least one relay required."; return; }
+
+  pubkey = pk;
+  relays = rl;
+  try { localStorage.setItem("or_pk", pk); localStorage.setItem("or_rl", JSON.stringify(rl)); } catch {}
+
+  msg.textContent = "Saved. Reconnecting...";
+  connect();
+  setTimeout(() => { if (msg) msg.textContent = ""; }, 2500);
+}
+
+function resetConfig() {
+  const msg = document.getElementById("cfg-msg");
+  try { localStorage.removeItem("or_pk"); localStorage.removeItem("or_rl"); } catch {}
+  pubkey = DEFAULT_PK;
+  relays = DEFAULT_RELAYS;
+  document.getElementById("cfg-pk").value = pubkey;
+  document.getElementById("cfg-rl").value = relays.join("\n");
+  msg.textContent = "Reset to defaults.";
+  connect();
+  setTimeout(() => { if (msg) msg.textContent = ""; }, 2500);
+}
+
+// ── LIGHTNING COPY ────────────────────────────────────────────────────────────
+
+function copyAddress(row) {
+  const addr = "blackfalcon2@primal.net";
+  const span = row.querySelector(".ln-addr");
+  const confirm = () => {
+    row.style.borderColor = "var(--green)";
+    if (span) span.style.color = "var(--green)";
+    setTimeout(() => { row.style.borderColor = ""; if (span) span.style.color = ""; }, 1600);
+  };
+
+  const fallback = () => {
+    const t = document.createElement("textarea");
+    t.value = addr; t.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(t); t.focus(); t.select();
+    try { document.execCommand("copy"); confirm(); } catch {}
+    document.body.removeChild(t);
+  };
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(addr).then(confirm).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+try { connect(); } catch (e) { console.error(e); setStatus("err"); }
+
+// Generate Lightning QR code
+function renderQR() {
+  const el = document.getElementById("ln-qr");
+  if (!el || typeof QRCode === "undefined") return;
+  el.innerHTML = "";
+  try {
+    new QRCode(el, {
+      text: "lightning:blackfalcon2@primal.net",
+      width: 164,
+      height: 164,
+      colorDark: "#0A0907",
+      colorLight: "#F0E8D0",
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+  } catch (e) {
+    console.error("QR render failed:", e);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", renderQR);
+} else {
+  renderQR();
+}
+</script>
+
+</body>
+</html>
