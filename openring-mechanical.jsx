@@ -939,3 +939,5 @@ export default function OpenRingMechanical() {
     </>
   );
 }
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<OpenRingMechanical />);
