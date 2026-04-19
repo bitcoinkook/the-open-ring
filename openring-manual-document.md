@@ -7,34 +7,34 @@
 
 ## Before You Begin
 
-**Which version to use**
+This is the pen and paper version of the Open Ring. Same questions and same logic as the on-screen tool — you apply the verdict rules yourself. The rules are printed directly below the questions they apply to.
 
-This is the pen and paper version. No technology required. You supply all the intelligence — the framework provides the questions, the verdict logic, and the structure for your answers.
+Use this version if you have real experience inside the structure you're analysing. If you find yourself leaving more than two or three sections empty, you don't yet have enough direct knowledge for this version to produce accurate output. In that case, run the AI version first — it takes ten minutes and will show you where the inversion probably is. Come back here when you know.
 
-Use this version if you have years of direct experience inside the structure you are analyzing and you know what you are looking for. If you find yourself leaving more than two or three sections empty, your domain knowledge may not yet be deep enough for this version to produce accurate output. In that case, run the AI-assisted version first — it takes ten minutes and will show you where the inversion probably is. Come back here when you know.
+For the full how-to — including when to use this version versus the mechanical versus the AI — read:
 
-If you have the experience, this version will produce sharper output than the AI version. Not because the logic is different — it is identical — but because it will not let you coast. Every blank is visible.
+**https://github.com/bitcoinkook/the-open-ring/blob/main/openring-instructions.md**
 
 ---
 
-This document runs one complete diagnostic cycle. It has two instruments and a field record.
+This document runs one complete diagnostic cycle. It has three instruments.
 
-**The Gradient** asks what is fixed, what varies, who pays the cost, and whether that arrangement serves the people using the structure or the people controlling it. It ends with a verdict and a seed crystal — the minimum action that allows the correct structure to emerge.
+**The Gradient** asks what's fixed, what varies, who pays the cost, and whether that arrangement serves the people using the structure or the people controlling it. It ends with a verdict and a seed crystal — the minimum action that would let the correct structure emerge.
 
 **SignalChain** takes the inversion the Gradient identified and asks where in the information chain the problem sustains itself. It names the specific break point and the minimum action at that exact node.
 
 **Field** records what happened when you acted. This is what turns a diagnosis into evidence.
 
-**One rule before you start:** this document is only as good as the experience you bring to it. The framework organises what you already know. It does not replace knowing. If you have mostly read about the structure you are analysing, the output will sound right but will be hollow underneath. The more time you have spent directly inside it, the sharper the result.
+**One rule before you start:** this document is only as good as the experience you bring to it. The framework organises what you already know — it does not replace knowing. The more time you have spent directly inside the structure, the sharper the result.
 
 ---
 ---
 
 # PART ONE — INPUT
 
-## What are you analysing?
+## What are you looking at?
 
-*Name a market, product format, institution, or practice where something feels wrong — where the thing that is fixed probably should not be, and the thing that varies probably should not either.*
+*Name a market, product format, institution, or practice. Be precise — "surf fins" not "the surf industry." "Bitcoin custody" not "cryptocurrency."*
 
 **Structure:**
 
@@ -45,33 +45,15 @@ _______________________________________________
 
 ---
 
-## Your direct experience
+## What you know about this from direct experience
 
-*Answer what you can. Leave blank what you cannot answer from direct observation.*
-
-**How long have you been directly involved?**
-*(As a user, practitioner, or close observer — not just someone who has read about it.)*
-
-```
-_______________________________________________
-_______________________________________________
-_______________________________________________
-```
-
-**What do you see that most people inside it do not talk about or do not notice?**
-*(The thing that is obvious to you after time in it, but absent from any official account.)*
+*How long you've been in it. What you see that most people don't talk about. Where the official story diverges from what you've seen on the ground. One paragraph — no format required.*
 
 ```
 _______________________________________________
 _______________________________________________
 _______________________________________________
 _______________________________________________
-```
-
-**What does the standard explanation say it is — versus what you have actually experienced?**
-*(Where does the official story diverge from what you have seen on the ground?)*
-
-```
 _______________________________________________
 _______________________________________________
 _______________________________________________
@@ -83,90 +65,143 @@ _______________________________________________
 
 # PART TWO — THE GRADIENT
 
-*Work through the pre-check first. Then the diagnostic. The verdict follows from what you find.*
+*Three pre-checks, then the diagnostic, then the analysis. The verdict follows from what you find.*
 
 ---
 
-## Pre-Check — Immunity
+## Pre-Check One — Is this structure resistant to change?
 
-*Answer each question Yes or No. These four mechanisms are how a locked arrangement stays locked.*
+*These four yes/no questions check whether the arrangement is locked in place by forces that would actively resist a better alternative emerging.*
 
-| | Question | Answer |
-|---|---|---|
-| 1 | Can education about this structure be suppressed by a single actor? | |
-| 2 | Does distribution require a controlled channel? | |
-| 3 | Can an incumbent concentrate finance to block alternatives? | |
-| 4 | Is legitimacy dependent on external validation? | |
+**1. Can one company or institution control what people learn about how this works?**
+
+*If a single player funds the training, shapes the certification, or dominates the media in this space — and can keep the real picture from reaching users — the answer is yes. Example: a pharmaceutical company funding medical education about the condition its drug treats.*
+
+```
+  [ ] Yes          [ ] No
+```
+
+**2. Do people have to go through a specific gatekeeper to get access to this?**
+
+*Think about who sits between the solution and the person who needs it. If you can't reach users without going through a controlled channel — a licensed distributor, a regulated exchange, an approved supplier — the answer is yes.*
+
+```
+  [ ] Yes          [ ] No
+```
+
+**3. Can the established players use their financial position to block better alternatives?**
+
+*If the incumbents control who gets investment, contracts, or shelf space — and can use that to keep competing solutions out — the answer is yes.*
+
+```
+  [ ] Yes          [ ] No
+```
+
+**4. Does a solution need official approval or endorsement to be taken seriously?**
+
+*If something can only be considered real or valid after being approved by a regulator, a standards body, or a dominant institution — and that institution has reason to withhold approval — the answer is yes.*
+
+```
+  [ ] Yes          [ ] No
+```
 
 ---
 
-## Pre-Check — Cost-Detection
+## Pre-Check Two — Is the fixed part genuinely held in place?
 
-*A fixed element is only genuinely fixed when falsifying it would be expensive AND any falsification would be immediately visible. If either fails, the element only appears stable. It is actually drifting.*
+*Something that's truly fixed costs more to fake than it's worth, and any attempt to fake it would be visible. If either of those isn't true, what looks fixed is actually drifting.*
 
-| | Question | Answer |
-|---|---|---|
-| 5 | Would falsifying the fixed element be expensive? | |
-| 6 | Would any falsification be visible? | |
+**5. Would it cost significantly more to cheat on the fixed part than you'd gain from doing so?**
+
+*Bitcoin's 21 million limit can't be cheated without outspending most countries in electricity — that's genuinely expensive. A safety certification that gets rubber-stamped by a captured regulator costs almost nothing to fake. Which one is this closer to?*
+
+```
+  [ ] Yes          [ ] No
+```
+
+**6. If someone did cheat on it, would people be able to see that it happened?**
+
+*If the fixed part can be quietly moved — through regulatory drift, opaque internal processes, or private agreements nobody outside sees — the answer is no. If any violation is immediately visible to anyone who looks, the answer is yes.*
+
+```
+  [ ] Yes          [ ] No
+```
 
 **If you answered No to either question 5 or 6, write this warning in your output:**
 
 ```
-WARNING: The fixed element is only nominally stable. The cost-detection
-threshold is not met. The arrangement looks fixed but is actually drifting.
+WARNING: The fixed part is only nominally stable. Cheating on it is
+either cheap, invisible, or both. The arrangement looks fixed
+but is actually drifting.
 ```
 
 ---
 
-## Pre-Check — Structure
+## Pre-Check Three — Does this structure have layers?
 
-**Does this structure have separable layers that could be in different states at the same time?**
+*Some structures look like one thing from the outside but operate completely differently at different levels.*
 
-```
-  [ ] Yes — I will run the diagnostic separately for each layer
-  [ ] No — one layer
-```
+**7. Does this structure have distinct layers that work differently from each other?**
 
-**Within the layer I am analysing, is there one natural arrangement that pressure moves toward — or could the correct state be a mix of several stable arrangements?**
+*Example: Bitcoin's underlying protocol — the 21 million limit, proof of work — is nearly impossible to falsify. Bitcoin custody through exchanges is completely captured. Same structure, two completely different layers. If you see that kind of split here, the answer is yes.*
 
 ```
-  [ ] Single attractor — one natural arrangement
-  [ ] Mixed equilibrium — several arrangements could stably coexist
+  [ ] Yes — I will run the full diagnostic separately for each layer
+  [ ] No  — one layer
 ```
 
-*If mixed: the captured / released reading that follows may be too simple. A correctly placed seed crystal will produce partial movement, not a full transition. Note this explicitly in your output.*
+**8. If this structure were unblocked, would it settle in one place or several?**
+
+*Some structures have one natural correct arrangement — fins sold individually, patient health as the outcome. Others have multiple stable states depending on who's involved. Which is this?*
+
+```
+  [ ] Single — one natural arrangement, a single correct way this should work
+  [ ] Mixed  — multiple stable arrangements, different outcomes for different users or contexts
+```
+
+*If Mixed: the captured / released reading that follows may be too simple. A correctly placed seed crystal will produce partial movement, not a clean transition. Note this explicitly in your output.*
 
 ---
 
-## Diagnostic
+## The Diagnostic
 
-**Q1 — What is fixed?** *(Name the element that is locked in place. Be precise.)*
+*Four questions. Name things precisely — not categories, specific things.*
 
-```
-_______________________________________________
-_______________________________________________
-_______________________________________________
-```
+**Q1 — What's locked in place that isn't allowed to change?**
 
-**Q2 — What varies?** *(Name what is allowed to change — the element whose variation falls on the user.)*
+*Name the specific thing that stays fixed regardless of what users actually need. Be precise — not "the product design" but what specific element of it. Examples: the requirement that fins are sold as a set of three; the requirement to use a custodial exchange to access Bitcoin; the requirement to treat the symptom rather than the cause.*
 
 ```
 _______________________________________________
 _______________________________________________
 _______________________________________________
+_______________________________________________
 ```
 
-**Q3 — Who bears the cost of the variance?**
+**Q2 — What's left to vary — and what does that variation cost the person using it?**
+
+*What's allowed to fluctuate, and who absorbs the cost of that fluctuation? If what varies is what matters most to the user — their performance, their health, their sovereignty — and they pay for it, that's the inversion. Examples: the surfer's performance across different wave types; whether you actually control your Bitcoin; the patient's health outcome over time.*
+
+```
+_______________________________________________
+_______________________________________________
+_______________________________________________
+_______________________________________________
+```
+
+**Q3 — When things go wrong because of that variation, who pays?**
+
+*The surfer underperforms because the fin doesn't suit the conditions — who loses? The exchange gets hacked and coins are frozen — who loses?*
 
 ```
   [ ] User          [ ] Incumbent          [ ] Both
 ```
 
-**Q4 — How did this get fixed?**
+**Q4 — Was this arrangement designed, or did it just accumulate?**
 
 ```
-  [ ] Intentional defense — the incumbent actively maintains it
-  [ ] Accretion — it accumulated by default, nobody decided
+  [ ] Intentional — someone actively maintains this arrangement because it serves them
+  [ ] Accretion   — nobody decided, it just accumulated and never got questioned
 ```
 
 ---
@@ -176,13 +211,18 @@ _______________________________________________
 *Apply this logic to what you found above:*
 
 ```
-All four immunity questions No  +  cost-detection both Yes  +  no separate layers
+Questions 1–4 all answered No
+  +  questions 5 and 6 both answered Yes
+  +  question 7 answered No
 →  CAPTURE IMMUNE
 
-All four immunity questions No  +  cost-detection both Yes  +  (other conditions present)
+Questions 1–4 all answered No
+  +  questions 5 and 6 both answered Yes
+  +  (but other conditions present — separate layers, etc.)
 →  APPROACHING IMMUNE
 
-Cost falls on User or Both  +  at least one immunity question Yes
+Cost falls on User or Both (Q3)
+  +  at least one of questions 1–4 answered Yes
 →  INVERSION CONFIRMED
 
 Otherwise
@@ -200,50 +240,65 @@ Otherwise
 
 ---
 
-## Gradient Analysis
+## What would this become?
 
-**Natural pressure** *(What does this structure want to become if the maintenance energy is removed?)*
+*These questions build the picture of where pressure has accumulated and what the minimum action is to let the correct structure emerge.*
 
-```
-_______________________________________________
-_______________________________________________
-_______________________________________________
-```
+**If nothing were holding this in place, what would it naturally become?**
 
-**Maintenance energy** *(What is being spent to hold the current arrangement in place?)*
-
-```
-_______________________________________________
-_______________________________________________
-_______________________________________________
-```
-
-**Supersaturation point** *(Where has pressure built longest without release? This is where movement is most likely.)*
-
-```
-_______________________________________________
-_______________________________________________
-_______________________________________________
-```
-
-**Seed crystal** *(The minimum intervention that allows the correct structure to emerge. Not a disruption. A seed.)*
+*Not what you'd want it to be — what would it actually move toward if the forces holding it in place stopped? What's the natural state this arrangement is being held away from?*
 
 ```
 _______________________________________________
 _______________________________________________
 _______________________________________________
 _______________________________________________
+```
+
+**What's actually holding the current arrangement in place?**
+
+*What would have to stop for this to shift? Think infrastructure, training programs, regulatory frameworks, funding flows, distribution agreements, cultural inertia.*
+
+```
+_______________________________________________
+_______________________________________________
+_______________________________________________
 _______________________________________________
 ```
 
-**Has the seed crystal already been placed?**
+**Where has the pressure been building longest without releasing?**
+
+*Name the specific group, moment, or context where the gap between what people need and what the arrangement delivers is widest. This is where change is most likely to start.*
 
 ```
-  [ ] Yes — the next action is documenting and feeding back outcomes
+_______________________________________________
+_______________________________________________
+_______________________________________________
+_______________________________________________
+```
+
+**What's the smallest specific thing someone could do that would allow the correct arrangement to start emerging?**
+
+*Not a campaign, not a disruption — a seed. Something one person could actually do that others could then build on. An open document, a working prototype, a verifiable public demonstration. It doesn't need to fix everything. It just needs to make it impossible to pretend the correct arrangement doesn't exist.*
+
+```
+_______________________________________________
+_______________________________________________
+_______________________________________________
+_______________________________________________
+_______________________________________________
+```
+
+**Has that seed already been placed?**
+
+```
+  [ ] Yes — the next action is documenting what happens as it grows
   [ ] No  — the next action is placing it
 ```
 
-**Opportunity signal** *(One sentence — the specific action you could take.)*
+**What's the one specific thing someone could do right now?**
+
+*One specific action. Something a real person could actually do, not a general strategy.*
 
 ```
 _______________________________________________
@@ -255,24 +310,25 @@ _______________________________________________
 
 # PART THREE — SIGNALCHAIN
 
-*SignalChain takes the inversion the Gradient identified and asks where in the information chain the problem sustains itself. Evaluate each node in order. The moment you find a broken or partial node, all subsequent nodes become INDETERMINATE — do not evaluate them.*
+*SignalChain takes the inversion the Gradient identified and asks where in the information chain the problem sustains itself. Evaluate each node in order. The moment you find a BROKEN or PARTIAL node, every node after it is INDETERMINATE — don't evaluate them.*
 
-**What you are evaluating:**
-*(Write the fixed element, variable element, and cost bearer from the Gradient — this grounds every node evaluation.)*
+**What you're evaluating** *(copy from the Gradient — this grounds every node evaluation):*
 
 ```
-Fixed:         ________________________________________
+What's locked in place:  _______________________________________________
 
-Variable:      ________________________________________
+What varies:             _______________________________________________
 
-Cost bearer:   ________________________________________
+Who pays:                _______________________________________________
 ```
 
 ---
 
 ## Node 1 — Signal
 
-*Is genuine information about the variable element actually being produced and reaching anyone?*
+*Is accurate, independent information about what varies — and what it costs users — actually reaching the people who need it?*
+
+*Not information produced or funded by whoever benefits from the current arrangement. Genuine, verifiable information reaching the people who bear the cost of the variation.*
 
 **Status:**
 
@@ -280,7 +336,7 @@ Cost bearer:   ________________________________________
   [ ] INTACT          [ ] BROKEN          [ ] PARTIAL
 ```
 
-**One sentence explaining this node's state:**
+**One sentence:**
 
 ```
 _______________________________________________
@@ -291,9 +347,11 @@ _______________________________________________
 
 ## Node 2 — Channel
 
-*Is there a path for that information to travel that is not owned or filtered by the incumbent?*
+*Is there a path for that information to travel that isn't owned or filtered by whoever benefits from the current arrangement?*
 
-*(If Signal was BROKEN, write INDETERMINATE here and skip to the break point section.)*
+*If the only way to learn is through the incumbent's channel — their funded studies, their certified trainers, their sponsored media — the channel is broken. An independent path means somewhere the information can travel without being filtered.*
+
+*(If Signal was BROKEN or PARTIAL, mark INDETERMINATE and skip to the break point section.)*
 
 **Status:**
 
@@ -312,9 +370,11 @@ _______________________________________________
 
 ## Node 3 — Ground
 
-*Is the reference point genuinely held — meaning the cost of falsifying it exceeds the benefit of doing so, and any falsification would be visible?*
+*Is the fixed part genuinely held — would cheating on it cost more than it's worth, and would any attempt to cheat be visible to everyone?*
 
-*(If an earlier node was BROKEN, write INDETERMINATE here and skip to the break point section.)*
+*Would cheating on the fixed part cost more than it's worth? Would any attempt to cheat be visible to everyone? If what looks fixed can quietly drift — through regulatory capture, opaque processes, or private agreements — the ground is broken.*
+
+*(If an earlier node was BROKEN or PARTIAL, mark INDETERMINATE and skip to the break point section.)*
 
 **Status:**
 
@@ -333,9 +393,11 @@ _______________________________________________
 
 ## Node 4 — Reach
 
-*Is the reference point distributed widely enough that no single actor can collapse it?*
+*Is the stability of the fixed part spread widely enough that no single actor can collapse it?*
 
-*(If an earlier node was BROKEN, write INDETERMINATE here and skip to the break point section.)*
+*If one company, regulator, or institution going away — or changing sides — would destabilize what's fixed, the reach is local. Global reach means the stability is distributed across enough independent actors that no single one can undermine it.*
+
+*(If an earlier node was BROKEN or PARTIAL, mark INDETERMINATE and skip to the break point section.)*
 
 **Status:**
 
@@ -362,7 +424,9 @@ _______________________________________________
   SIGNAL          CHANNEL          GROUND          REACH          NONE — CHAIN INTACT
 ```
 
-**What is failing and why?** *(Two sentences grounded in the specific inversion the Gradient named.)*
+**What exactly is failing here, and why does it stay that way?**
+
+*Two sentences. Don't just say "information doesn't flow" — name the specific mechanism that blocks it and what holds that block in place.*
 
 ```
 _______________________________________________
@@ -375,7 +439,7 @@ _______________________________________________
 
 ## Intervention
 
-*The minimum action at the break point — not general strategy, not the overall seed crystal. The specific action at this specific node.*
+*What's the smallest action at this specific point that would start unblocking it? One specific thing at the break point — not a general strategy.*
 
 ```
 _______________________________________________
@@ -403,15 +467,15 @@ SIGNAL ___  →  CHANNEL ___  →  GROUND ___  →  REACH ___
 
 # PART FOUR — ACT
 
-*The diagnostic is complete. You know what is inverted, where the chain breaks, and what the minimum intervention is. This section is the only one the document cannot do for you.*
+*The diagnostic is complete. You know what is inverted, where the chain breaks, and what the minimum action is. This section is the only one the document cannot do for you.*
 
 ---
 
-## What you are going to do
+## What you're going to do
 
-*Copy the seed crystal and intervention here so they are on one page.*
+*Copy the seed crystal and intervention here so they're on one page.*
 
-**Seed crystal (from Gradient):**
+**Seed crystal (from the Gradient):**
 
 ```
 _______________________________________________
@@ -459,7 +523,7 @@ _______________________________________________
 
 # PART FIVE — FIELD
 
-*Record what happened when you acted. Do this even if you do not have a result yet. A record with "too early to tell" is still a record — the cycle still counts.*
+*Record what happened when you acted. Do this even if you don't have a result yet. A record with "too early to tell" is still a record — the cycle still counts.*
 
 ---
 
@@ -472,7 +536,8 @@ _______________________________________________
 ```
 
 **What was wrong with it — in your own words?**
-*(Do not use the framework's language. Describe what you found as you would explain it to someone who was not in the room.)*
+
+*Don't use the framework's language. Describe what you found as you'd explain it to someone who wasn't in the room.*
 
 ```
 _______________________________________________
@@ -483,7 +548,8 @@ _______________________________________________
 ```
 
 **What did you do about it?**
-*(The specific thing you did — as concrete as possible.)*
+
+*The specific thing you did — as concrete as possible.*
 
 ```
 _______________________________________________
@@ -501,10 +567,9 @@ _______________________________________________
   [ ] Too early to tell
 ```
 
-**Detail — what specifically happened?**
+**Anything else worth noting?**
 
 ```
-_______________________________________________
 _______________________________________________
 _______________________________________________
 _______________________________________________
@@ -524,14 +589,14 @@ _______________________________________________
 
 ## Submit your record
 
-*If you have access to the Open Ring field data form, submit this record so it contributes to the evidence base:*
+*If you have access to the Open Ring field data form, submit this record so it contributes to the shared evidence base:*
 
 ```
 https://docs.google.com/forms/d/e/
 1FAIpQLSdtbq3LRYc2bLsQRg8JDzGUYgoruFVe4JRguPsokBn006gx8w/viewform
 ```
 
-*If you do not, keep this document. A record that exists only on paper is still a record.*
+*If you don't, keep this document. A record that exists only on paper is still a record.*
 
 ---
 ---
@@ -540,14 +605,14 @@ https://docs.google.com/forms/d/e/
 
 *Three things to watch for when you act on the output of this document:*
 
-**Mixed equilibria.** Some structures do not have one correct arrangement they want to become. The natural state is a mix of several arrangements coexisting. In these cases the captured / released verdict is too simple, and a correctly placed seed crystal will produce partial movement rather than a clean shift.
+**Mixed equilibria.** Some structures don't have one correct arrangement they want to move toward. The natural state is several arrangements coexisting. In these cases the captured / released verdict is too simple, and a correctly placed seed crystal will produce partial movement rather than a clean shift.
 
 **Rotated capture.** A seed crystal can succeed at releasing the current capture and immediately produce a new one in the space it opened. This document identifies what needs to change — it does not predict what prevents the next inversion from forming. Watch for who benefits from the new arrangement.
 
-**The wrong-layer escape hatch.** When a seed crystal fails, it is always possible to say the fixed element was named wrong. Sometimes that is true. But the same move can protect the framework from any evidence that would falsify it. If you find yourself re-specifying the fixed element after a failed action, ask honestly whether you are correcting a mistake or protecting a conclusion.
+**The wrong-layer escape hatch.** When a seed crystal fails, it's always possible to say the fixed part was named wrong. Sometimes that's true. But the same move can protect the framework from any evidence that would falsify it. If you find yourself re-specifying the fixed part after a failed action, ask honestly whether you're correcting a mistake or protecting a conclusion.
 
 ---
 
 *The Open Ring — openring*
 *MIT license. Copy and share freely.*
-*openring-manual-v1*
+*openring-manual-v2*
