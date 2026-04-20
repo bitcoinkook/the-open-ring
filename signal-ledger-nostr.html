@@ -18,6 +18,7 @@
       --green:      #70D090;
       --green-bg:   rgba(112,208,144,0.06);
       --red:        #E57070;
+      --red-bg:     rgba(229,112,112,0.06);
       --text:       #c8bfaa;
       --dim:        #2e2a22;
       --dim2:       #1e1c16;
@@ -33,11 +34,10 @@
       min-height: 100vh;
     }
 
-    /* ── LAYOUT ── */
-    .app { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .app { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
     /* ── HEADER ── */
-    .header { margin-bottom: 3rem; }
+    .header { margin-bottom: 2.5rem; }
     .header-label {
       font-size: 0.6rem; letter-spacing: 0.25em;
       text-transform: uppercase; color: var(--amber-dim);
@@ -53,17 +53,26 @@
       font-size: 0.85rem; font-weight: 300;
       color: var(--amber-dim); line-height: 1.7;
     }
+    .protocol-badge {
+      display: inline-flex; gap: 0.4rem;
+      margin-top: 0.8rem; flex-wrap: wrap;
+    }
+    .protocol-badge span {
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--dim);
+      color: var(--amber-dim);
+    }
 
     /* ── TABS ── */
     .tabs {
-      display: flex; gap: 0;
-      border-bottom: 1px solid var(--dim);
+      display: flex; border-bottom: 1px solid var(--dim);
       margin-bottom: 2rem;
     }
     .tab {
       padding: 0.6rem 1.2rem;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.1em;
+      font-size: 0.68rem; letter-spacing: 0.1em;
       text-transform: uppercase;
       background: none; border: none;
       color: var(--amber-dim); cursor: pointer;
@@ -73,7 +82,6 @@
     .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
     .tab:hover:not(.active) { color: var(--text); }
 
-    /* ── PANELS ── */
     .panel { display: none; }
     .panel.active { display: block; }
 
@@ -99,7 +107,7 @@
     .dot.error { background: var(--red); }
     .connect-btn {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem; letter-spacing: 0.08em;
+      font-size: 0.68rem; letter-spacing: 0.08em;
       text-transform: uppercase;
       background: none;
       border: 1px solid var(--amber-dim);
@@ -108,29 +116,52 @@
     }
     .connect-btn:hover { background: var(--amber-bg); border-color: var(--amber); }
     .pubkey-display {
-      font-size: 0.65rem; color: var(--amber-dim);
-      word-break: break-all;
+      font-size: 0.62rem; color: var(--amber-dim);
+      word-break: break-all; margin-bottom: 1.5rem;
     }
 
-    /* ── FORM ── */
+    /* ── SECTION (ORP-01 sections) ── */
     .form-section {
       margin-bottom: 2rem;
       padding-bottom: 2rem;
       border-bottom: 1px solid var(--dim);
     }
     .form-section:last-of-type { border-bottom: none; }
-    .section-label {
-      font-size: 0.6rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--amber-dim);
-      margin-bottom: 1.2rem;
+    .section-header {
+      display: flex; align-items: baseline; gap: 0.8rem;
+      margin-bottom: 0.5rem; flex-wrap: wrap;
     }
-    .field { margin-bottom: 1.2rem; }
+    .section-num {
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      color: var(--amber-dim);
+    }
+    .section-title {
+      font-size: 0.85rem; font-weight: 500;
+      color: var(--amber); letter-spacing: 0.05em;
+    }
+    .section-subtitle {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.75rem; color: var(--amber-dim);
+      margin-bottom: 1.2rem; font-weight: 300;
+    }
+
+    /* ── FIELD ── */
+    .field { margin-bottom: 1.1rem; }
     .field label {
-      display: block; font-size: 0.68rem;
-      letter-spacing: 0.1em; text-transform: uppercase;
+      display: block; font-size: 0.65rem;
+      letter-spacing: 0.08em;
       color: var(--amber-dim); margin-bottom: 0.4rem;
+      font-family: 'IBM Plex Mono', monospace;
     }
-    .field input, .field textarea, .field select {
+    .field label .q-id {
+      color: var(--blue); margin-right: 0.4rem;
+    }
+    .field label .req {
+      color: var(--red); margin-left: 0.3rem;
+    }
+    .field input,
+    .field textarea,
+    .field select {
       width: 100%;
       background: var(--dim2);
       border: 1px solid var(--dim);
@@ -147,17 +178,51 @@
       font-size: 0.75rem;
       cursor: pointer;
     }
-    .field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
-    .field input:focus, .field textarea:focus, .field select:focus {
-      border-color: var(--amber-dim);
-    }
+    select option { background: #1a1810; }
+    .field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--amber-dim); }
+
     .field-hint {
-      font-size: 0.65rem; color: var(--amber-dim);
+      font-size: 0.63rem; color: var(--amber-dim);
       margin-top: 0.3rem; line-height: 1.5;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
-    /* ── SELECT OPTIONS ── */
-    select option { background: #1a1810; }
+    /* ── DUAL FIELD (alpha + P(detect)) ── */
+    .dual-field {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    /* ── BINARY GROUP (immunity checks) ── */
+    .binary-group { display: flex; flex-direction: column; gap: 0.8rem; }
+    .binary-row {
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: center; gap: 1rem;
+      padding: 0.5rem 0.9rem;
+      background: var(--dim2);
+      border: 1px solid var(--dim);
+    }
+    .binary-q {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 300;
+      color: var(--text); line-height: 1.5;
+    }
+    .binary-options { display: flex; gap: 0.3rem; }
+    .binary-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none; border: 1px solid var(--dim);
+      color: var(--amber-dim); padding: 0.3rem 0.6rem;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .binary-btn:hover { color: var(--text); }
+    .binary-btn.active-yes { background: rgba(229,112,112,0.1); border-color: var(--red); color: var(--red); }
+    .binary-btn.active-no  { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .binary-btn.active-unclear { background: var(--amber-bg); border-color: var(--amber-dim); color: var(--amber); }
 
     /* ── SUBMIT ── */
     .submit-btn {
@@ -168,7 +233,7 @@
       background: var(--amber-bg);
       border: 1px solid var(--amber-dim);
       color: var(--amber);
-      padding: 0.9rem;
+      padding: 0.95rem;
       cursor: pointer; transition: all 0.2s;
       margin-top: 1rem;
     }
@@ -178,36 +243,36 @@
     }
     .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── STATUS MESSAGE ── */
+    /* ── MSG ── */
     .msg {
       margin-top: 1rem; padding: 0.8rem 1rem;
-      font-size: 0.75rem; line-height: 1.6;
-      display: none;
+      font-size: 0.72rem; line-height: 1.6;
+      display: none; font-family: 'IBM Plex Mono', monospace;
     }
     .msg.success { background: var(--green-bg); border-left: 2px solid var(--green); color: var(--green); display: block; }
-    .msg.error   { background: rgba(229,112,112,0.06); border-left: 2px solid var(--red); color: var(--red); display: block; }
+    .msg.error   { background: var(--red-bg); border-left: 2px solid var(--red); color: var(--red); display: block; }
     .msg.loading { background: var(--amber-bg); border-left: 2px solid var(--amber-dim); color: var(--amber-dim); display: block; }
 
-    /* ── LEDGER FEED ── */
+    /* ── FEED ── */
     .feed-controls {
-      display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;
     }
     .feed-btn {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.68rem; letter-spacing: 0.08em;
+      font-size: 0.64rem; letter-spacing: 0.08em;
       text-transform: uppercase;
       background: none; border: 1px solid var(--dim);
-      color: var(--amber-dim); padding: 0.4rem 0.8rem;
+      color: var(--amber-dim); padding: 0.35rem 0.7rem;
       cursor: pointer; transition: all 0.2s;
     }
     .feed-btn:hover, .feed-btn.active {
       border-color: var(--amber-dim); color: var(--amber);
     }
+
     .record {
       background: var(--dim2);
       border: 1px solid var(--dim);
-      padding: 1.2rem;
-      margin-bottom: 1rem;
+      padding: 1.2rem; margin-bottom: 1rem;
       transition: border-color 0.2s;
     }
     .record:hover { border-color: var(--amber-dim); }
@@ -218,30 +283,39 @@
     }
     .record-structure {
       font-family: 'IBM Plex Sans', sans-serif;
-      font-size: 0.9rem; font-weight: 500;
-      color: var(--amber);
+      font-size: 0.92rem; font-weight: 500;
+      color: var(--amber); line-height: 1.4;
     }
     .record-meta {
-      font-size: 0.65rem; color: var(--amber-dim);
+      font-size: 0.62rem; color: var(--amber-dim);
       text-align: right; line-height: 1.5; flex-shrink: 0;
     }
-    .state-badge {
-      display: inline-block;
-      font-size: 0.6rem; letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.5rem;
-      margin-bottom: 0.8rem;
+    .record-flags {
+      display: flex; gap: 0.4rem; margin-bottom: 0.8rem;
+      flex-wrap: wrap;
     }
-    .state-INVERTED  { background: rgba(229,112,112,0.1); color: var(--red); border: 1px solid rgba(229,112,112,0.3); }
-    .state-SOUND     { background: var(--green-bg); color: var(--green); border: 1px solid rgba(112,208,144,0.3); }
-    .state-FROZEN    { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(96,181,229,0.3); }
-    .state-UNGROUNDED{ background: rgba(212,181,128,0.08); color: var(--amber-dim); border: 1px solid var(--dim); }
-    .state-IMMUNE    { background: var(--green-bg); color: var(--green); border: 1px solid rgba(112,208,144,0.5); }
-    .record-field { margin-bottom: 0.6rem; }
+    .flag-badge {
+      font-size: 0.58rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid;
+    }
+    .flag-state.INVERTED  { background: var(--red-bg);   color: var(--red);   border-color: rgba(229,112,112,0.3); }
+    .flag-state.SOUND     { background: var(--green-bg); color: var(--green); border-color: rgba(112,208,144,0.3); }
+    .flag-state.FROZEN    { background: var(--blue-bg);  color: var(--blue);  border-color: rgba(96,181,229,0.3); }
+    .flag-state.UNGROUNDED{ background: var(--amber-bg); color: var(--amber-dim); border-color: var(--dim); }
+    .flag-state.IMMUNE    { background: var(--green-bg); color: var(--green); border-color: rgba(112,208,144,0.5); }
+    .flag-warning { background: var(--red-bg); color: var(--red); border-color: rgba(229,112,112,0.3); }
+    .flag-info    { background: var(--amber-bg); color: var(--amber-dim); border-color: var(--dim); }
+
+    .record-field { margin-bottom: 0.7rem; }
     .record-field-label {
-      font-size: 0.6rem; letter-spacing: 0.12em;
+      font-size: 0.58rem; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--amber-dim);
       margin-bottom: 0.2rem;
+    }
+    .record-field-label .f-id {
+      color: var(--blue); margin-right: 0.3rem;
     }
     .record-field-value {
       font-family: 'IBM Plex Sans', sans-serif;
@@ -249,7 +323,7 @@
       color: var(--text); line-height: 1.6;
     }
     .record-toggle {
-      font-size: 0.65rem; color: var(--amber-dim);
+      font-size: 0.62rem; color: var(--amber-dim);
       background: none; border: none;
       cursor: pointer; padding: 0;
       margin-top: 0.6rem; letter-spacing: 0.08em;
@@ -259,37 +333,52 @@
     .record-full { margin-top: 0.8rem; display: none; }
     .record-full.open { display: block; }
     .record-pubkey {
-      font-size: 0.6rem; color: var(--dim);
+      font-size: 0.56rem; color: var(--dim);
       margin-top: 0.8rem; word-break: break-all;
     }
+
     .empty-state {
       text-align: center; padding: 3rem 1rem;
-      color: var(--amber-dim); font-size: 0.8rem;
+      color: var(--amber-dim); font-size: 0.78rem;
       line-height: 1.8;
     }
     .loading-state {
       text-align: center; padding: 2rem;
-      color: var(--amber-dim); font-size: 0.75rem;
+      color: var(--amber-dim); font-size: 0.72rem;
     }
 
-    /* ── SCHEMA SECTION ── */
-    .schema-block {
+    /* ── ABOUT ── */
+    .about-prose {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 300;
+      line-height: 1.8; color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .about-prose strong { color: var(--amber); font-weight: 400; }
+    .code-block {
       background: var(--blue-bg);
       border-left: 2px solid var(--blue);
-      padding: 1rem 1.2rem;
-      margin: 1.5rem 0;
-      font-size: 0.75rem;
-      color: var(--blue);
-      line-height: 1.8;
-      white-space: pre;
-      overflow-x: auto;
+      padding: 0.9rem 1.1rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem; color: var(--blue);
+      line-height: 1.8; white-space: pre;
+      overflow-x: auto; margin: 1rem 0;
     }
+    .link-row {
+      display: flex; flex-direction: column;
+      gap: 0.4rem; margin-top: 0.8rem;
+    }
+    .link-row a {
+      font-size: 0.72rem; color: var(--amber);
+      text-decoration: none; font-family: 'IBM Plex Mono', monospace;
+    }
+    .link-row a:hover { color: var(--blue); }
 
     /* ── FOOTER ── */
     .footer {
       margin-top: 4rem; padding-top: 1.5rem;
       border-top: 1px solid var(--dim);
-      font-size: 0.65rem; color: var(--amber-dim);
+      font-size: 0.62rem; color: var(--amber-dim);
       display: flex; justify-content: space-between;
       flex-wrap: wrap; gap: 0.5rem;
     }
@@ -301,6 +390,9 @@
     @media (max-width: 480px) {
       .app { padding: 1.5rem 1rem 3rem; }
       .connect-bar { flex-direction: column; align-items: flex-start; }
+      .dual-field { grid-template-columns: 1fr; }
+      .binary-row { grid-template-columns: 1fr; }
+      .binary-options { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -309,22 +401,28 @@
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-label">Open Ring — Signal Ledger</div>
+    <div class="header-label">Open Ring · Signal Ledger</div>
     <h1 class="header-title">The Field.<br>Signed. Owned by nobody.</h1>
     <p class="header-sub">
-      Where outcomes go after the diagnostic runs and someone acts on the verdict.
-      Built on Nostr — signed events, verifiable by anyone, stored by no one.
+      Reference implementation of the Open Ring Protocol stack.
+      Records live on Nostr as kind 1337 events — verifiable by anyone, stored by no one.
     </p>
+    <div class="protocol-badge">
+      <span>ORP-01</span>
+      <span>ORP-02</span>
+      <span>ORP-03</span>
+      <span>STACK v1</span>
+    </div>
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('submit')">File a record</button>
-    <button class="tab" onclick="switchTab('ledger')">Read the ledger</button>
-    <button class="tab" onclick="switchTab('about')">About</button>
+    <button class="tab active" onclick="switchTab('submit', this)">File a record</button>
+    <button class="tab" onclick="switchTab('ledger', this)">Read the ledger</button>
+    <button class="tab" onclick="switchTab('about', this)">About</button>
   </div>
 
-  <!-- ── SUBMIT PANEL ── -->
+  <!-- ══════ SUBMIT PANEL ══════ -->
   <div id="panel-submit" class="panel active">
 
     <!-- CONNECTION -->
@@ -335,77 +433,355 @@
       </div>
       <button class="connect-btn" id="conn-btn" onclick="connectNostr()">Connect</button>
     </div>
-    <div id="pubkey-display" class="pubkey-display" style="margin-bottom:1.5rem;display:none;"></div>
+    <div id="pubkey-display" class="pubkey-display" style="display:none;"></div>
 
-    <!-- FORM -->
+    <!-- ═══ SECTION 1 — IDENTIFICATION ═══ -->
     <div class="form-section">
-      <div class="section-label">The structure</div>
-      <div class="field">
-        <label>What did you analyse?</label>
-        <input type="text" id="f-structure" placeholder="e.g. Surf fins sold in sets of three">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §1</span>
+        <span class="section-title">Identification</span>
       </div>
+      <p class="section-subtitle">What is being examined.</p>
+
       <div class="field">
-        <label>State</label>
-        <select id="f-state">
+        <label><span class="q-id">Q1.01</span>Structure<span class="req">*</span></label>
+        <input type="text" id="q1_01" placeholder="e.g. Surf fins sold in sets of three">
+        <div class="field-hint">One sentence · precise · name the specific thing, not the category.</div>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.02</span>Domain<span class="req">*</span></label>
+        <select id="q1_02">
           <option value="">— select —</option>
-          <option value="INVERTED">INVERTED — capture, user pays</option>
-          <option value="SOUND">SOUND — structure healthy</option>
-          <option value="FROZEN">FROZEN — nothing moves</option>
-          <option value="UNGROUNDED">UNGROUNDED — mutual drift</option>
-          <option value="IMMUNE">IMMUNE — cannot be captured</option>
+          <option value="market">market</option>
+          <option value="institution">institution</option>
+          <option value="relationship">relationship</option>
+          <option value="practice">practice</option>
+          <option value="product">product</option>
+          <option value="system">system</option>
+          <option value="culture">culture</option>
+          <option value="infrastructure">infrastructure</option>
+          <option value="technology">technology</option>
+          <option value="governance">governance</option>
+          <option value="other">other</option>
         </select>
       </div>
+
       <div class="field">
-        <label>Inversion type</label>
-        <select id="f-inversion">
-          <option value="none">None</option>
-          <option value="accretion">Accretion — accumulated by default</option>
-          <option value="intentional">Intentional — actively maintained</option>
+        <label><span class="q-id">Q1.03</span>Felt sense<span class="req">*</span></label>
+        <textarea id="q1_03" placeholder="What feels wrong — or right? Both are signal. Your own words."></textarea>
+        <div class="field-hint">Preserved verbatim. Never paraphrased.</div>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.04</span>Direct experience<span class="req">*</span></label>
+        <select id="q1_04">
+          <option value="">— select —</option>
+          <option value="years">years of direct contact</option>
+          <option value="months">months of direct contact</option>
+          <option value="occasional">occasional direct contact</option>
+          <option value="secondhand">secondhand — read or heard</option>
+          <option value="speculative">speculative — inferred only</option>
+        </select>
+        <div class="field-hint">Determines signal weight. Secondhand/speculative triggers PRELIMINARY flag.</div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 2 — INVERSION ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §2</span>
+        <span class="section-title">Inversion Diagnostic</span>
+      </div>
+      <p class="section-subtitle">What is fixed · what varies · who pays.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q2.01</span>What is fixed<span class="req">*</span></label>
+        <input type="text" id="q2_01" placeholder="The specific element that does not change">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q2.02</span>What varies<span class="req">*</span></label>
+        <input type="text" id="q2_02" placeholder="What changes as a result of that fixedness">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q2.03</span>Who bears the cost<span class="req">*</span></label>
+        <select id="q2_03">
+          <option value="">— select —</option>
+          <option value="user">user</option>
+          <option value="incumbent">incumbent</option>
+          <option value="both">both</option>
+          <option value="unclear">unclear</option>
+        </select>
+        <input type="text" id="q2_03_cost" placeholder="What is the cost? (money / time / health / opportunity / autonomy / attention / safety / other)" style="margin-top:0.4rem;">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q2.04</span>Cost magnitude</label>
+        <select id="q2_04">
+          <option value="unclear">unclear</option>
+          <option value="severe">severe — life-altering or financially ruinous</option>
+          <option value="significant">significant — regularly felt, materially real</option>
+          <option value="moderate">moderate — noticeable but manageable</option>
+          <option value="minor">minor — marginal, easy to absorb</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q2.05</span>Capture type</label>
+        <select id="q2_05">
+          <option value="unclear">unclear</option>
+          <option value="accretion">accretion — accumulated by default</option>
+          <option value="intentional">intentional — actively defended</option>
+          <option value="mixed">mixed — accretion then defended</option>
+          <option value="none">none — no capture present</option>
+        </select>
+        <input type="text" id="q2_05_evidence" placeholder="Evidence — what tells you this?" style="margin-top:0.4rem;">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q2.06</span>Cost-detection check</label>
+        <div class="dual-field">
+          <select id="q2_06_alpha">
+            <option value="">α — cost of lying</option>
+            <option value="high">α high — expensive</option>
+            <option value="low">α low — cheap</option>
+            <option value="unclear">α unclear</option>
+          </select>
+          <select id="q2_06_pdetect">
+            <option value="">P(detect) — visibility</option>
+            <option value="high">P(detect) high — visible</option>
+            <option value="low">P(detect) low — hidden</option>
+            <option value="unclear">P(detect) unclear</option>
+          </select>
+        </div>
+        <div class="field-hint">If α or P(detect) = low → triggers NOMINALLY CONSTANT flag.</div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 3 — GRADIENT ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §3</span>
+        <span class="section-title">Gradient</span>
+      </div>
+      <p class="section-subtitle">Pressure · maintenance · the seed crystal.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q3.01</span>Natural pressure</label>
+        <textarea id="q3_01" placeholder="What does this structure want to become if unblocked?"></textarea>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q3.02</span>Maintenance energy</label>
+        <textarea id="q3_02" placeholder="What is being spent to hold the blockage in place?"></textarea>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q3.03</span>Supersaturation point</label>
+        <input type="text" id="q3_03" placeholder="Where has pressure built longest without release?">
+        <div class="field-hint">The concrete place where the call to action lands.</div>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q3.04</span>Pressure duration</label>
+        <select id="q3_04">
+          <option value="unclear">unclear</option>
+          <option value="decades">decades</option>
+          <option value="years">years</option>
+          <option value="months">months</option>
+          <option value="recent">recent</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q3.05</span>Seed crystal<span class="req">*</span></label>
+        <textarea id="q3_05" placeholder="The minimum intervention. Placed at the stratum where the blockage is held. True, open, emergent."></textarea>
+        <select id="q3_05_stratum" style="margin-top:0.4rem;">
+          <option value="">— stratum the seed crystal is placed at —</option>
+          <option value="1">Stratum 1 — Individual</option>
+          <option value="2">Stratum 2 — Relationship</option>
+          <option value="3">Stratum 3 — Institution</option>
+          <option value="4">Stratum 4 — Environment</option>
+          <option value="5">Stratum 5 — Culture</option>
+          <option value="mixed">Mixed strata</option>
         </select>
       </div>
     </div>
 
+    <!-- ═══ SECTION 4 — SIGNALCHAIN ═══ -->
     <div class="form-section">
-      <div class="section-label">The verdict</div>
-      <div class="field">
-        <label>Diagnosis</label>
-        <textarea id="f-diagnosis" placeholder="One sentence. The whole thing in plain language."></textarea>
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §4</span>
+        <span class="section-title">SignalChain</span>
       </div>
+      <p class="section-subtitle">Find the first break in the chain.</p>
+
       <div class="field">
-        <label>SignalChain break</label>
-        <select id="f-break">
-          <option value="none">No break — structure is sound</option>
-          <option value="SIGNAL">SIGNAL — information not reaching people who need it</option>
-          <option value="MEDIUM">MEDIUM — transmission channel is captured</option>
-          <option value="POTENTIAL">POTENTIAL — reference not genuinely constant</option>
-          <option value="PHASE">PHASE — local only, not globally distributed</option>
+        <label><span class="q-id">Q4.01</span>Signal node — information reaching the people who need it?</label>
+        <select id="q4_01">
+          <option value="unclear">unclear</option>
+          <option value="yes">yes</option>
+          <option value="no">no</option>
+          <option value="partial">partial</option>
         </select>
       </div>
+
       <div class="field">
-        <label>Seed crystal</label>
-        <textarea id="f-seed" placeholder="The minimum intervention. Placed at the correct stratum. Concrete."></textarea>
-        <div class="field-hint">Not a disruption. The smallest true thing that lets the correct structure emerge on its own.</div>
+        <label><span class="q-id">Q4.02</span>Medium node — transmission channel not captured?</label>
+        <select id="q4_02">
+          <option value="unclear">unclear</option>
+          <option value="yes">yes</option>
+          <option value="no">no</option>
+          <option value="partial">partial</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q4.03</span>Potential node — α × P(detect) > 1?</label>
+        <select id="q4_03">
+          <option value="unclear">unclear</option>
+          <option value="yes">yes</option>
+          <option value="no">no</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q4.04</span>Phase node — local or globally distributed?</label>
+        <select id="q4_04">
+          <option value="unclear">unclear</option>
+          <option value="local">local only</option>
+          <option value="regional">regional</option>
+          <option value="global">global</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q4.05</span>Break stratum — where does the break occur?</label>
+        <select id="q4_05_stratum">
+          <option value="">— select stratum —</option>
+          <option value="1">Stratum 1 — Individual</option>
+          <option value="2">Stratum 2 — Relationship</option>
+          <option value="3">Stratum 3 — Institution</option>
+          <option value="4">Stratum 4 — Environment</option>
+          <option value="5">Stratum 5 — Culture</option>
+        </select>
+        <div class="field-hint">If this differs from Q3.05 stratum → triggers STRATUM MISMATCH flag.</div>
       </div>
     </div>
 
+    <!-- ═══ SECTION 5 — ORIENTATION ═══ -->
     <div class="form-section">
-      <div class="section-label">What happened</div>
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §5</span>
+        <span class="section-title">Orientation</span>
+      </div>
+      <p class="section-subtitle">Correct invariant · what must be freed · immunity.</p>
+
       <div class="field">
-        <label>Call to action — did you act on it?</label>
-        <select id="f-acted">
+        <label><span class="q-id">Q5.01</span>Correct invariant</label>
+        <input type="text" id="q5_01" placeholder="What should be permanently fixed — as orientation, not value">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q5.02</span>What must be freed</label>
+        <input type="text" id="q5_02" placeholder="What must vary that the current structure locks">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q5.03</span>Weakest pillar</label>
+        <select id="q5_03">
+          <option value="">— select —</option>
+          <option value="signal">signal</option>
+          <option value="medium">medium</option>
+          <option value="potential">potential</option>
+          <option value="phase">phase</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q5.04a</span>Immunity checks (four binary)</label>
+        <div class="binary-group" id="immunity-checks">
+          <div class="binary-row" data-check="education">
+            <div class="binary-q">Can education about this structure be suppressed by a single actor?</div>
+            <div class="binary-options">
+              <button type="button" class="binary-btn" onclick="setBinary('education','yes',this)">Yes</button>
+              <button type="button" class="binary-btn" onclick="setBinary('education','no',this)">No</button>
+              <button type="button" class="binary-btn" onclick="setBinary('education','unclear',this)">?</button>
+            </div>
+          </div>
+          <div class="binary-row" data-check="distribution">
+            <div class="binary-q">Does distribution require a controlled channel?</div>
+            <div class="binary-options">
+              <button type="button" class="binary-btn" onclick="setBinary('distribution','yes',this)">Yes</button>
+              <button type="button" class="binary-btn" onclick="setBinary('distribution','no',this)">No</button>
+              <button type="button" class="binary-btn" onclick="setBinary('distribution','unclear',this)">?</button>
+            </div>
+          </div>
+          <div class="binary-row" data-check="finance">
+            <div class="binary-q">Can an incumbent concentrate finance to block it?</div>
+            <div class="binary-options">
+              <button type="button" class="binary-btn" onclick="setBinary('finance','yes',this)">Yes</button>
+              <button type="button" class="binary-btn" onclick="setBinary('finance','no',this)">No</button>
+              <button type="button" class="binary-btn" onclick="setBinary('finance','unclear',this)">?</button>
+            </div>
+          </div>
+          <div class="binary-row" data-check="legitimacy">
+            <div class="binary-q">Is legitimacy dependent on external validation?</div>
+            <div class="binary-options">
+              <button type="button" class="binary-btn" onclick="setBinary('legitimacy','yes',this)">Yes</button>
+              <button type="button" class="binary-btn" onclick="setBinary('legitimacy','no',this)">No</button>
+              <button type="button" class="binary-btn" onclick="setBinary('legitimacy','unclear',this)">?</button>
+            </div>
+          </div>
+        </div>
+        <div class="field-hint">All four "No" → approaching capture immune.</div>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q5.04b</span>Closest to satisfied</label>
+        <select id="q5_04b">
+          <option value="none">none</option>
+          <option value="education">education</option>
+          <option value="distribution">distribution</option>
+          <option value="finance">finance</option>
+          <option value="legitimacy">legitimacy</option>
+          <option value="all_four">all four</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q5.04c</span>Next step toward immunity</label>
+        <textarea id="q5_04c" placeholder="What is the next realistic step?"></textarea>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION FIELD ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-03 · Field</span>
+        <span class="section-title">What happened</span>
+      </div>
+      <p class="section-subtitle">Updated after acting in the real world.</p>
+
+      <div class="field">
+        <label>Action taken<span class="req">*</span></label>
+        <select id="f_action_taken">
           <option value="pending">Not yet — verdict just received</option>
           <option value="yes">Yes — acted on it</option>
           <option value="no">No — decided not to</option>
         </select>
       </div>
+
       <div class="field">
-        <label>What you observed (optional)</label>
-        <textarea id="f-observed" placeholder="What the real world showed you after acting. What held, what didn't, what surprised you."></textarea>
-        <div class="field-hint">Leave blank if you haven't acted yet. Come back and file an update when you have.</div>
+        <label>What you observed</label>
+        <textarea id="f_observed" placeholder="What the real world showed after acting. What held, what didn't, what surprised you."></textarea>
       </div>
+
       <div class="field">
-        <label>Signal update (optional)</label>
-        <textarea id="f-signal-update" placeholder="What you know now that you didn't know when you ran the diagnostic."></textarea>
+        <label>Signal update</label>
+        <textarea id="f_signal_update" placeholder="What you know now that you didn't when you filed. Becomes the felt sense for the next run."></textarea>
       </div>
     </div>
 
@@ -416,15 +792,16 @@
 
   </div>
 
-  <!-- ── LEDGER PANEL ── -->
+  <!-- ══════ LEDGER PANEL ══════ -->
   <div id="panel-ledger" class="panel">
 
     <div class="feed-controls">
-      <button class="feed-btn active" onclick="filterFeed('all', this)">All records</button>
+      <button class="feed-btn active" onclick="filterFeed('all', this)">All</button>
       <button class="feed-btn" onclick="filterFeed('INVERTED', this)">Inverted</button>
       <button class="feed-btn" onclick="filterFeed('SOUND', this)">Sound</button>
+      <button class="feed-btn" onclick="filterFeed('FROZEN', this)">Frozen</button>
       <button class="feed-btn" onclick="filterFeed('IMMUNE', this)">Immune</button>
-      <button class="feed-btn" onclick="loadFeed()">↻ Refresh</button>
+      <button class="feed-btn" onclick="loadFeed()">↻</button>
     </div>
 
     <div id="feed-container">
@@ -433,66 +810,93 @@
 
   </div>
 
-  <!-- ── ABOUT PANEL ── -->
+  <!-- ══════ ABOUT PANEL ══════ -->
   <div id="panel-about" class="panel">
 
     <div class="form-section">
-      <div class="section-label">What this is</div>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:1rem;">
-        The Signal Ledger is the Field node of the Open Ring cycle. It records what happened when someone ran the diagnostic and acted on the verdict — what held, what didn't, what the real world showed.
+      <div class="section-header">
+        <span class="section-title">What this is</span>
+      </div>
+      <p class="about-prose">
+        The Signal Ledger is the reference implementation of the <strong>Open Ring Protocol</strong> stack — ORP-01 (questions), ORP-02 (verdict), ORP-03 (Field record).
       </p>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:1rem;">
-        A ledger only means something when nobody owns it. Records here are signed Nostr events — owned by the person who filed them, verifiable by anyone, stored across the relay network.
+      <p class="about-prose">
+        A ledger only means something when <strong>nobody owns it</strong>. Records here are signed Nostr events of kind 1337 — owned by the person who filed them, verifiable by anyone, stored across the relay network.
       </p>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;">
-        The framework holds itself to its own condition: α × P(detect) &gt; 1. A Google Sheet fails both. A signed Nostr event satisfies both.
+      <p class="about-prose">
+        The framework holds itself to its own condition: α × P(detect) &gt; 1. A signed Nostr event satisfies both. A Google Sheet satisfies neither.
       </p>
     </div>
 
     <div class="form-section">
-      <div class="section-label">Event schema — kind 1337</div>
-      <div class="schema-block">kind:    1337
-content: { full field record as JSON }
-tags: [
-  ["t",              "signal-ledger"  ],
-  ["t",              "open-ring"      ],
-  ["structure",      "..."            ],
-  ["state",          "INVERTED|..."   ],
-  ["break",          "MEDIUM|..."     ],
-  ["inversion_type", "accretion|..."  ],
-  ["action_taken",   "yes|no|pending" ],
-  ["client",         "open-ring-signal-ledger"]
+      <div class="section-header">
+        <span class="section-title">The protocol stack</span>
+      </div>
+      <div class="code-block">ORP-01   Question Protocol    input layer
+         The questions and answer types.
+
+ORP-02   Verdict Protocol     processing layer
+         The nine-field standard output.
+         V.01 through V.09.
+
+ORP-03   Field Protocol       output layer
+         The signed record on Nostr kind 1337.</div>
+      <div class="link-row">
+        <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" target="_blank">→ ORP-01</a>
+        <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" target="_blank">→ ORP-02</a>
+        <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" target="_blank">→ ORP-03</a>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Nostr event schema · kind 1337</span>
+      </div>
+      <div class="code-block">kind:     1337
+content:  full record payload (JSON)
+tags:     [
+  ["t",                  "signal-ledger"    ],
+  ["t",                  "open-ring"        ],
+  ["t",                  "orp-03"           ],
+  ["orp_stack_version",  "1"                ],
+  ["structure",          Q1.01              ],
+  ["domain",             Q1.02              ],
+  ["state",              V.02               ],
+  ["inversion_type",     V.03               ],
+  ["signal_weight",      V.04               ],
+  ["break",              V.05               ],
+  ["action_taken",       yes|no|pending     ],
+  ["client",             "signal-ledger"    ]
 ]</div>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.8rem;font-weight:300;line-height:1.7;color:var(--amber-dim);">
-        Any client that understands this schema can read and write to the ledger. The schema is MIT licensed. Build on it.
-      </p>
     </div>
 
     <div class="form-section">
-      <div class="section-label">How to connect</div>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:0.8rem;">
-        The Signal Ledger uses NIP-07 — a browser extension that holds your Nostr private key and signs events without ever exposing the key to this page.
+      <div class="section-header">
+        <span class="section-title">How to connect</span>
+      </div>
+      <p class="about-prose">
+        Uses <strong>NIP-07</strong> — a browser extension that holds your Nostr private key and signs events without exposing the key.
       </p>
-      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;">
-        Compatible extensions: Alby, nos2x, Nostore. Install any one, import or generate a key, then click Connect.
+      <p class="about-prose">
+        Compatible: Alby, nos2x, Nostore (iOS), Kiwi Browser + nos2x (Android).
       </p>
     </div>
 
     <div>
-      <div class="section-label">Relays</div>
-      <div style="font-size:0.72rem;line-height:2;color:var(--amber-dim);">
-        wss://relay.damus.io<br>
-        wss://relay.nostr.band<br>
-        wss://nos.lol<br>
-        wss://relay.snort.social
+      <div class="section-header">
+        <span class="section-title">Reference relays</span>
       </div>
+      <div class="code-block">wss://relay.damus.io
+wss://relay.nostr.band
+wss://nos.lol
+wss://relay.snort.social</div>
     </div>
 
   </div>
 
   <!-- FOOTER -->
   <div class="footer">
-    <span>MIT license — Open Ring Signal Ledger v1</span>
+    <span>Signal Ledger · ORP stack v1 · MIT</span>
     <a href="https://github.com/bitcoinkook/the-open-ring" target="_blank">github.com/bitcoinkook/the-open-ring</a>
   </div>
 
@@ -501,10 +905,6 @@ tags: [
 <script type="module">
   import {
     SimplePool,
-    getEventHash,
-    getPublicKey,
-    generateSecretKey,
-    finalizeEvent,
     nip19
   } from 'https://esm.sh/nostr-tools@2.3.1'
 
@@ -513,6 +913,7 @@ tags: [
   let pool = null
   let allRecords = []
   let activeFilter = 'all'
+  const immunityState = { education:'', distribution:'', finance:'', legitimacy:'' }
 
   const RELAYS = [
     'wss://relay.damus.io',
@@ -524,21 +925,27 @@ tags: [
 
   // ── INIT ──
   window.addEventListener('load', () => {
-    initPool()
+    pool = new SimplePool()
     loadFeed()
   })
 
-  function initPool() {
-    pool = new SimplePool()
-  }
-
-  // ── TAB SWITCHING ──
-  window.switchTab = function(tab) {
+  // ── TABS ──
+  window.switchTab = function(tab, el) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
     document.getElementById('panel-' + tab).classList.add('active')
-    event.target.classList.add('active')
+    el.classList.add('active')
     if (tab === 'ledger') loadFeed()
+  }
+
+  // ── IMMUNITY BINARY BUTTONS ──
+  window.setBinary = function(check, value, btn) {
+    immunityState[check] = value
+    const row = btn.closest('.binary-row')
+    row.querySelectorAll('.binary-btn').forEach(b => {
+      b.classList.remove('active-yes','active-no','active-unclear')
+    })
+    btn.classList.add('active-' + value)
   }
 
   // ── CONNECT ──
@@ -546,7 +953,7 @@ tags: [
     const btn = document.getElementById('conn-btn')
     const dot = document.getElementById('conn-dot')
     const label = document.getElementById('conn-label')
-    const pkDisplay = document.getElementById('pubkey-display')
+    const pk = document.getElementById('pubkey-display')
 
     if (!window.nostr) {
       showMsg('submit-msg', 'error',
@@ -561,14 +968,10 @@ tags: [
       label.textContent = 'Connected'
       btn.textContent = 'Disconnect'
       btn.onclick = disconnectNostr
-
-      const npub = nip19.npubEncode(pubkey)
-      pkDisplay.textContent = npub
-      pkDisplay.style.display = 'block'
-
+      pk.textContent = nip19.npubEncode(pubkey)
+      pk.style.display = 'block'
       document.getElementById('submit-btn').disabled = false
       document.getElementById('submit-btn').textContent = 'Sign and publish to Nostr'
-
     } catch(e) {
       dot.classList.add('error')
       label.textContent = 'Connection failed'
@@ -579,62 +982,193 @@ tags: [
 
   window.disconnectNostr = function() {
     pubkey = null
-    const dot = document.getElementById('conn-dot')
-    const label = document.getElementById('conn-label')
+    document.getElementById('conn-dot').classList.remove('connected','error')
+    document.getElementById('conn-label').textContent = 'Not connected — connect your Nostr key to sign records'
     const btn = document.getElementById('conn-btn')
-    const pkDisplay = document.getElementById('pubkey-display')
-
-    dot.classList.remove('connected', 'error')
-    label.textContent = 'Not connected — connect your Nostr key to sign records'
     btn.textContent = 'Connect'
     btn.onclick = connectNostr
-    pkDisplay.style.display = 'none'
+    document.getElementById('pubkey-display').style.display = 'none'
     document.getElementById('submit-btn').disabled = true
     document.getElementById('submit-btn').textContent = 'Connect to sign and publish'
+  }
+
+  // ── DERIVATION LOGIC ──
+  function deriveSignalWeight(q1_04) {
+    if (q1_04 === 'years') return 'strong'
+    if (q1_04 === 'months' || q1_04 === 'occasional') return 'adequate'
+    return 'thin'  // secondhand or speculative
+  }
+
+  function deriveState(answers) {
+    // IMMUNE: all four checks = no, α and P both high, no user cost
+    const allNo = Object.values(immunityState).every(v => v === 'no')
+    const strongGrounding = answers.q2_06_alpha === 'high' && answers.q2_06_pdetect === 'high'
+    const noUserCost = answers.q2_03 === 'incumbent' || answers.q2_03 === 'unclear'
+    if (allNo && strongGrounding && noUserCost) return 'IMMUNE'
+
+    // INVERTED: cost falls on user, fixed serves incumbent
+    if (answers.q2_03 === 'user' || answers.q2_03 === 'both') return 'INVERTED'
+
+    // UNGROUNDED: no fixed element named or alpha low
+    if (!answers.q2_01 || answers.q2_06_alpha === 'low') return 'UNGROUNDED'
+
+    // FROZEN: fixed but nothing varies
+    if (answers.q2_01 && !answers.q2_02) return 'FROZEN'
+
+    // SOUND: fixed, varies, no user cost
+    return 'SOUND'
+  }
+
+  function deriveBreakPoint(answers) {
+    if (answers.q4_01 === 'no' || answers.q4_01 === 'partial') return 'SIGNAL'
+    if (answers.q4_02 === 'no' || answers.q4_02 === 'partial') return 'MEDIUM'
+    if (answers.q4_03 === 'no') return 'POTENTIAL'
+    if (answers.q4_04 === 'local') return 'PHASE'
+    return 'none'
   }
 
   // ── SUBMIT ──
   window.submitRecord = async function() {
     if (!pubkey) return
 
-    const structure = document.getElementById('f-structure').value.trim()
-    const state     = document.getElementById('f-state').value
-    const inversion = document.getElementById('f-inversion').value
-    const diagnosis = document.getElementById('f-diagnosis').value.trim()
-    const brk       = document.getElementById('f-break').value
-    const seed      = document.getElementById('f-seed').value.trim()
-    const acted     = document.getElementById('f-acted').value
-    const observed  = document.getElementById('f-observed').value.trim()
-    const sigUpdate = document.getElementById('f-signal-update').value.trim()
+    // collect all ORP-01 answers
+    const a = {
+      q1_01: val('q1_01'), q1_02: val('q1_02'),
+      q1_03: val('q1_03'), q1_04: val('q1_04'),
+      q2_01: val('q2_01'), q2_02: val('q2_02'),
+      q2_03: val('q2_03'), q2_03_cost: val('q2_03_cost'),
+      q2_04: val('q2_04'), q2_05: val('q2_05'),
+      q2_05_evidence: val('q2_05_evidence'),
+      q2_06_alpha: val('q2_06_alpha'),
+      q2_06_pdetect: val('q2_06_pdetect'),
+      q3_01: val('q3_01'), q3_02: val('q3_02'),
+      q3_03: val('q3_03'), q3_04: val('q3_04'),
+      q3_05: val('q3_05'), q3_05_stratum: val('q3_05_stratum'),
+      q4_01: val('q4_01'), q4_02: val('q4_02'),
+      q4_03: val('q4_03'), q4_04: val('q4_04'),
+      q4_05_stratum: val('q4_05_stratum'),
+      q5_01: val('q5_01'), q5_02: val('q5_02'),
+      q5_03: val('q5_03'),
+      q5_04b: val('q5_04b'), q5_04c: val('q5_04c'),
+      f_action_taken: val('f_action_taken'),
+      f_observed: val('f_observed'),
+      f_signal_update: val('f_signal_update')
+    }
 
-    if (!structure || !state || !diagnosis || !seed) {
+    // required validation
+    const required = ['q1_01','q1_02','q1_03','q1_04','q2_01','q2_02','q2_03','q3_05']
+    const missing = required.filter(k => !a[k])
+    if (missing.length) {
       showMsg('submit-msg', 'error',
-        'Required: structure, state, diagnosis, seed crystal.')
+        'Missing required fields: ' + missing.join(', '))
       return
     }
 
+    // derive verdict fields
+    const signal_weight = deriveSignalWeight(a.q1_04)
+    const state = deriveState(a)
+    const break_point = deriveBreakPoint(a)
+    const inversion_type = a.q2_05 || 'unclear'
+
+    // derive flags
+    const flag_nominally_constant = a.q2_06_alpha === 'low' || a.q2_06_pdetect === 'low'
+    const flag_preliminary = signal_weight === 'thin'
+    const flag_stratum_mismatch =
+      a.q3_05_stratum && a.q4_05_stratum && a.q3_05_stratum !== a.q4_05_stratum
+
+    // build content payload (ORP-03 spec)
     const content = {
-      structure, state, inversion_type: inversion,
-      diagnosis, signalchain_break: brk, seed_crystal: seed,
-      action_taken: acted,
-      ...(observed  && { what_observed: observed }),
-      ...(sigUpdate && { signal_update: sigUpdate }),
-      filed_at: new Date().toISOString()
+      orp_stack_version: '1',
+      identification: {
+        structure: a.q1_01,
+        domain: a.q1_02,
+        felt_sense: a.q1_03,
+        direct_experience: a.q1_04
+      },
+      inversion: {
+        what_is_fixed: a.q2_01,
+        what_varies: a.q2_02,
+        who_bears_cost: a.q2_03,
+        cost_description: a.q2_03_cost || null,
+        cost_magnitude: a.q2_04,
+        capture_type: a.q2_05,
+        capture_evidence: a.q2_05_evidence || null,
+        alpha: a.q2_06_alpha || null,
+        p_detect: a.q2_06_pdetect || null
+      },
+      gradient: {
+        natural_pressure: a.q3_01 || null,
+        maintenance_energy: a.q3_02 || null,
+        supersaturation_point: a.q3_03 || null,
+        pressure_duration: a.q3_04 || null,
+        seed_crystal: a.q3_05,
+        seed_crystal_stratum: a.q3_05_stratum || null
+      },
+      signalchain: {
+        signal_node: a.q4_01 || null,
+        medium_node: a.q4_02 || null,
+        potential_node: a.q4_03 || null,
+        phase_node: a.q4_04 || null,
+        break_stratum: a.q4_05_stratum || null
+      },
+      orientation: {
+        correct_invariant: a.q5_01 || null,
+        what_must_be_freed: a.q5_02 || null,
+        weakest_pillar: a.q5_03 || null,
+        immunity_checks: { ...immunityState },
+        immunity_closest: a.q5_04b || null,
+        immunity_next_step: a.q5_04c || null
+      },
+      verdict: {
+        v01_structure: a.q1_01,
+        v02_state: state,
+        v02_state_explanation: null,
+        v03_inversion_type: inversion_type,
+        v03_inversion_evidence: a.q2_05_evidence || null,
+        v04_signal_weight: signal_weight,
+        v05_break_point: break_point,
+        v05_break_explanation: null,
+        v06_diagnosis: null,
+        v07_treatment: a.q3_05,
+        v08_call_to_action: null,
+        v09_capture_immunity_path: a.q5_04c || null
+      },
+      flags: {
+        nominally_constant: flag_nominally_constant,
+        preliminary: flag_preliminary,
+        stratum_mismatch: flag_stratum_mismatch
+      },
+      field: {
+        action_taken: a.f_action_taken,
+        what_observed: a.f_observed || null,
+        signal_update: a.f_signal_update || null,
+        filed_at: new Date().toISOString()
+      }
     }
+
+    // build tags (ORP-03 spec)
+    const tags = [
+      ['t', 'signal-ledger'],
+      ['t', 'open-ring'],
+      ['t', 'orp-03'],
+      ['orp_stack_version', '1'],
+      ['structure', a.q1_01],
+      ['domain', a.q1_02],
+      ['state', state],
+      ['inversion_type', inversion_type],
+      ['signal_weight', signal_weight],
+      ['break', break_point],
+      ['action_taken', a.f_action_taken],
+      ['client', 'signal-ledger']
+    ]
+    if (flag_preliminary)         tags.push(['preliminary', 'true'])
+    if (flag_nominally_constant)  tags.push(['nominally_constant', 'true'])
+    if (flag_stratum_mismatch)    tags.push(['stratum_mismatch', 'true'])
 
     const eventTemplate = {
       kind: KIND,
       created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ['t',              'signal-ledger'   ],
-        ['t',              'open-ring'       ],
-        ['structure',      structure         ],
-        ['state',          state             ],
-        ['break',          brk               ],
-        ['inversion_type', inversion         ],
-        ['action_taken',   acted             ],
-        ['client',         'open-ring-signal-ledger']
-      ],
+      tags,
       content: JSON.stringify(content),
       pubkey
     }
@@ -644,32 +1178,14 @@ tags: [
 
     try {
       const signedEvent = await window.nostr.signEvent(eventTemplate)
-
       showMsg('submit-msg', 'loading', 'Publishing to relays...')
-
-      const pubs = pool.publish(RELAYS, signedEvent)
-
-      await Promise.any(pubs.map(p =>
-        new Promise((res, rej) => { p.on('ok', res); p.on('failed', rej) })
-      ))
-
+      await Promise.any(pool.publish(RELAYS, signedEvent))
       showMsg('submit-msg', 'success',
-        '✓ Record published to Nostr. Event ID: ' + signedEvent.id.slice(0,16) + '...')
-
-      // clear form
-      ;['f-structure','f-diagnosis','f-seed','f-observed','f-signal-update']
-        .forEach(id => document.getElementById(id).value = '')
-      document.getElementById('f-state').value = ''
-      document.getElementById('f-break').value = 'none'
-      document.getElementById('f-inversion').value = 'none'
-      document.getElementById('f-acted').value = 'pending'
+        '✓ Filed. State: ' + state + ' · Break: ' + break_point +
+        ' · Weight: ' + signal_weight +
+        '\nEvent: ' + signedEvent.id.slice(0,16) + '...')
 
       allRecords.unshift(signedEvent)
-      if (activeFilter === 'all' ||
-          getTag(signedEvent, 'state') === activeFilter) {
-        renderFeed([signedEvent, ...allRecords.slice(1)])
-      }
-
     } catch(e) {
       showMsg('submit-msg', 'error', 'Publish failed: ' + (e.message || 'relay rejected'))
     } finally {
@@ -683,18 +1199,23 @@ tags: [
     container.innerHTML = '<div class="loading-state">Querying relays...</div>'
 
     try {
-      const events = await pool.querySync(RELAYS, {
-        kinds: [KIND],
-        '#t': ['signal-ledger'],
-        limit: 50
+      const events = await new Promise((resolve) => {
+        const collected = []
+        const timeout = setTimeout(() => resolve(collected), 6000)
+        pool.subscribeMany(
+          RELAYS,
+          [{ kinds: [KIND], '#t': ['signal-ledger'], limit: 50 }],
+          {
+            onevent(ev) { collected.push(ev) },
+            oneose()    { clearTimeout(timeout); resolve(collected) }
+          }
+        )
       })
-
       allRecords = events.sort((a,b) => b.created_at - a.created_at)
       renderFeed(filterRecords(allRecords, activeFilter))
-
     } catch(e) {
       container.innerHTML =
-        '<div class="empty-state">Could not reach relays.<br>Check your connection and try again.</div>'
+        '<div class="empty-state">Could not reach relays.<br>Check connection and try again.</div>'
     }
   }
 
@@ -707,95 +1228,114 @@ tags: [
 
   function filterRecords(records, filter) {
     if (filter === 'all') return records
-    return records.filter(e => getTag(e, 'state') === filter)
+    return records.filter(e => getTag(e,'state') === filter)
   }
 
   function renderFeed(records) {
     const container = document.getElementById('feed-container')
-
     if (!records.length) {
       container.innerHTML =
         '<div class="empty-state">No records yet.<br>Be the first to file a signal.</div>'
       return
     }
-
-    container.innerHTML = records.map((e, i) => {
-      let content = {}
-      try { content = JSON.parse(e.content) } catch(_) {}
-
-      const state     = getTag(e, 'state') || '—'
-      const structure = getTag(e, 'structure') || content.structure || 'Unknown structure'
-      const brk       = getTag(e, 'break') || '—'
-      const acted     = getTag(e, 'action_taken') || '—'
-      const date      = new Date(e.created_at * 1000).toLocaleDateString('en-GB', {
-        day: 'numeric', month: 'short', year: 'numeric'
+    container.innerHTML = records.map((e,i) => {
+      let c = {}
+      try { c = JSON.parse(e.content) } catch(_) {}
+      const v = c.verdict || {}
+      const f = c.flags || {}
+      const structure = v.v01_structure || getTag(e,'structure') || '—'
+      const state     = v.v02_state      || getTag(e,'state')     || '—'
+      const brk       = v.v05_break_point|| getTag(e,'break')     || '—'
+      const weight    = v.v04_signal_weight || getTag(e,'signal_weight') || '—'
+      const invType   = v.v03_inversion_type || getTag(e,'inversion_type') || '—'
+      const date = new Date(e.created_at * 1000).toLocaleDateString('en-GB', {
+        day:'numeric', month:'short', year:'numeric'
       })
       const npub = (() => {
         try { return nip19.npubEncode(e.pubkey) } catch(_) { return e.pubkey }
       })()
 
+      const flags = []
+      if (f.preliminary)        flags.push('<span class="flag-badge flag-warning">PRELIMINARY</span>')
+      if (f.nominally_constant) flags.push('<span class="flag-badge flag-warning">NOMINALLY CONST</span>')
+      if (f.stratum_mismatch)   flags.push('<span class="flag-badge flag-info">STRATUM MISMATCH</span>')
+
       return `
-        <div class="record" id="rec-${i}">
+        <div class="record">
           <div class="record-header">
-            <div class="record-structure">${escHtml(structure)}</div>
+            <div class="record-structure">${esc(structure)}</div>
             <div class="record-meta">${date}</div>
           </div>
-          <div class="state-badge state-${state}">${state}</div>
+          <div class="record-flags">
+            <span class="flag-badge flag-state ${state}">${state}</span>
+            <span class="flag-badge flag-info">${invType}</span>
+            <span class="flag-badge flag-info">BREAK: ${brk}</span>
+            <span class="flag-badge flag-info">SIG: ${weight}</span>
+            ${flags.join('')}
+          </div>
           <div class="record-field">
-            <div class="record-field-label">Diagnosis</div>
-            <div class="record-field-value">${escHtml(content.diagnosis || '—')}</div>
+            <div class="record-field-label"><span class="f-id">V.06</span>Diagnosis</div>
+            <div class="record-field-value">${esc(v.v06_diagnosis || v.v07_treatment || '—')}</div>
           </div>
           <div class="record-full" id="full-${i}">
             <div class="record-field">
-              <div class="record-field-label">Seed crystal</div>
-              <div class="record-field-value">${escHtml(content.seed_crystal || '—')}</div>
+              <div class="record-field-label"><span class="f-id">Q1.03</span>Felt sense</div>
+              <div class="record-field-value">${esc(c.identification?.felt_sense || '—')}</div>
             </div>
             <div class="record-field">
-              <div class="record-field-label">SignalChain break</div>
-              <div class="record-field-value">${escHtml(brk)}</div>
+              <div class="record-field-label"><span class="f-id">V.07</span>Seed crystal</div>
+              <div class="record-field-value">${esc(v.v07_treatment || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label"><span class="f-id">V.08</span>Call to action</div>
+              <div class="record-field-value">${esc(v.v08_call_to_action || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label"><span class="f-id">V.09</span>Capture immunity path</div>
+              <div class="record-field-value">${esc(v.v09_capture_immunity_path || '—')}</div>
             </div>
             <div class="record-field">
               <div class="record-field-label">Action taken</div>
-              <div class="record-field-value">${escHtml(acted)}</div>
+              <div class="record-field-value">${esc(c.field?.action_taken || '—')}</div>
             </div>
-            ${content.what_observed ? `
+            ${c.field?.what_observed ? `
             <div class="record-field">
               <div class="record-field-label">What happened</div>
-              <div class="record-field-value">${escHtml(content.what_observed)}</div>
+              <div class="record-field-value">${esc(c.field.what_observed)}</div>
             </div>` : ''}
-            ${content.signal_update ? `
+            ${c.field?.signal_update ? `
             <div class="record-field">
               <div class="record-field-label">Signal update</div>
-              <div class="record-field-value">${escHtml(content.signal_update)}</div>
+              <div class="record-field-value">${esc(c.field.signal_update)}</div>
             </div>` : ''}
             <div class="record-pubkey">${npub}</div>
           </div>
-          <button class="record-toggle" onclick="toggleRecord(${i})">
-            + expand
-          </button>
+          <button class="record-toggle" onclick="toggleRecord(${i})">+ expand</button>
         </div>`
     }).join('')
   }
 
   window.toggleRecord = function(i) {
     const full = document.getElementById('full-' + i)
-    const btn  = full.nextElementSibling
+    const btn = full.nextElementSibling
     const open = full.classList.toggle('open')
     btn.textContent = open ? '− collapse' : '+ expand'
   }
 
   // ── HELPERS ──
-  function getTag(event, name) {
-    const tag = event.tags.find(t => t[0] === name)
-    return tag ? tag[1] : null
+  function val(id) {
+    const el = document.getElementById(id)
+    return el ? (el.value || '').trim() : ''
   }
-
-  function escHtml(str) {
-    return String(str)
+  function getTag(event, name) {
+    const t = event.tags.find(x => x[0] === name)
+    return t ? t[1] : null
+  }
+  function esc(str) {
+    return String(str == null ? '' : str)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
   }
-
   function showMsg(id, type, text) {
     const el = document.getElementById(id)
     el.className = 'msg ' + type
