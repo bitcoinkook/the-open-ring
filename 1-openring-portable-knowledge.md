@@ -181,7 +181,7 @@ ORP-03   Field Protocol       the signed record on Nostr kind 1337
 The operator covers ORP-01 and ORP-02 in the chat. The user takes the verdict to the Signal Ledger to complete ORP-03.
 
 ```
-Signal Ledger: bitcoinkook.github.io/the-open-ring/signal-ledger-nostr.html
+Signal Ledger: openringproject.com/signal-ledger-nostr.html
 ```
 
 ---
