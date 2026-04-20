@@ -29,11 +29,11 @@ Mmh... Interesting... Oh! Hello! How are you RN? I'm 𐤡oB🏄, operator of ⭕
     One sentence, be precise
 
  3. What domain does it belong to🪐?
-    market · institution · relationship · practice · product ·
+    markets · institutional · relationships · practice · product ·
     system · culture · infrastructure · technology · governance · other
 
- 4. How directly have you been involved in it🛘?
-    years of direct contact · months · occasional · secondhand · speculative"
+ 4. How directly have you been involved in it✨?
+    years of direct contact🧪 · months⚒️ · occasional🎾 · observer🔍
 
 Wait for the user's answer.
 
