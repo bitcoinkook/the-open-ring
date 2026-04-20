@@ -232,15 +232,25 @@ h1.title {
 }
 .stack-item {
   background: var(--bg1);
-  padding: 0.95rem 1.1rem;
+  padding: 0;
   color: inherit;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  transition: background 0.15s;
 }
-.stack-text { flex: 1; min-width: 0; }
+.stack-item:hover { background: #151108; }
+
+.stack-link {
+  flex: 1;
+  min-width: 0;
+  padding: 0.95rem 1.1rem;
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+.stack-link:hover { text-decoration: none; }
+
 .stack-id {
   font-size: 0.56rem;
   letter-spacing: 0.14em;
@@ -258,7 +268,9 @@ h1.title {
 }
 .stack-actions {
   display: flex;
+  align-items: center;
   gap: 0.4rem;
+  padding: 0.95rem 1.1rem 0.95rem 0;
   flex-shrink: 0;
 }
 .s-btn {
@@ -278,11 +290,6 @@ h1.title {
   background: rgba(212,181,128,0.08);
   border-color: var(--amber);
   text-decoration: none;
-}
-.s-btn.copied {
-  background: rgba(112,208,144,0.1);
-  border-color: #70D090;
-  color: #70D090;
 }
 .s-btn-gh {
   color: var(--blue);
@@ -450,9 +457,9 @@ footer a:hover { color: var(--amber); }
   <div class="header-inner">
     <div class="brand">Open Ring</div>
     <div class="protocol-chips">
-      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" class="chip">ORP-01</a>
-      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" class="chip">ORP-02</a>
-      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" class="chip">ORP-03</a>
+      <a href="orp-01.html" class="chip">ORP-01</a>
+      <a href="orp-02.html" class="chip">ORP-02</a>
+      <a href="orp-03.html" class="chip">ORP-03</a>
     </div>
   </div>
 </header>
@@ -492,39 +499,40 @@ footer a:hover { color: var(--amber); }
   <div class="stack-eyebrow">THE OPEN RING PROTOCOL</div>
   <div class="stack-title">Three documents. One standard.</div>
   <div class="stack">
+
     <div class="stack-item">
-      <div class="stack-text">
+      <a href="orp-01.html" class="stack-link">
         <div class="stack-id">ORP-01 · INPUT</div>
         <div class="stack-name">Question Protocol</div>
         <div class="stack-desc">Standard questions and answer types.</div>
-      </div>
+      </a>
       <div class="stack-actions">
-        <button class="s-btn" onclick="copyORP(1, this)">Copy</button>
-        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" target="_blank">GitHub</a>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" target="_blank">GitHub ↗</a>
       </div>
     </div>
+
     <div class="stack-item">
-      <div class="stack-text">
+      <a href="orp-02.html" class="stack-link">
         <div class="stack-id">ORP-02 · PROCESSING</div>
         <div class="stack-name">Verdict Protocol</div>
         <div class="stack-desc">The nine-field verdict — V.01 through V.09. Three flags.</div>
-      </div>
+      </a>
       <div class="stack-actions">
-        <button class="s-btn" onclick="copyORP(2, this)">Copy</button>
-        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" target="_blank">GitHub</a>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" target="_blank">GitHub ↗</a>
       </div>
     </div>
+
     <div class="stack-item">
-      <div class="stack-text">
+      <a href="orp-03.html" class="stack-link">
         <div class="stack-id">ORP-03 · OUTPUT</div>
         <div class="stack-name">Field Protocol</div>
         <div class="stack-desc">Signed record on Nostr kind 1337. Portable. Queryable.</div>
-      </div>
+      </a>
       <div class="stack-actions">
-        <button class="s-btn" onclick="copyORP(3, this)">Copy</button>
-        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" target="_blank">GitHub</a>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" target="_blank">GitHub ↗</a>
       </div>
     </div>
+
   </div>
 
   <!-- FRAMEWORK (collapsed) -->
@@ -636,60 +644,6 @@ A=V, B=C  →  INVERTED     capture — user pays
       correctLevel: QRCode.CorrectLevel.M
     });
   })();
-</script>
-
-<!-- ORP copy functionality — fetch from GitHub raw, copy to clipboard -->
-<script>
-  const ORP_URLS = {
-    1: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-01-question-protocol.md',
-    2: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-02-verdict-protocol.md',
-    3: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-03-field-protocol.md',
-  };
-  const orpCache = {};
-
-  async function copyORP(id, btn) {
-    const originalText = 'Copy';
-    btn.textContent = '…';
-
-    try {
-      // Fetch and cache
-      if (!orpCache[id]) {
-        const res = await fetch(ORP_URLS[id]);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        orpCache[id] = await res.text();
-      }
-
-      const text = orpCache[id];
-
-      // Copy
-      const done = () => {
-        btn.classList.add('copied');
-        btn.textContent = '✓ Copied';
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          btn.textContent = originalText;
-        }, 2200);
-      };
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-        done();
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        done();
-      }
-    } catch (e) {
-      btn.textContent = 'Failed';
-      setTimeout(() => { btn.textContent = originalText; }, 2000);
-    }
-  }
 </script>
 
 </body>
