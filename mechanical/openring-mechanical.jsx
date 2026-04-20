@@ -3,8 +3,8 @@ const { useState, useRef, useEffect } = React;
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 
 const SHEET_ID        = "1BhZ24t56pkRA3LXK6Wcr0nxqYp0_phN5RVdLHhFjIGQ";
-const SHEET_URL       = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-const FORM_SUBMIT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdtbq3LRYc2bLsQRg8JDzGUYgoruFVe4JRguPsokBn006gx8w/formResponse";
+const SHEET_URL       = `https://bitcoinkook.github.io/the-open-ring/signal-ledger-nostr.html`;
+const FORM_SUBMIT_URL = "https://bitcoinkook.github.io/the-open-ring/signal-ledger-nostr.html";
 const FORM_ENTRIES    = {
   structure:  "entry.850797677",
   tool:       "entry.121788852",
