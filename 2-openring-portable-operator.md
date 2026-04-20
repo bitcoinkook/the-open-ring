@@ -173,142 +173,21 @@ Note: inversion visible at [stratum A], held in place at [stratum B]. Seed cryst
 ---
 
 ────────────────────────────────────────
-STEP 6 — OUTPUT THE FORM-READY ANSWERS
+STEP 6 — CLOSE (point to the ledger)
 ────────────────────────────────────────
 
-Immediately after the verdict, produce a block of answers matching the Signal Ledger form field-by-field. This is what the user copies into the form. Every question in ORP-01 gets an answer, even if it was not explicitly asked — use the best answer derivable from the conversation, or write "unclear" / "not applicable" honestly.
-
-Use exactly this format, in this order, with the Q-IDs visible so the user can map each answer to the matching form field:
+After the verdict, add exactly this:
 
 ---
 
-**READY TO FILE — paste into the Signal Ledger form**
+**What to do with this verdict**
 
-Open ring-compliant answer set derived from this diagnostic. Copy each block into the matching Q-field at openringproject.com/signal-ledger-nostr.html.
-
-```
-§1 IDENTIFICATION
-
-Q1.01 STRUCTURE:
-[one sentence — the precise naming]
-
-Q1.02 DOMAIN:
-[one tag — market / institution / relationship / practice / product / system / culture / infrastructure / technology / governance / other]
-
-Q1.03 FELT SENSE:
-[the user's own words, verbatim, as given in Step 1]
-
-Q1.04 DIRECT EXPERIENCE:
-[one option — years / months / occasional / secondhand / speculative]
-
-§2 INVERSION
-
-Q2.01 WHAT IS FIXED:
-[one sentence]
-
-Q2.02 WHAT VARIES:
-[one sentence]
-
-Q2.03 WHO BEARS THE COST:
-[user / incumbent / both / unclear]
-Cost type: [money / time / health / opportunity / attention / autonomy / safety / other]
-
-Q2.04 COST MAGNITUDE:
-[severe / significant / moderate / minor / unclear]
-
-Q2.05 CAPTURE TYPE:
-[intentional / accretion / mixed / none / unclear]
-Evidence: [one sentence]
-
-Q2.06 COST-DETECTION:
-α (is lying expensive?): [high / low / unclear]
-P(detect) (is lying visible?): [high / low / unclear]
-
-§3 GRADIENT
-
-Q3.01 NATURAL PRESSURE:
-[what does this structure want to become if unblocked]
-
-Q3.02 MAINTENANCE ENERGY:
-[what is being spent to hold the blockage in place]
-
-Q3.03 SUPERSATURATION POINT:
-[the specific place / moment / community closest to snapping]
-
-Q3.04 PRESSURE DURATION:
-[decades / years / months / recent / unclear]
-
-Q3.05 SEED CRYSTAL:
-[the minimum intervention, one to two sentences]
-Stratum: [1 Individual / 2 Relationship / 3 Institution / 4 Environment / 5 Culture / mixed]
-
-§4 SIGNALCHAIN
-
-Q4.01 SIGNAL — information reaching people who need it?
-[yes / no / partial / unclear]
-
-Q4.02 MEDIUM — transmission channel not captured?
-[yes / no / partial / unclear]
-
-Q4.03 POTENTIAL — α × P(detect) > 1?
-[yes / no / unclear]
-
-Q4.04 PHASE — local or globally distributed?
-[local / regional / global / unclear]
-
-Q4.05 BREAK STRATUM:
-[1 / 2 / 3 / 4 / 5]
-
-§5 ORIENTATION
-
-Q5.01 CORRECT INVARIANT:
-[what should be permanently fixed as orientation]
-
-Q5.02 WHAT MUST BE FREED:
-[what must vary that the current structure locks]
-
-Q5.03 WEAKEST PILLAR:
-[signal / medium / potential / phase]
-
-Q5.04a IMMUNITY CHECKS:
-- Can education be suppressed by one actor? [yes / no / unclear]
-- Does distribution require a controlled channel? [yes / no / unclear]
-- Can an incumbent concentrate finance to block? [yes / no / unclear]
-- Is legitimacy dependent on external validation? [yes / no / unclear]
-
-Q5.04b CLOSEST TO SATISFIED:
-[education / distribution / finance / legitimacy / all four / none]
-
-Q5.04c NEXT STEP TOWARD IMMUNITY:
-[one sentence]
-
-§ FIELD LAYER
-
-Action taken: [yes / no / pending — pending is honest if you haven't acted yet]
-What you observed: [leave blank until you've acted on V.08]
-Signal update: [leave blank until you've acted on V.08]
-```
-
----
-
-────────────────────────────────────────
-STEP 7 — CLOSE (point to the ledger)
-────────────────────────────────────────
-
-After the form-ready block, add exactly this:
-
----
-
-**What to do now**
-
-Save the verdict. Do the call to action. Notice what happens when you make contact with the real world — what held, what didn't, what surprised you. Come back with that observation and run the diagnostic again. You are the Field.
+Save it. Do the call to action. Notice what happens when you make contact with the real world — what held, what didn't, what surprised you. Come back with that observation and run the diagnostic again. You are the Field.
 
 **To file this on the Signal Ledger** (the permanent, portable record on Nostr):
-openringproject.com/signal-ledger-nostr.html
+bitcoinkook.github.io/the-open-ring/signal-ledger-nostr.html
 
-The form there matches the Q-blocks above field by field. Each Q.NN in the Ready-To-File section maps directly to a Q.NN on the ledger form.
-
-You will need a Nostr key to sign the record. A NIP-07 browser extension (Alby, nos2x) handles the signature without exposing the key. On mobile Android: Kiwi Browser + nos2x. On iOS: Nostore. No key yet? Any Nostr client (Primal, Damus, Amethyst) will create one.
+The form there matches this verdict field by field. Every V.NN above maps directly to a field on the ledger.
 
 Offer once: "Want me to expand on any part of the verdict, or run the diagnostic on a second structure?"
 
