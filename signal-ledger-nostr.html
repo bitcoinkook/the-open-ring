@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Ledger — Open Ring</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+    :root {
+      --bg:         #0A0907;
+      --bg2:        #111009;
+      --amber:      #D4B580;
+      --amber-dim:  #7a6a48;
+      --amber-bg:   rgba(212,181,128,0.05);
+      --blue:       #60B5E5;
+      --blue-bg:    rgba(96,181,229,0.06);
+      --green:      #70D090;
+      --green-bg:   rgba(112,208,144,0.06);
+      --red:        #E57070;
+      --text:       #c8bfaa;
+      --dim:        #2e2a22;
+      --dim2:       #1e1c16;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── LAYOUT ── */
+    .app { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── HEADER ── */
+    .header { margin-bottom: 3rem; }
+    .header-label {
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--amber-dim);
+      margin-bottom: 0.75rem;
+    }
+    .header-title {
+      font-size: clamp(1.4rem, 4vw, 1.9rem);
+      font-weight: 500; color: var(--amber);
+      line-height: 1.2; margin-bottom: 1rem;
+    }
+    .header-sub {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 300;
+      color: var(--amber-dim); line-height: 1.7;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--dim);
+      margin-bottom: 2rem;
+    }
+    .tab {
+      padding: 0.6rem 1.2rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: none; border: none;
+      color: var(--amber-dim); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: all 0.2s;
+    }
+    .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* ── PANELS ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CONNECTION BAR ── */
+    .connect-bar {
+      background: var(--dim2);
+      border: 1px solid var(--dim);
+      padding: 1rem 1.2rem;
+      margin-bottom: 2rem;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .connect-status {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.72rem;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--amber-dim); flex-shrink: 0;
+    }
+    .dot.connected { background: var(--green); animation: pulse 2s infinite; }
+    .dot.error { background: var(--red); }
+    .connect-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--amber-dim);
+      color: var(--amber); padding: 0.4rem 0.9rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .connect-btn:hover { background: var(--amber-bg); border-color: var(--amber); }
+    .pubkey-display {
+      font-size: 0.65rem; color: var(--amber-dim);
+      word-break: break-all;
+    }
+
+    /* ── FORM ── */
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--dim);
+    }
+    .form-section:last-of-type { border-bottom: none; }
+    .section-label {
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--amber-dim);
+      margin-bottom: 1.2rem;
+    }
+    .field { margin-bottom: 1.2rem; }
+    .field label {
+      display: block; font-size: 0.68rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--amber-dim); margin-bottom: 0.4rem;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      background: var(--dim2);
+      border: 1px solid var(--dim);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 300;
+      padding: 0.65rem 0.9rem;
+      transition: border-color 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .field select {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--amber-dim);
+    }
+    .field-hint {
+      font-size: 0.65rem; color: var(--amber-dim);
+      margin-top: 0.3rem; line-height: 1.5;
+    }
+
+    /* ── SELECT OPTIONS ── */
+    select option { background: #1a1810; }
+
+    /* ── SUBMIT ── */
+    .submit-btn {
+      width: 100%;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-dim);
+      color: var(--amber);
+      padding: 0.9rem;
+      cursor: pointer; transition: all 0.2s;
+      margin-top: 1rem;
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: rgba(212,181,128,0.12);
+      border-color: var(--amber);
+    }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── STATUS MESSAGE ── */
+    .msg {
+      margin-top: 1rem; padding: 0.8rem 1rem;
+      font-size: 0.75rem; line-height: 1.6;
+      display: none;
+    }
+    .msg.success { background: var(--green-bg); border-left: 2px solid var(--green); color: var(--green); display: block; }
+    .msg.error   { background: rgba(229,112,112,0.06); border-left: 2px solid var(--red); color: var(--red); display: block; }
+    .msg.loading { background: var(--amber-bg); border-left: 2px solid var(--amber-dim); color: var(--amber-dim); display: block; }
+
+    /* ── LEDGER FEED ── */
+    .feed-controls {
+      display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .feed-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none; border: 1px solid var(--dim);
+      color: var(--amber-dim); padding: 0.4rem 0.8rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .feed-btn:hover, .feed-btn.active {
+      border-color: var(--amber-dim); color: var(--amber);
+    }
+    .record {
+      background: var(--dim2);
+      border: 1px solid var(--dim);
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .record:hover { border-color: var(--amber-dim); }
+    .record-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 1rem;
+      margin-bottom: 0.8rem; flex-wrap: wrap;
+    }
+    .record-structure {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--amber);
+    }
+    .record-meta {
+      font-size: 0.65rem; color: var(--amber-dim);
+      text-align: right; line-height: 1.5; flex-shrink: 0;
+    }
+    .state-badge {
+      display: inline-block;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .state-INVERTED  { background: rgba(229,112,112,0.1); color: var(--red); border: 1px solid rgba(229,112,112,0.3); }
+    .state-SOUND     { background: var(--green-bg); color: var(--green); border: 1px solid rgba(112,208,144,0.3); }
+    .state-FROZEN    { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(96,181,229,0.3); }
+    .state-UNGROUNDED{ background: rgba(212,181,128,0.08); color: var(--amber-dim); border: 1px solid var(--dim); }
+    .state-IMMUNE    { background: var(--green-bg); color: var(--green); border: 1px solid rgba(112,208,144,0.5); }
+    .record-field { margin-bottom: 0.6rem; }
+    .record-field-label {
+      font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--amber-dim);
+      margin-bottom: 0.2rem;
+    }
+    .record-field-value {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 300;
+      color: var(--text); line-height: 1.6;
+    }
+    .record-toggle {
+      font-size: 0.65rem; color: var(--amber-dim);
+      background: none; border: none;
+      cursor: pointer; padding: 0;
+      margin-top: 0.6rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .record-toggle:hover { color: var(--amber); }
+    .record-full { margin-top: 0.8rem; display: none; }
+    .record-full.open { display: block; }
+    .record-pubkey {
+      font-size: 0.6rem; color: var(--dim);
+      margin-top: 0.8rem; word-break: break-all;
+    }
+    .empty-state {
+      text-align: center; padding: 3rem 1rem;
+      color: var(--amber-dim); font-size: 0.8rem;
+      line-height: 1.8;
+    }
+    .loading-state {
+      text-align: center; padding: 2rem;
+      color: var(--amber-dim); font-size: 0.75rem;
+    }
+
+    /* ── SCHEMA SECTION ── */
+    .schema-block {
+      background: var(--blue-bg);
+      border-left: 2px solid var(--blue);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-size: 0.75rem;
+      color: var(--blue);
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 4rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--dim);
+      font-size: 0.65rem; color: var(--amber-dim);
+      display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .footer a { color: var(--amber-dim); text-decoration: none; }
+    .footer a:hover { color: var(--amber); }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    @media (max-width: 480px) {
+      .app { padding: 1.5rem 1rem 3rem; }
+      .connect-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-label">Open Ring — Signal Ledger</div>
+    <h1 class="header-title">The Field.<br>Signed. Owned by nobody.</h1>
+    <p class="header-sub">
+      Where outcomes go after the diagnostic runs and someone acts on the verdict.
+      Built on Nostr — signed events, verifiable by anyone, stored by no one.
+    </p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('submit')">File a record</button>
+    <button class="tab" onclick="switchTab('ledger')">Read the ledger</button>
+    <button class="tab" onclick="switchTab('about')">About</button>
+  </div>
+
+  <!-- ── SUBMIT PANEL ── -->
+  <div id="panel-submit" class="panel active">
+
+    <!-- CONNECTION -->
+    <div class="connect-bar">
+      <div class="connect-status">
+        <div class="dot" id="conn-dot"></div>
+        <span id="conn-label">Not connected — connect your Nostr key to sign records</span>
+      </div>
+      <button class="connect-btn" id="conn-btn" onclick="connectNostr()">Connect</button>
+    </div>
+    <div id="pubkey-display" class="pubkey-display" style="margin-bottom:1.5rem;display:none;"></div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <div class="section-label">The structure</div>
+      <div class="field">
+        <label>What did you analyse?</label>
+        <input type="text" id="f-structure" placeholder="e.g. Surf fins sold in sets of three">
+      </div>
+      <div class="field">
+        <label>State</label>
+        <select id="f-state">
+          <option value="">— select —</option>
+          <option value="INVERTED">INVERTED — capture, user pays</option>
+          <option value="SOUND">SOUND — structure healthy</option>
+          <option value="FROZEN">FROZEN — nothing moves</option>
+          <option value="UNGROUNDED">UNGROUNDED — mutual drift</option>
+          <option value="IMMUNE">IMMUNE — cannot be captured</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Inversion type</label>
+        <select id="f-inversion">
+          <option value="none">None</option>
+          <option value="accretion">Accretion — accumulated by default</option>
+          <option value="intentional">Intentional — actively maintained</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">The verdict</div>
+      <div class="field">
+        <label>Diagnosis</label>
+        <textarea id="f-diagnosis" placeholder="One sentence. The whole thing in plain language."></textarea>
+      </div>
+      <div class="field">
+        <label>SignalChain break</label>
+        <select id="f-break">
+          <option value="none">No break — structure is sound</option>
+          <option value="SIGNAL">SIGNAL — information not reaching people who need it</option>
+          <option value="MEDIUM">MEDIUM — transmission channel is captured</option>
+          <option value="POTENTIAL">POTENTIAL — reference not genuinely constant</option>
+          <option value="PHASE">PHASE — local only, not globally distributed</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Seed crystal</label>
+        <textarea id="f-seed" placeholder="The minimum intervention. Placed at the correct stratum. Concrete."></textarea>
+        <div class="field-hint">Not a disruption. The smallest true thing that lets the correct structure emerge on its own.</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">What happened</div>
+      <div class="field">
+        <label>Call to action — did you act on it?</label>
+        <select id="f-acted">
+          <option value="pending">Not yet — verdict just received</option>
+          <option value="yes">Yes — acted on it</option>
+          <option value="no">No — decided not to</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>What you observed (optional)</label>
+        <textarea id="f-observed" placeholder="What the real world showed you after acting. What held, what didn't, what surprised you."></textarea>
+        <div class="field-hint">Leave blank if you haven't acted yet. Come back and file an update when you have.</div>
+      </div>
+      <div class="field">
+        <label>Signal update (optional)</label>
+        <textarea id="f-signal-update" placeholder="What you know now that you didn't know when you ran the diagnostic."></textarea>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitRecord()" disabled>
+      Connect to sign and publish
+    </button>
+    <div class="msg" id="submit-msg"></div>
+
+  </div>
+
+  <!-- ── LEDGER PANEL ── -->
+  <div id="panel-ledger" class="panel">
+
+    <div class="feed-controls">
+      <button class="feed-btn active" onclick="filterFeed('all', this)">All records</button>
+      <button class="feed-btn" onclick="filterFeed('INVERTED', this)">Inverted</button>
+      <button class="feed-btn" onclick="filterFeed('SOUND', this)">Sound</button>
+      <button class="feed-btn" onclick="filterFeed('IMMUNE', this)">Immune</button>
+      <button class="feed-btn" onclick="loadFeed()">↻ Refresh</button>
+    </div>
+
+    <div id="feed-container">
+      <div class="loading-state">Loading records from Nostr relays...</div>
+    </div>
+
+  </div>
+
+  <!-- ── ABOUT PANEL ── -->
+  <div id="panel-about" class="panel">
+
+    <div class="form-section">
+      <div class="section-label">What this is</div>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:1rem;">
+        The Signal Ledger is the Field node of the Open Ring cycle. It records what happened when someone ran the diagnostic and acted on the verdict — what held, what didn't, what the real world showed.
+      </p>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:1rem;">
+        A ledger only means something when nobody owns it. Records here are signed Nostr events — owned by the person who filed them, verifiable by anyone, stored across the relay network.
+      </p>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;">
+        The framework holds itself to its own condition: α × P(detect) &gt; 1. A Google Sheet fails both. A signed Nostr event satisfies both.
+      </p>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Event schema — kind 1337</div>
+      <div class="schema-block">kind:    1337
+content: { full field record as JSON }
+tags: [
+  ["t",              "signal-ledger"  ],
+  ["t",              "open-ring"      ],
+  ["structure",      "..."            ],
+  ["state",          "INVERTED|..."   ],
+  ["break",          "MEDIUM|..."     ],
+  ["inversion_type", "accretion|..."  ],
+  ["action_taken",   "yes|no|pending" ],
+  ["client",         "open-ring-signal-ledger"]
+]</div>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.8rem;font-weight:300;line-height:1.7;color:var(--amber-dim);">
+        Any client that understands this schema can read and write to the ledger. The schema is MIT licensed. Build on it.
+      </p>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">How to connect</div>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;margin-bottom:0.8rem;">
+        The Signal Ledger uses NIP-07 — a browser extension that holds your Nostr private key and signs events without ever exposing the key to this page.
+      </p>
+      <p style="font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;font-weight:300;line-height:1.8;">
+        Compatible extensions: Alby, nos2x, Nostore. Install any one, import or generate a key, then click Connect.
+      </p>
+    </div>
+
+    <div>
+      <div class="section-label">Relays</div>
+      <div style="font-size:0.72rem;line-height:2;color:var(--amber-dim);">
+        wss://relay.damus.io<br>
+        wss://relay.nostr.band<br>
+        wss://nos.lol<br>
+        wss://relay.snort.social
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>MIT license — Open Ring Signal Ledger v1</span>
+    <a href="https://github.com/bitcoinkook/the-open-ring" target="_blank">github.com/bitcoinkook/the-open-ring</a>
+  </div>
+
+</div>
+
+<script type="module">
+  import {
+    SimplePool,
+    getEventHash,
+    getPublicKey,
+    generateSecretKey,
+    finalizeEvent,
+    nip19
+  } from 'https://esm.sh/nostr-tools@2.3.1'
+
+  // ── STATE ──
+  let pubkey = null
+  let pool = null
+  let allRecords = []
+  let activeFilter = 'all'
+
+  const RELAYS = [
+    'wss://relay.damus.io',
+    'wss://relay.nostr.band',
+    'wss://nos.lol',
+    'wss://relay.snort.social'
+  ]
+  const KIND = 1337
+
+  // ── INIT ──
+  window.addEventListener('load', () => {
+    initPool()
+    loadFeed()
+  })
+
+  function initPool() {
+    pool = new SimplePool()
+  }
+
+  // ── TAB SWITCHING ──
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+    document.getElementById('panel-' + tab).classList.add('active')
+    event.target.classList.add('active')
+    if (tab === 'ledger') loadFeed()
+  }
+
+  // ── CONNECT ──
+  window.connectNostr = async function() {
+    const btn = document.getElementById('conn-btn')
+    const dot = document.getElementById('conn-dot')
+    const label = document.getElementById('conn-label')
+    const pkDisplay = document.getElementById('pubkey-display')
+
+    if (!window.nostr) {
+      showMsg('submit-msg', 'error',
+        'No NIP-07 extension found. Install Alby or nos2x, then try again.')
+      return
+    }
+
+    try {
+      btn.textContent = 'Connecting...'
+      pubkey = await window.nostr.getPublicKey()
+      dot.classList.add('connected')
+      label.textContent = 'Connected'
+      btn.textContent = 'Disconnect'
+      btn.onclick = disconnectNostr
+
+      const npub = nip19.npubEncode(pubkey)
+      pkDisplay.textContent = npub
+      pkDisplay.style.display = 'block'
+
+      document.getElementById('submit-btn').disabled = false
+      document.getElementById('submit-btn').textContent = 'Sign and publish to Nostr'
+
+    } catch(e) {
+      dot.classList.add('error')
+      label.textContent = 'Connection failed'
+      btn.textContent = 'Try again'
+      showMsg('submit-msg', 'error', 'Connection failed: ' + e.message)
+    }
+  }
+
+  window.disconnectNostr = function() {
+    pubkey = null
+    const dot = document.getElementById('conn-dot')
+    const label = document.getElementById('conn-label')
+    const btn = document.getElementById('conn-btn')
+    const pkDisplay = document.getElementById('pubkey-display')
+
+    dot.classList.remove('connected', 'error')
+    label.textContent = 'Not connected — connect your Nostr key to sign records'
+    btn.textContent = 'Connect'
+    btn.onclick = connectNostr
+    pkDisplay.style.display = 'none'
+    document.getElementById('submit-btn').disabled = true
+    document.getElementById('submit-btn').textContent = 'Connect to sign and publish'
+  }
+
+  // ── SUBMIT ──
+  window.submitRecord = async function() {
+    if (!pubkey) return
+
+    const structure = document.getElementById('f-structure').value.trim()
+    const state     = document.getElementById('f-state').value
+    const inversion = document.getElementById('f-inversion').value
+    const diagnosis = document.getElementById('f-diagnosis').value.trim()
+    const brk       = document.getElementById('f-break').value
+    const seed      = document.getElementById('f-seed').value.trim()
+    const acted     = document.getElementById('f-acted').value
+    const observed  = document.getElementById('f-observed').value.trim()
+    const sigUpdate = document.getElementById('f-signal-update').value.trim()
+
+    if (!structure || !state || !diagnosis || !seed) {
+      showMsg('submit-msg', 'error',
+        'Required: structure, state, diagnosis, seed crystal.')
+      return
+    }
+
+    const content = {
+      structure, state, inversion_type: inversion,
+      diagnosis, signalchain_break: brk, seed_crystal: seed,
+      action_taken: acted,
+      ...(observed  && { what_observed: observed }),
+      ...(sigUpdate && { signal_update: sigUpdate }),
+      filed_at: new Date().toISOString()
+    }
+
+    const eventTemplate = {
+      kind: KIND,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ['t',              'signal-ledger'   ],
+        ['t',              'open-ring'       ],
+        ['structure',      structure         ],
+        ['state',          state             ],
+        ['break',          brk               ],
+        ['inversion_type', inversion         ],
+        ['action_taken',   acted             ],
+        ['client',         'open-ring-signal-ledger']
+      ],
+      content: JSON.stringify(content),
+      pubkey
+    }
+
+    showMsg('submit-msg', 'loading', 'Signing event...')
+    document.getElementById('submit-btn').disabled = true
+
+    try {
+      const signedEvent = await window.nostr.signEvent(eventTemplate)
+
+      showMsg('submit-msg', 'loading', 'Publishing to relays...')
+
+      const pubs = pool.publish(RELAYS, signedEvent)
+
+      await Promise.any(pubs.map(p =>
+        new Promise((res, rej) => { p.on('ok', res); p.on('failed', rej) })
+      ))
+
+      showMsg('submit-msg', 'success',
+        '✓ Record published to Nostr. Event ID: ' + signedEvent.id.slice(0,16) + '...')
+
+      // clear form
+      ;['f-structure','f-diagnosis','f-seed','f-observed','f-signal-update']
+        .forEach(id => document.getElementById(id).value = '')
+      document.getElementById('f-state').value = ''
+      document.getElementById('f-break').value = 'none'
+      document.getElementById('f-inversion').value = 'none'
+      document.getElementById('f-acted').value = 'pending'
+
+      allRecords.unshift(signedEvent)
+      if (activeFilter === 'all' ||
+          getTag(signedEvent, 'state') === activeFilter) {
+        renderFeed([signedEvent, ...allRecords.slice(1)])
+      }
+
+    } catch(e) {
+      showMsg('submit-msg', 'error', 'Publish failed: ' + (e.message || 'relay rejected'))
+    } finally {
+      document.getElementById('submit-btn').disabled = false
+    }
+  }
+
+  // ── FEED ──
+  window.loadFeed = async function() {
+    const container = document.getElementById('feed-container')
+    container.innerHTML = '<div class="loading-state">Querying relays...</div>'
+
+    try {
+      const events = await pool.querySync(RELAYS, {
+        kinds: [KIND],
+        '#t': ['signal-ledger'],
+        limit: 50
+      })
+
+      allRecords = events.sort((a,b) => b.created_at - a.created_at)
+      renderFeed(filterRecords(allRecords, activeFilter))
+
+    } catch(e) {
+      container.innerHTML =
+        '<div class="empty-state">Could not reach relays.<br>Check your connection and try again.</div>'
+    }
+  }
+
+  window.filterFeed = function(filter, btn) {
+    activeFilter = filter
+    document.querySelectorAll('.feed-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    renderFeed(filterRecords(allRecords, filter))
+  }
+
+  function filterRecords(records, filter) {
+    if (filter === 'all') return records
+    return records.filter(e => getTag(e, 'state') === filter)
+  }
+
+  function renderFeed(records) {
+    const container = document.getElementById('feed-container')
+
+    if (!records.length) {
+      container.innerHTML =
+        '<div class="empty-state">No records yet.<br>Be the first to file a signal.</div>'
+      return
+    }
+
+    container.innerHTML = records.map((e, i) => {
+      let content = {}
+      try { content = JSON.parse(e.content) } catch(_) {}
+
+      const state     = getTag(e, 'state') || '—'
+      const structure = getTag(e, 'structure') || content.structure || 'Unknown structure'
+      const brk       = getTag(e, 'break') || '—'
+      const acted     = getTag(e, 'action_taken') || '—'
+      const date      = new Date(e.created_at * 1000).toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      })
+      const npub = (() => {
+        try { return nip19.npubEncode(e.pubkey) } catch(_) { return e.pubkey }
+      })()
+
+      return `
+        <div class="record" id="rec-${i}">
+          <div class="record-header">
+            <div class="record-structure">${escHtml(structure)}</div>
+            <div class="record-meta">${date}</div>
+          </div>
+          <div class="state-badge state-${state}">${state}</div>
+          <div class="record-field">
+            <div class="record-field-label">Diagnosis</div>
+            <div class="record-field-value">${escHtml(content.diagnosis || '—')}</div>
+          </div>
+          <div class="record-full" id="full-${i}">
+            <div class="record-field">
+              <div class="record-field-label">Seed crystal</div>
+              <div class="record-field-value">${escHtml(content.seed_crystal || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">SignalChain break</div>
+              <div class="record-field-value">${escHtml(brk)}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">Action taken</div>
+              <div class="record-field-value">${escHtml(acted)}</div>
+            </div>
+            ${content.what_observed ? `
+            <div class="record-field">
+              <div class="record-field-label">What happened</div>
+              <div class="record-field-value">${escHtml(content.what_observed)}</div>
+            </div>` : ''}
+            ${content.signal_update ? `
+            <div class="record-field">
+              <div class="record-field-label">Signal update</div>
+              <div class="record-field-value">${escHtml(content.signal_update)}</div>
+            </div>` : ''}
+            <div class="record-pubkey">${npub}</div>
+          </div>
+          <button class="record-toggle" onclick="toggleRecord(${i})">
+            + expand
+          </button>
+        </div>`
+    }).join('')
+  }
+
+  window.toggleRecord = function(i) {
+    const full = document.getElementById('full-' + i)
+    const btn  = full.nextElementSibling
+    const open = full.classList.toggle('open')
+    btn.textContent = open ? '− collapse' : '+ expand'
+  }
+
+  // ── HELPERS ──
+  function getTag(event, name) {
+    const tag = event.tags.find(t => t[0] === name)
+    return tag ? tag[1] : null
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+  }
+
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id)
+    el.className = 'msg ' + type
+    el.textContent = text
+  }
+</script>
+</body>
+</html>
