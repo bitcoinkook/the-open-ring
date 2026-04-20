@@ -291,14 +291,20 @@ details.framework[open] .fw-hint { color: var(--amber2); }
   color: var(--amber);
   padding: 0.5rem 0.9rem;
   border: 1px solid var(--amber2);
+  background: transparent;
   margin-bottom: 0.8rem;
+  cursor: pointer;
   transition: all 0.15s;
 }
 .sats-addr:hover {
-  text-decoration: none;
   border-color: #F7931A;
   color: #F7931A;
   background: rgba(247,147,26,0.05);
+}
+.sats-addr.copied {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(112,208,144,0.08);
 }
 .sats-note {
   font-size: 0.56rem;
@@ -331,9 +337,9 @@ footer a:hover { color: var(--amber); }
   <div class="header-inner">
     <div class="brand">Open Ring</div>
     <div class="protocol-chips">
-      <a href="ORP-01-question-protocol.md" class="chip">ORP-01</a>
-      <a href="ORP-02-verdict-protocol.md" class="chip">ORP-02</a>
-      <a href="ORP-03-field-protocol.md" class="chip">ORP-03</a>
+      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" class="chip">ORP-01</a>
+      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" class="chip">ORP-02</a>
+      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" class="chip">ORP-03</a>
     </div>
   </div>
 </header>
@@ -347,10 +353,10 @@ footer a:hover { color: var(--amber); }
 
   <!-- ACTIONS -->
   <div class="actions">
-    <a href="https://yakihonne.com" class="action action-amber">
+    <a href="https://github.com/bitcoinkook/the-open-ring" class="action action-amber">
       <div class="action-label">POCKET</div>
       <div class="action-name">Run the diagnostic</div>
-      <div class="action-desc">Two markdown files. Paste into any AI chat — Grok, ChatGPT, Claude. Receive a full nine-field verdict with diagnosis, treatment, and call to action.</div>
+      <div class="action-desc">Two markdown files in the repo. Paste into any AI chat — Grok, ChatGPT, Claude. Receive a full nine-field verdict with diagnosis, treatment, and call to action.</div>
     </a>
     <a href="signal-ledger-nostr.html" class="action action-blue">
       <div class="action-label">SIGNAL LEDGER</div>
@@ -363,17 +369,17 @@ footer a:hover { color: var(--amber); }
   <div class="stack-eyebrow">THE OPEN RING PROTOCOL</div>
   <div class="stack-title">Three documents. One standard.</div>
   <div class="stack">
-    <a href="ORP-01-question-protocol.md" class="stack-item">
+    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" class="stack-item">
       <div class="stack-id">ORP-01 · INPUT</div>
       <div class="stack-name">Question Protocol</div>
       <div class="stack-desc">Standard questions and answer types.</div>
     </a>
-    <a href="ORP-02-verdict-protocol.md" class="stack-item">
+    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" class="stack-item">
       <div class="stack-id">ORP-02 · PROCESSING</div>
       <div class="stack-name">Verdict Protocol</div>
       <div class="stack-desc">The nine-field verdict — V.01 through V.09. Three flags.</div>
     </a>
-    <a href="ORP-03-field-protocol.md" class="stack-item">
+    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" class="stack-item">
       <div class="stack-id">ORP-03 · OUTPUT</div>
       <div class="stack-name">Field Protocol</div>
       <div class="stack-desc">Signed record on Nostr kind 1337. Portable. Queryable.</div>
@@ -424,8 +430,8 @@ A=V, B=C  →  INVERTED     capture — user pays
   <div class="sats">
     <div class="sats-line">Running Open Ring on empty pockets.</div>
     <div class="sats-line sats-beg">Send sats. Keep the signal flowing.</div>
-    <a href="lightning:blackfalcon2@primal.net" class="sats-addr">blackfalcon2@primal.net</a>
-    <div class="sats-note">⚡ Lightning address · every sat is a vote the framework works</div>
+    <button class="sats-addr" id="sats-btn" onclick="copySats()">blackfalcon2@primal.net</button>
+    <div class="sats-note" id="sats-note">⚡ Lightning address · tap to copy</div>
   </div>
 
 </main>
@@ -434,6 +440,41 @@ A=V, B=C  →  INVERTED     capture — user pays
   <div>OPEN RING · MIT · v2</div>
   <div><a href="https://github.com/bitcoinkook/the-open-ring">github.com/bitcoinkook/the-open-ring</a></div>
 </footer>
+
+<script>
+  function copySats() {
+    const addr = 'blackfalcon2@primal.net';
+    const note = document.getElementById('sats-note');
+    const btn = document.getElementById('sats-btn');
+
+    const done = () => {
+      note.textContent = '✓ Copied — paste into your Lightning wallet';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        note.textContent = '⚡ Lightning address · tap to copy';
+        btn.classList.remove('copied');
+      }, 2500);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(addr).then(done).catch(fallback);
+    } else {
+      fallback();
+    }
+
+    function fallback() {
+      const ta = document.createElement('textarea');
+      ta.value = addr;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch(e) { note.textContent = 'Copy: ' + addr; }
+      document.body.removeChild(ta);
+    }
+  }
+</script>
 
 </body>
 </html>
