@@ -155,7 +155,59 @@ h1.title {
   line-height: 1.7;
 }
 
-/* 3. PROTOCOL */
+/* ── SOURCE / FORK ── */
+
+.source {
+  margin: 0 0 2.5rem;
+  padding: 1.2rem 1.25rem;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--blue);
+}
+.source-eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--blue);
+  margin-bottom: 0.5rem;
+}
+.source-text {
+  font-size: 0.72rem;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+.source-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.src-btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--amber2);
+  background: transparent;
+  color: var(--amber);
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.src-btn:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+.src-btn-fork {
+  color: var(--blue);
+  border-color: rgba(96,181,229,0.4);
+}
+.src-btn-fork:hover {
+  background: rgba(96,181,229,0.08);
+  border-color: var(--blue);
+}
+
+/* ── PROTOCOL ── */
 
 .stack-eyebrow {
   font-size: 0.52rem;
@@ -179,16 +231,16 @@ h1.title {
   margin-bottom: 2.5rem;
 }
 .stack-item {
-  display: block;
   background: var(--bg1);
-  padding: 0.9rem 1.1rem;
+  padding: 0.95rem 1.1rem;
   color: inherit;
-  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
-.stack-item:hover {
-  background: #151108;
-  text-decoration: none;
-}
+.stack-text { flex: 1; min-width: 0; }
 .stack-id {
   font-size: 0.56rem;
   letter-spacing: 0.14em;
@@ -203,6 +255,42 @@ h1.title {
 .stack-desc {
   font-size: 0.65rem;
   color: var(--dim);
+}
+.stack-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.s-btn {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  padding: 0.38rem 0.7rem;
+  border: 1px solid var(--amber2);
+  background: transparent;
+  color: var(--amber);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.s-btn:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+.s-btn.copied {
+  background: rgba(112,208,144,0.1);
+  border-color: #70D090;
+  color: #70D090;
+}
+.s-btn-gh {
+  color: var(--blue);
+  border-color: rgba(96,181,229,0.3);
+}
+.s-btn-gh:hover {
+  background: rgba(96,181,229,0.08);
+  border-color: var(--blue);
 }
 
 /* 4. FRAMEWORK — collapsed */
@@ -312,6 +400,31 @@ details.framework[open] .fw-hint { color: var(--amber2); }
   color: var(--dim);
 }
 
+.sats-qr-wrap {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sats-qr {
+  padding: 0.5rem;
+  background: #F5F1E8;
+  border: 1px solid var(--border);
+  display: inline-block;
+  line-height: 0;
+}
+.sats-qr img, .sats-qr canvas {
+  display: block;
+  width: 140px !important;
+  height: 140px !important;
+}
+.sats-qr-label {
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
 /* ── FOOTER ───────────────────────────────────────────────── */
 
 footer {
@@ -353,10 +466,10 @@ footer a:hover { color: var(--amber); }
 
   <!-- ACTIONS -->
   <div class="actions">
-    <a href="https://github.com/bitcoinkook/the-open-ring" class="action action-amber">
+    <a href="pocket.html" class="action action-amber">
       <div class="action-label">POCKET</div>
       <div class="action-name">Run the diagnostic</div>
-      <div class="action-desc">Two markdown files in the repo. Paste into any AI chat — Grok, ChatGPT, Claude. Receive a full nine-field verdict with diagnosis, treatment, and call to action.</div>
+      <div class="action-desc">Two markdown files you copy and paste into any AI chat — Grok, ChatGPT, Claude. Receive a full nine-field verdict with diagnosis, treatment, and call to action.</div>
     </a>
     <a href="signal-ledger-nostr.html" class="action action-blue">
       <div class="action-label">SIGNAL LEDGER</div>
@@ -365,25 +478,53 @@ footer a:hover { color: var(--amber); }
     </a>
   </div>
 
+  <!-- SOURCE / FORK -->
+  <div class="source">
+    <div class="source-eyebrow">SOURCE · MIT · OPEN</div>
+    <div class="source-text">Clone it. Fork it. Build your own implementation. The protocol approaches capture immune only when multiple independent clients exist.</div>
+    <div class="source-actions">
+      <a href="https://github.com/bitcoinkook/the-open-ring" class="src-btn">View repo</a>
+      <a href="https://github.com/bitcoinkook/the-open-ring/fork" class="src-btn src-btn-fork">Fork it</a>
+    </div>
+  </div>
+
   <!-- PROTOCOL -->
   <div class="stack-eyebrow">THE OPEN RING PROTOCOL</div>
   <div class="stack-title">Three documents. One standard.</div>
   <div class="stack">
-    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" class="stack-item">
-      <div class="stack-id">ORP-01 · INPUT</div>
-      <div class="stack-name">Question Protocol</div>
-      <div class="stack-desc">Standard questions and answer types.</div>
-    </a>
-    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" class="stack-item">
-      <div class="stack-id">ORP-02 · PROCESSING</div>
-      <div class="stack-name">Verdict Protocol</div>
-      <div class="stack-desc">The nine-field verdict — V.01 through V.09. Three flags.</div>
-    </a>
-    <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" class="stack-item">
-      <div class="stack-id">ORP-03 · OUTPUT</div>
-      <div class="stack-name">Field Protocol</div>
-      <div class="stack-desc">Signed record on Nostr kind 1337. Portable. Queryable.</div>
-    </a>
+    <div class="stack-item">
+      <div class="stack-text">
+        <div class="stack-id">ORP-01 · INPUT</div>
+        <div class="stack-name">Question Protocol</div>
+        <div class="stack-desc">Standard questions and answer types.</div>
+      </div>
+      <div class="stack-actions">
+        <button class="s-btn" onclick="copyORP(1, this)">Copy</button>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-01-question-protocol.md" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-text">
+        <div class="stack-id">ORP-02 · PROCESSING</div>
+        <div class="stack-name">Verdict Protocol</div>
+        <div class="stack-desc">The nine-field verdict — V.01 through V.09. Three flags.</div>
+      </div>
+      <div class="stack-actions">
+        <button class="s-btn" onclick="copyORP(2, this)">Copy</button>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="stack-item">
+      <div class="stack-text">
+        <div class="stack-id">ORP-03 · OUTPUT</div>
+        <div class="stack-name">Field Protocol</div>
+        <div class="stack-desc">Signed record on Nostr kind 1337. Portable. Queryable.</div>
+      </div>
+      <div class="stack-actions">
+        <button class="s-btn" onclick="copyORP(3, this)">Copy</button>
+        <a class="s-btn s-btn-gh" href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-03-field-protocol.md" target="_blank">GitHub</a>
+      </div>
+    </div>
   </div>
 
   <!-- FRAMEWORK (collapsed) -->
@@ -432,6 +573,10 @@ A=V, B=C  →  INVERTED     capture — user pays
     <div class="sats-line sats-beg">Send sats. Keep the signal flowing.</div>
     <button class="sats-addr" id="sats-btn" onclick="copySats()">blackfalcon2@primal.net</button>
     <div class="sats-note" id="sats-note">⚡ Lightning address · tap to copy</div>
+    <div class="sats-qr-wrap">
+      <div id="sats-qr" class="sats-qr"></div>
+      <div class="sats-qr-label">Or scan with a Lightning wallet</div>
+    </div>
   </div>
 
 </main>
@@ -472,6 +617,77 @@ A=V, B=C  →  INVERTED     capture — user pays
       try { document.execCommand('copy'); done(); }
       catch(e) { note.textContent = 'Copy: ' + addr; }
       document.body.removeChild(ta);
+    }
+  }
+</script>
+
+<!-- QR code generator (no API calls — renders client-side) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  (function() {
+    const el = document.getElementById('sats-qr');
+    if (!el || typeof QRCode === 'undefined') return;
+    new QRCode(el, {
+      text: 'lightning:blackfalcon2@primal.net',
+      width: 140,
+      height: 140,
+      colorDark: '#0A0907',
+      colorLight: '#F5F1E8',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  })();
+</script>
+
+<!-- ORP copy functionality — fetch from GitHub raw, copy to clipboard -->
+<script>
+  const ORP_URLS = {
+    1: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-01-question-protocol.md',
+    2: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-02-verdict-protocol.md',
+    3: 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-03-field-protocol.md',
+  };
+  const orpCache = {};
+
+  async function copyORP(id, btn) {
+    const originalText = 'Copy';
+    btn.textContent = '…';
+
+    try {
+      // Fetch and cache
+      if (!orpCache[id]) {
+        const res = await fetch(ORP_URLS[id]);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        orpCache[id] = await res.text();
+      }
+
+      const text = orpCache[id];
+
+      // Copy
+      const done = () => {
+        btn.classList.add('copied');
+        btn.textContent = '✓ Copied';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = originalText;
+        }, 2200);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        done();
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
+    } catch (e) {
+      btn.textContent = 'Failed';
+      setTimeout(() => { btn.textContent = originalText; }, 2000);
     }
   }
 </script>
