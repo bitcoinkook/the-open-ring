@@ -396,6 +396,54 @@
       font-family: 'IBM Plex Sans', sans-serif;
     }
 
+    /* ── REVIEW MODE (active after Import) ── */
+    .review-mode .section-header,
+    .review-mode .section-subtitle,
+    .review-mode .field-hint,
+    .review-mode .form-section { border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0; }
+    .review-mode .field { margin-bottom: 0.7rem; }
+    .review-mode .q-id { display: none; }
+    .review-mode .submit-btn:not(:disabled) {
+      font-size: 1rem;
+      padding: 1rem 2rem;
+      letter-spacing: 0.12em;
+      margin-top: 2rem;
+    }
+
+    .review-banner {
+      background: var(--green-bg);
+      border: 1px solid rgba(112,208,144,0.3);
+      border-left: 2px solid var(--green);
+      padding: 0.8rem 1.1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      display: none;
+    }
+    .review-banner.visible { display: flex; }
+    .review-banner-text {
+      font-size: 0.72rem;
+      color: var(--green);
+      line-height: 1.6;
+    }
+    .review-banner-text strong { font-weight: 500; }
+    .review-exit {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      background: none;
+      border: 1px solid rgba(112,208,144,0.4);
+      color: var(--green);
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .review-exit:hover { background: rgba(112,208,144,0.1); }
+
     /* ── DUAL FIELD (alpha + P(detect)) ── */
     .dual-field {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -646,6 +694,14 @@
       <button class="connect-btn" id="conn-btn" onclick="connectNostr()">Connect</button>
     </div>
     <div id="pubkey-display" class="pubkey-display" style="display:none;"></div>
+
+    <!-- REVIEW BANNER (shown after import) -->
+    <div class="review-banner" id="review-banner">
+      <div class="review-banner-text">
+        <strong>Review mode.</strong> Form filled from pocket tool. Check each field, then sign below.
+      </div>
+      <button class="review-exit" onclick="exitReviewMode()">Show full form</button>
+    </div>
 
     <!-- ══════ IMPORT FROM POCKET ══════ -->
     <div class="import-bar">
@@ -1070,6 +1126,18 @@
 
     <div class="form-section">
       <div class="section-header">
+        <span class="section-title">One-paste filing</span>
+      </div>
+      <p class="about-prose">
+        The <strong>Import</strong> button on the File a record tab accepts the <strong>READY TO FILE</strong> block produced by the pocket operator. Paste the block, every matching Q-field auto-fills, review the form, sign. Full cycle in under a minute.
+      </p>
+      <p class="about-prose">
+        Don't have a verdict yet? <a href="pocket.html">Run the pocket diagnostic</a> on a structure you know.
+      </p>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
         <span class="section-title">The protocol stack</span>
       </div>
       <div class="code-block">ORP-01   Question Protocol    input layer
@@ -1222,14 +1290,32 @@ wss://relay.snort.social</div>
       }
 
       msg.className = 'import-msg success'
-      msg.textContent = '✓ Filled ' + count + ' field' + (count === 1 ? '' : 's') + '. Review the form below, then sign.'
+      msg.textContent = '✓ Filled ' + count + ' field' + (count === 1 ? '' : 's') + '. Switching to review mode…'
 
-      // Auto-close after 1.8s so the user sees the filled form
-      setTimeout(() => closeImportModal(), 1800)
+      setTimeout(() => {
+        closeImportModal()
+        enterReviewMode()
+      }, 900)
     } catch(e) {
       msg.className = 'import-msg error'
       msg.textContent = 'Parse error: ' + e.message
     }
+  }
+
+  window.enterReviewMode = function() {
+    const panel = document.getElementById('panel-submit')
+    panel.classList.add('review-mode')
+    const banner = document.getElementById('review-banner')
+    banner.classList.add('visible')
+    // Scroll to top of form
+    banner.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  window.exitReviewMode = function() {
+    const panel = document.getElementById('panel-submit')
+    panel.classList.remove('review-mode')
+    const banner = document.getElementById('review-banner')
+    banner.classList.remove('visible')
   }
 
   function parseReadyToFile(text) {
