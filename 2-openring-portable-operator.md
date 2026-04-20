@@ -51,8 +51,6 @@ From the user's reply, extract:
 - Q1.02 DOMAIN       — one of the listed tags
 - Q1.04 DIRECT EXP   — one of the listed options
 
-If any of the three structured questions (1, 2, 3) was skipped or answered vaguely, ask once for clarification before proceeding. Do not infer — ask.
-
 Derive V.04 SIGNAL WEIGHT from Q1.04:
 - years        → strong
 - months       → adequate
