@@ -153,6 +153,179 @@
       word-break: break-all; margin-bottom: 1.5rem;
     }
 
+    /* ── IMPORT BAR ── */
+    .import-bar {
+      background: var(--blue-bg);
+      border: 1px solid rgba(96,181,229,0.25);
+      border-left: 2px solid var(--blue);
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .import-info { flex: 1; min-width: 0; }
+    .import-label {
+      font-size: 0.72rem;
+      color: var(--blue);
+      margin-bottom: 0.15rem;
+      font-weight: 500;
+    }
+    .import-sub {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.68rem;
+      color: var(--amber-dim);
+      font-weight: 300;
+    }
+    .import-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--blue);
+      color: var(--blue);
+      padding: 0.45rem 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .import-btn:hover {
+      background: rgba(96,181,229,0.12);
+    }
+
+    /* ── IMPORT MODAL ── */
+    .import-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .import-modal-inner {
+      background: #14120C;
+      border: 1px solid var(--dim);
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    .import-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .import-modal-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--amber);
+    }
+    .import-close {
+      background: none;
+      border: none;
+      color: var(--amber-dim);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+    .import-close:hover { color: var(--amber); }
+    .import-modal-desc {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text);
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .import-modal-desc code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      background: var(--dim2);
+      padding: 0.05rem 0.3rem;
+      color: var(--blue);
+    }
+    .import-modal-desc strong {
+      color: var(--amber);
+      font-weight: 500;
+    }
+    #import-text {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--dim);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      line-height: 1.6;
+      padding: 0.7rem 0.9rem;
+      outline: none;
+      resize: vertical;
+      min-height: 160px;
+    }
+    #import-text:focus { border-color: var(--amber-dim); }
+
+    .import-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: flex-end;
+    }
+    .import-cancel, .import-apply {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+    .import-cancel {
+      background: none;
+      border-color: var(--dim);
+      color: var(--amber-dim);
+    }
+    .import-cancel:hover {
+      border-color: var(--amber-dim);
+      color: var(--amber);
+    }
+    .import-apply {
+      background: var(--amber-bg);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .import-apply:hover {
+      background: rgba(212,181,128,0.15);
+    }
+    .import-msg {
+      margin-top: 0.8rem;
+      font-size: 0.68rem;
+      line-height: 1.6;
+      font-family: 'IBM Plex Mono', monospace;
+      display: none;
+    }
+    .import-msg.success {
+      background: var(--green-bg);
+      border-left: 2px solid var(--green);
+      color: var(--green);
+      padding: 0.7rem 0.9rem;
+      display: block;
+    }
+    .import-msg.error {
+      background: var(--red-bg);
+      border-left: 2px solid var(--red);
+      color: var(--red);
+      padding: 0.7rem 0.9rem;
+      display: block;
+    }
+
     /* ── SECTION (ORP-01 sections) ── */
     .form-section {
       margin-bottom: 2rem;
@@ -473,6 +646,34 @@
       <button class="connect-btn" id="conn-btn" onclick="connectNostr()">Connect</button>
     </div>
     <div id="pubkey-display" class="pubkey-display" style="display:none;"></div>
+
+    <!-- ══════ IMPORT FROM POCKET ══════ -->
+    <div class="import-bar">
+      <div class="import-info">
+        <div class="import-label">Have a verdict from the pocket tool?</div>
+        <div class="import-sub">Paste the READY TO FILE block. Every answer auto-fills.</div>
+      </div>
+      <button class="import-btn" onclick="openImportModal()">Import ↓</button>
+    </div>
+
+    <!-- IMPORT MODAL -->
+    <div class="import-modal" id="import-modal" style="display:none;">
+      <div class="import-modal-inner">
+        <div class="import-modal-header">
+          <div class="import-modal-title">Import from pocket tool</div>
+          <button class="import-close" onclick="closeImportModal()">×</button>
+        </div>
+        <p class="import-modal-desc">
+          Paste the full <strong>READY TO FILE</strong> block from your operator — the code-fenced block starting with <code>§1 IDENTIFICATION</code>. Every matching field auto-fills. Review before signing.
+        </p>
+        <textarea id="import-text" placeholder="Paste the READY TO FILE block here..." rows="10"></textarea>
+        <div class="import-actions">
+          <button class="import-cancel" onclick="closeImportModal()">Cancel</button>
+          <button class="import-apply" onclick="applyImport()">Fill form</button>
+        </div>
+        <div class="import-msg" id="import-msg"></div>
+      </div>
+    </div>
 
     <!-- ═══ SECTION 1 — IDENTIFICATION ═══ -->
     <div class="form-section">
@@ -985,6 +1186,308 @@ wss://relay.snort.social</div>
       b.classList.remove('active-yes','active-no','active-unclear')
     })
     btn.classList.add('active-' + value)
+  }
+
+  // ── IMPORT FROM POCKET TOOL ──
+  window.openImportModal = function() {
+    document.getElementById('import-modal').style.display = 'flex'
+    document.getElementById('import-msg').style.display = 'none'
+    setTimeout(() => document.getElementById('import-text').focus(), 100)
+  }
+
+  window.closeImportModal = function() {
+    document.getElementById('import-modal').style.display = 'none'
+    document.getElementById('import-text').value = ''
+    document.getElementById('import-msg').style.display = 'none'
+  }
+
+  window.applyImport = function() {
+    const text = document.getElementById('import-text').value
+    const msg = document.getElementById('import-msg')
+
+    if (!text.trim()) {
+      msg.className = 'import-msg error'
+      msg.textContent = 'Paste the READY TO FILE block first.'
+      return
+    }
+
+    try {
+      const parsed = parseReadyToFile(text)
+      const count = fillForm(parsed)
+
+      if (count === 0) {
+        msg.className = 'import-msg error'
+        msg.textContent = 'No Q-fields matched. Check that the pasted block uses "Q1.01 STRUCTURE:" style labels.'
+        return
+      }
+
+      msg.className = 'import-msg success'
+      msg.textContent = '✓ Filled ' + count + ' field' + (count === 1 ? '' : 's') + '. Review the form below, then sign.'
+
+      // Auto-close after 1.8s so the user sees the filled form
+      setTimeout(() => closeImportModal(), 1800)
+    } catch(e) {
+      msg.className = 'import-msg error'
+      msg.textContent = 'Parse error: ' + e.message
+    }
+  }
+
+  function parseReadyToFile(text) {
+    // Strip code fences if present
+    text = text.replace(/```[^\n]*\n/g, '').replace(/```/g, '')
+
+    const result = {}
+
+    // Match Q1.01, Q1.02, ..., Q5.04c — followed by label, then capture everything
+    // until the next Q-label or section header
+    const qPattern = /Q(\d+\.\d+[a-z]?(?:\.\d+)?)\s*[A-Z][^:\n]*:\s*\n?([\s\S]*?)(?=\n\s*Q\d+\.\d+|\n\s*§|\n\s*Action taken:|$)/gi
+
+    let match
+    while ((match = qPattern.exec(text)) !== null) {
+      const qid = match[1].toLowerCase()
+      let value = match[2].trim()
+
+      // Strip parenthetical notes starting with "(Note:" or "(The user" at end
+      // Keep them if they look like part of the answer, only strip if they look like meta commentary
+      // Actually: keep everything — user reviews the filled form before signing
+
+      // For compound Q-fields, extract sub-parts
+      result[qid] = value
+    }
+
+    // Also match the field layer (Action taken / What you observed / Signal update)
+    const actionMatch = text.match(/Action taken:\s*([^\n]+)/i)
+    if (actionMatch) result['action_taken'] = actionMatch[1].trim()
+
+    const observedMatch = text.match(/What you observed:\s*([^\n]+(?:\n(?!\s*Signal update)[^\n]+)*)/i)
+    if (observedMatch) {
+      const v = observedMatch[1].trim()
+      // Only use if it's actual content, not a placeholder
+      if (!/^\[.*\]$/.test(v)) result['observed'] = v
+    }
+
+    const updateMatch = text.match(/Signal update:\s*([^\n]+(?:\n(?!\s*§)[^\n]+)*)/i)
+    if (updateMatch) {
+      const v = updateMatch[1].trim()
+      if (!/^\[.*\]$/.test(v)) result['signal_update'] = v
+    }
+
+    return result
+  }
+
+  function fillForm(parsed) {
+    let filled = 0
+
+    // Simple text/select fields — id matches q-id with underscore
+    const simpleFields = [
+      '1.01', '1.02', '1.03', '1.04',
+      '2.01', '2.02', '2.04', '2.05',
+      '3.01', '3.02', '3.03', '3.04',
+      '5.01', '5.02', '5.03', '5.04c'
+    ]
+
+    for (const q of simpleFields) {
+      const value = parsed[q]
+      if (!value) continue
+      const id = 'q' + q.replace('.', '_')
+      const el = document.getElementById(id)
+      if (!el) continue
+
+      if (el.tagName === 'SELECT') {
+        // Find matching option — case-insensitive, match first word
+        const firstWord = value.split(/[\s,;(]/)[0].toLowerCase().trim()
+        let matched = false
+        for (const opt of el.options) {
+          if (opt.value.toLowerCase() === firstWord) {
+            el.value = opt.value
+            matched = true
+            break
+          }
+        }
+        // Fallback: try to match any option value that starts with the value
+        if (!matched) {
+          for (const opt of el.options) {
+            if (opt.value && value.toLowerCase().startsWith(opt.value.toLowerCase())) {
+              el.value = opt.value
+              matched = true
+              break
+            }
+          }
+        }
+        if (matched) filled++
+      } else {
+        el.value = value
+        filled++
+      }
+    }
+
+    // Q2.03: dropdown + cost type text input
+    if (parsed['2.03']) {
+      const v = parsed['2.03']
+      // Extract who bears the cost — first word user/incumbent/both/unclear
+      const whoMatch = v.match(/\b(user|incumbent|both|unclear)\b/i)
+      if (whoMatch) {
+        const sel = document.getElementById('q2_03')
+        if (sel) {
+          sel.value = whoMatch[1].toLowerCase()
+          filled++
+        }
+      }
+      // Extract cost description after "Cost type:"
+      const costMatch = v.match(/cost[\s_]?type:?\s*(.+?)(?:\n|$)/i)
+      const costInput = document.getElementById('q2_03_cost')
+      if (costInput) {
+        if (costMatch) {
+          costInput.value = costMatch[1].trim()
+        } else {
+          // If no explicit Cost type, use the rest of the value after the first word
+          const rest = v.replace(/^\s*(user|incumbent|both|unclear)\s*[.,;\n]?\s*/i, '').trim()
+          if (rest) costInput.value = rest
+        }
+        filled++
+      }
+    }
+
+    // Q2.06: α and P(detect) — dual select
+    if (parsed['2.06']) {
+      const v = parsed['2.06']
+      const alphaMatch = v.match(/α[^:]*:\s*(high|low|unclear)/i)
+      const pdMatch = v.match(/P\(?detect\)?[^:]*:\s*(high|low|unclear)/i)
+      if (alphaMatch) {
+        const el = document.getElementById('q2_06_alpha')
+        if (el) { el.value = alphaMatch[1].toLowerCase(); filled++ }
+      }
+      if (pdMatch) {
+        const el = document.getElementById('q2_06_pdetect')
+        if (el) { el.value = pdMatch[1].toLowerCase(); filled++ }
+      }
+    }
+
+    // Q2.05 evidence
+    if (parsed['2.05']) {
+      const v = parsed['2.05']
+      const evMatch = v.match(/evidence:\s*(.+?)(?:\n|$)/is)
+      const ev = document.getElementById('q2_05_evidence')
+      if (ev && evMatch) {
+        ev.value = evMatch[1].trim()
+        filled++
+      }
+    }
+
+    // Q3.05: seed crystal text + stratum dropdown
+    if (parsed['3.05']) {
+      const v = parsed['3.05']
+      // Extract stratum
+      const stratumMatch = v.match(/stratum:?\s*(\d|mixed)/i)
+      const textPart = v.replace(/stratum:.*$/is, '').trim()
+      const ta = document.getElementById('q3_05')
+      const st = document.getElementById('q3_05_stratum')
+      if (ta) { ta.value = textPart; filled++ }
+      if (st && stratumMatch) {
+        st.value = stratumMatch[1] === 'mixed' ? 'mixed' : stratumMatch[1]
+        filled++
+      }
+    }
+
+    // Q4.01–Q4.04
+    for (const q of ['4.01', '4.02', '4.03', '4.04']) {
+      if (!parsed[q]) continue
+      const v = parsed[q].toLowerCase()
+      const el = document.getElementById('q' + q.replace('.', '_'))
+      if (!el) continue
+      // Match first valid option word
+      for (const opt of el.options) {
+        if (opt.value && v.includes(opt.value)) {
+          el.value = opt.value
+          filled++
+          break
+        }
+      }
+    }
+
+    // Q4.05 break stratum
+    if (parsed['4.05']) {
+      const match = parsed['4.05'].match(/[1-5]/)
+      const el = document.getElementById('q4_05_stratum')
+      if (el && match) { el.value = match[0]; filled++ }
+    }
+
+    // Q5.04a: four binary immunity checks
+    if (parsed['5.04a']) {
+      const v = parsed['5.04a']
+      const checks = [
+        { key: 'education',    regex: /education[\s\S]*?:\s*(yes|no|unclear)/i },
+        { key: 'distribution', regex: /distribution[\s\S]*?:\s*(yes|no|unclear)/i },
+        { key: 'finance',      regex: /finance[\s\S]*?:\s*(yes|no|unclear)/i },
+        { key: 'legitimacy',   regex: /legitimacy[\s\S]*?:\s*(yes|no|unclear)/i },
+      ]
+      for (const c of checks) {
+        const m = v.match(c.regex)
+        if (m) {
+          const value = m[1].toLowerCase()
+          immunityState[c.key] = value
+          // Update the button UI
+          const row = document.querySelector('.binary-row[data-check="' + c.key + '"]')
+          if (row) {
+            row.querySelectorAll('.binary-btn').forEach(b => {
+              b.classList.remove('active-yes','active-no','active-unclear')
+            })
+            // Find matching button by text content
+            const btns = row.querySelectorAll('.binary-btn')
+            btns.forEach(b => {
+              const text = b.textContent.trim().toLowerCase()
+              if ((value === 'yes' && text === 'yes') ||
+                  (value === 'no' && text === 'no') ||
+                  (value === 'unclear' && text === '?')) {
+                b.classList.add('active-' + value)
+              }
+            })
+            filled++
+          }
+        }
+      }
+    }
+
+    // Q5.04b closest to satisfied
+    if (parsed['5.04b']) {
+      const el = document.getElementById('q5_04b')
+      if (el) {
+        const v = parsed['5.04b'].toLowerCase()
+        const opts = ['education','distribution','finance','legitimacy','all four','all_four','none']
+        for (const o of opts) {
+          if (v.includes(o.replace('_', ' '))) {
+            el.value = o === 'all four' ? 'all_four' : o
+            filled++
+            break
+          }
+        }
+      }
+    }
+
+    // Field layer
+    if (parsed['action_taken']) {
+      const el = document.getElementById('f_action_taken')
+      if (el) {
+        const v = parsed['action_taken'].toLowerCase()
+        for (const opt of el.options) {
+          if (v.includes(opt.value)) {
+            el.value = opt.value
+            filled++
+            break
+          }
+        }
+      }
+    }
+    if (parsed['observed']) {
+      const el = document.getElementById('f_observed')
+      if (el) { el.value = parsed['observed']; filled++ }
+    }
+    if (parsed['signal_update']) {
+      const el = document.getElementById('f_signal_update')
+      if (el) { el.value = parsed['signal_update']; filled++ }
+    }
+
+    return filled
   }
 
   // ── CONNECT ──
