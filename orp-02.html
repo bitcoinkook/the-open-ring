@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORP-02 · Open Ring</title>
+<meta name="description" content="ORP-01 — Verdict Protocol. The standard questions and answer types for Open Ring diagnostics.">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0A0907;
+  --bg1:    #100D08;
+  --bg2:    #0C0A07;
+  --border: #1E1A12;
+  --line:   #2A2620;
+  --text:   #C8C0B0;
+  --dim:    #6A6050;
+  --faint:  #3A3628;
+  --amber:  #D4B580;
+  --amber2: #6A5A38;
+  --blue:   #60B5E5;
+  --green:  #70D090;
+  --mono:   'JetBrains Mono', monospace;
+  --serif:  'Libre Baskerville', serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+a { color: var(--amber); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+}
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #E8E0CC;
+}
+.header-actions { display: flex; gap: 0.4rem; }
+.nav-btn {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--amber2);
+  color: var(--amber);
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-btn:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+.nav-btn-gh {
+  color: var(--blue);
+  border-color: rgba(96,181,229,0.3);
+}
+.nav-btn-gh:hover {
+  background: rgba(96,181,229,0.08);
+  border-color: var(--blue);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 1rem;
+}
+
+.eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--blue);
+  margin-bottom: 0.85rem;
+}
+h1.title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.9rem;
+  color: #E8E0CC;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+@media (min-width: 640px) { h1.title { font-size: 2.2rem; } }
+
+.lead {
+  font-size: 0.78rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.file-block {
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  margin: 2rem 0;
+}
+.file-header {
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.file-meta { flex: 1; min-width: 0; }
+.file-label {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  margin-bottom: 0.25rem;
+}
+.file-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #D8D0BC;
+}
+
+.file-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--amber2);
+  background: transparent;
+  color: var(--amber);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+.btn.copied {
+  background: rgba(112,208,144,0.1);
+  border-color: var(--green);
+  color: var(--green);
+}
+.btn-github {
+  color: var(--blue);
+  border-color: rgba(96,181,229,0.3);
+}
+.btn-github:hover {
+  background: rgba(96,181,229,0.08);
+  border-color: var(--blue);
+}
+
+.file-body {
+  max-height: 500px;
+  overflow-y: auto;
+  background: var(--bg2);
+}
+.file-body pre {
+  padding: 1rem 1.1rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.7;
+  color: #A89878;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.file-body-loading {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+.file-body-error {
+  padding: 1.5rem 1.1rem;
+  font-size: 0.68rem;
+  color: #E57070;
+  line-height: 1.7;
+}
+
+.file-footer {
+  padding: 0.6rem 1.1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.next-nav {
+  margin: 2.5rem 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.next-btn {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.next-btn:hover {
+  border-color: var(--amber2);
+  color: var(--amber);
+  text-decoration: none;
+}
+.next-btn:empty { visibility: hidden; }
+
+footer {
+  max-width: 720px;
+  margin: 3rem auto 0;
+  padding: 1.5rem 1.25rem 2.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+footer a { color: var(--amber2); }
+footer a:hover { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">Open Ring</div>
+    <div class="header-actions">
+      <a href="/" class="nav-btn">← Home</a>
+      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/ORP-02-verdict-protocol.md" target="_blank" class="nav-btn nav-btn-gh">GitHub ↗</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="eyebrow">ORP-02 · PROCESSING LAYER</div>
+  <h1 class="title">Verdict Protocol</h1>
+  <p class="lead">The nine-field verdict format produced from an Open Ring diagnostic. V.01 through V.09 covering structure, state, inversion type, signal weight, break point, diagnosis, treatment, call to action, and capture immunity path. Three flags fire automatically from the answers.</p>
+
+  <div class="file-block">
+    <div class="file-header">
+      <div class="file-meta">
+        <div class="file-label">OPEN RING PROTOCOL · DOCUMENT 2 OF 3</div>
+        <div class="file-name">ORP-02-verdict-protocol.md</div>
+      </div>
+      <div class="file-actions">
+        <button class="btn" id="copy-btn" onclick="copyFile()">Copy</button>
+      </div>
+    </div>
+    <div class="file-body" id="file-body">
+      <div class="file-body-loading">Loading…</div>
+    </div>
+    <div class="file-footer">
+      <span>Stack v1 · MIT</span>
+      <span>openringproject.com</span>
+    </div>
+  </div>
+
+  <div class="next-nav">
+    <a href="orp-01.html" class="next-btn">← Previous: ORP-01</a>
+    <a href="orp-03.html" class="next-btn">Next: ORP-03 →</a>
+  </div>
+
+</main>
+
+<footer>
+  <div>OPEN RING · PROTOCOL v1 · MIT</div>
+  <div><a href="/">back to home</a></div>
+</footer>
+
+<script>
+  const URL = 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/ORP-02-verdict-protocol.md';
+  let cache = null;
+
+  async function load() {
+    const body = document.getElementById('file-body');
+    try {
+      const res = await fetch(URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      cache = await res.text();
+      const pre = document.createElement('pre');
+      pre.textContent = cache;
+      body.innerHTML = '';
+      body.appendChild(pre);
+    } catch (e) {
+      body.innerHTML = '<div class="file-body-error">Could not load the file. You can grab it from GitHub using the link in the header.</div>';
+    }
+  }
+
+  function copyFile() {
+    const btn = document.getElementById('copy-btn');
+    if (!cache) {
+      btn.textContent = 'Not loaded';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1800);
+      return;
+    }
+    const done = () => {
+      btn.classList.add('copied');
+      btn.textContent = '✓ Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = 'Copy';
+      }, 2200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cache).then(done).catch(fb);
+    } else { fb(); }
+    function fb() {
+      const ta = document.createElement('textarea');
+      ta.value = cache;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch (e) { btn.textContent = 'Failed'; }
+      document.body.removeChild(ta);
+    }
+  }
+
+  load();
+</script>
+
+</body>
+</html>
