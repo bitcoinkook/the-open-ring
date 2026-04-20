@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Open Ring — Find what's locked in place and change it</title>
-<meta name="description" content="Open Ring is a diagnostic framework that identifies when markets, institutions and products have their fixed and variable elements incorrectly arranged — and names the minimum intervention to correct it. MIT licensed. Free to use and share.">
-<meta name="keywords" content="open ring, capture diagnostic, market capture, minimum intervention, seed crystal, nostr, bitcoin sovereignty">
-<meta property="og:title" content="Open Ring — Find what's locked in place and change it">
-<meta property="og:description" content="A diagnostic framework for identifying capture in markets, institutions and products. Names the minimum intervention to release it.">
+<title>Open Ring</title>
+<meta name="description" content="A diagnostic framework and protocol for identifying structural inversions. MIT licensed.">
+<meta property="og:title" content="Open Ring">
+<meta property="og:description" content="A diagnostic framework and protocol for identifying structural inversions.">
 <meta property="og:type" content="website">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -27,70 +25,65 @@
   --faint:  #3A3628;
   --amber:  #D4B580;
   --amber2: #6A5A38;
-  --green:  #70D090;
+  --blue:   #60B5E5;
   --mono:   'JetBrains Mono', monospace;
   --serif:  'Libre Baskerville', serif;
 }
 
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--mono); line-height: 1.7; overflow-x: hidden; max-width: 100vw; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+a { color: var(--amber); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 /* ── HEADER ───────────────────────────────────────────────── */
 
 header {
-  position: sticky;
-  top: 0;
-  background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  z-index: 100;
-  padding: 0.85rem 1rem 0;
+  padding: 1rem 1.25rem;
 }
-
-.site-title {
-  font-family: var(--serif);
-  font-size: 1.05rem;
-  font-style: italic;
-  color: #E8E0CC;
-  margin-bottom: 0.6rem;
-}
-
-.anchors {
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
   display: flex;
-  gap: 1.1rem;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 0.7rem;
-  scrollbar-width: none;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
 }
-.anchors::-webkit-scrollbar { display: none; }
-
-.anchors a {
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-  color: var(--dim);
-  text-decoration: none;
-  padding: 0.2rem 0;
-  border-bottom: 1px solid transparent;
-  transition: all 0.15s;
+.brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #E8E0CC;
 }
-
-.anchors a:hover { color: var(--amber); border-bottom-color: var(--amber2); }
+.protocol-chips {
+  display: flex;
+  gap: 0.4rem;
+}
+.chip {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+  border: 1px solid rgba(96,181,229,0.25);
+  padding: 0.15rem 0.45rem;
+}
 
 /* ── MAIN ─────────────────────────────────────────────────── */
 
 main {
   max-width: 720px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 2.5rem 1.25rem 1rem;
 }
 
-section, details.section-fold {
-  scroll-margin-top: 110px;
-}
+/* 1. HOOK */
 
-section:last-of-type { border-bottom: none; }
-
-.eyebrow {
+.hook-eyebrow {
   font-size: 0.52rem;
   letter-spacing: 0.22em;
   color: var(--faint);
@@ -99,821 +92,348 @@ section:last-of-type { border-bottom: none; }
 
 h1.title {
   font-family: var(--serif);
-  font-size: 2rem;
   font-style: italic;
   font-weight: 400;
+  font-size: 1.9rem;
   color: #E8E0CC;
   line-height: 1.15;
-  margin-bottom: 0.75rem;
-}
-
-@media (min-width: 680px) { h1.title { font-size: 2.3rem; } }
-
-.meta {
-  display: flex;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.75rem;
-}
-
-.meta-item { font-size: 0.56rem; letter-spacing: 0.1em; color: var(--faint); }
-.meta-item span { color: var(--amber2); }
-
-.lead {
-  font-size: 0.78rem;
-  line-height: 1.9;
-  color: var(--text);
   margin-bottom: 1rem;
 }
+@media (min-width: 640px) { h1.title { font-size: 2.2rem; } }
 
-.prose { font-size: 0.76rem; line-height: 1.9; color: var(--text); }
-.prose p { margin-bottom: 1rem; }
-.prose h1 { font-family: var(--serif); font-size: 1.4rem; font-style: italic; font-weight: 400; color: #E8E0CC; margin: 2.25rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
-.prose h2 { font-family: var(--serif); font-size: 1.1rem; font-style: italic; font-weight: 400; color: #D8D0BC; margin: 1.75rem 0 0.6rem; }
-.prose h3 { font-size: 0.6rem; letter-spacing: 0.18em; color: var(--amber2); text-transform: uppercase; margin: 1.25rem 0 0.4rem; }
-.prose strong { color: #D8C8A0; font-weight: 500; }
-.prose em { color: #A89878; }
-.prose blockquote { border-left: 2px solid var(--amber2); padding: 0.6rem 1rem; margin: 1rem 0; background: var(--bg1); color: #A89878; font-style: italic; }
-.prose code { font-family: var(--mono); font-size: 0.74rem; background: #130F08; border: 1px solid var(--line); padding: 0.08rem 0.28rem; color: #C8B890; }
-.prose pre { background: var(--bg2); border: 1px solid var(--border); padding: 0.85rem 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.68rem; line-height: 1.65; color: #A89878; }
-.prose pre code { background: none; border: none; padding: 0; }
-.prose ul, .prose ol { margin: 0.5rem 0 1rem 1.4rem; }
-.prose li { margin-bottom: 0.3rem; }
-.prose hr { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
-.prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.72rem; }
-.prose th { font-size: 0.52rem; letter-spacing: 0.12em; color: var(--amber2); text-align: left; padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--line); }
-.prose td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--border); color: #A89878; }
-.prose a { color: var(--amber); text-underline-offset: 2px; }
-
-blockquote.pull {
-  border-left: 2px solid var(--amber2);
-  padding: 0.8rem 1.1rem;
-  margin: 1.25rem 0;
-  background: var(--bg1);
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 0.88rem;
-  color: #D8C8A0;
-  line-height: 1.65;
+.hook-lead {
+  font-size: 0.82rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 0.8rem;
 }
 
-/* ── LOADING STATE ────────────────────────────────────────── */
+/* 2. ACTION CARDS */
 
-.loading {
-  padding: 1.75rem 0;
-  text-align: center;
-}
-
-.loading .spinner {
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--line);
-  border-top-color: var(--amber);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 0.85rem;
-}
-
-.loading-text {
-  font-size: 0.54rem;
-  letter-spacing: 0.2em;
-  color: var(--faint);
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── TOOLS GRID ───────────────────────────────────────────── */
-
-.tools-grid {
+.actions {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
-  margin-top: 1.25rem;
+  margin: 2rem 0 2.5rem;
+}
+@media (min-width: 560px) {
+  .actions { grid-template-columns: 1fr 1fr; }
 }
 
-@media (min-width: 500px) { .tools-grid { grid-template-columns: 1fr 1fr; } }
-
-.tool {
+.action {
+  display: block;
   background: var(--bg1);
-  padding: 1.2rem;
+  padding: 1.15rem 1.2rem;
+  color: inherit;
+  transition: background 0.15s;
+}
+.action:hover {
+  background: #151108;
+  text-decoration: none;
 }
 
-.tool-name {
-  font-family: var(--serif);
-  font-size: 1rem;
-  font-style: italic;
-  color: #D8D0BC;
-  margin-bottom: 0.35rem;
-}
-
-.tool-desc { font-size: 0.66rem; color: var(--dim); line-height: 1.7; margin-bottom: 0.85rem; }
-
-.tool-tag {
-  display: inline-block;
-  font-size: 0.48rem;
+.action-label {
+  font-size: 0.58rem;
   letter-spacing: 0.14em;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid;
+  margin-bottom: 0.45rem;
 }
+.action-amber .action-label { color: var(--amber); }
+.action-blue  .action-label { color: var(--blue); }
 
-.tag-ai   { border-color: #D4B58040; color: var(--amber2); }
-.tag-mech { border-color: #70D09040; color: #5A9A70; }
-
-.source-note {
-  margin-top: 1.5rem;
-  padding: 0.85rem 1rem;
-  background: var(--bg1);
-  border: 1px solid var(--border);
-  border-left: 2px solid var(--line);
-  font-size: 0.66rem;
+.action-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: #D8D0BC;
+  margin-bottom: 0.4rem;
+}
+.action-desc {
+  font-size: 0.68rem;
   color: var(--dim);
+  line-height: 1.7;
 }
 
-.source-note .label { font-size: 0.5rem; letter-spacing: 0.18em; color: var(--amber2); margin-bottom: 0.3rem; }
+/* 3. PROTOCOL */
 
-/* ── NOTES ────────────────────────────────────────────────── */
-
-#notes-list {
+.stack-eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+  margin-bottom: 0.6rem;
+}
+.stack-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: #D8D0BC;
+  margin-bottom: 1rem;
+}
+.stack {
   display: flex;
   flex-direction: column;
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
-  margin-top: 1.25rem;
+  margin-bottom: 2.5rem;
 }
-
-.note {
-  background: var(--bg1);
-  padding: 0.95rem 1.1rem;
-}
-
-.note-date { font-size: 0.52rem; color: var(--faint); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-.note-body { font-size: 0.72rem; color: var(--text); line-height: 1.7; white-space: pre-wrap; overflow-wrap: break-word; word-break: break-word; }
-
-/* ── SUPPORT ──────────────────────────────────────────────── */
-
-.ln-card {
-  margin-top: 1.25rem;
-  padding: 1.4rem;
-  background: var(--bg1);
-  border: 1px solid var(--border);
-  text-align: center;
-}
-
-.ln-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid var(--line);
-  background: var(--bg2);
-  cursor: pointer;
-  margin: 0.85rem auto;
-  max-width: 340px;
-  transition: border-color 0.2s;
-}
-
-.ln-row:active { border-color: var(--green); }
-
-.ln-addr {
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  color: var(--amber);
-  letter-spacing: 0.04em;
-  flex: 1;
-  text-align: left;
-}
-
-.ln-hint { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.1em; margin-top: 0.4rem; }
-
-.ln-qr {
+.stack-item {
   display: block;
-  margin: 1.2rem auto 0;
-  padding: 0.6rem;
-  background: #F0E8D0;
-  border: 1px solid var(--border);
-  width: 180px;
-  height: 180px;
+  background: var(--bg1);
+  padding: 0.9rem 1.1rem;
+  color: inherit;
+  transition: background 0.15s;
+}
+.stack-item:hover {
+  background: #151108;
+  text-decoration: none;
+}
+.stack-id {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  margin-bottom: 0.2rem;
+}
+.stack-name {
+  font-size: 0.8rem;
+  color: #D8D0BC;
+  margin-bottom: 0.15rem;
+}
+.stack-desc {
+  font-size: 0.65rem;
+  color: var(--dim);
 }
 
-.ln-qr img, .ln-qr canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-}
+/* 4. FRAMEWORK — collapsed */
 
-/* ── COLLAPSIBLE SECTIONS ─────────────────────────────────── */
-
-details.section-fold {
+details.framework {
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
 }
-
-details.section-fold > summary {
+details.framework > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 1.1rem 0;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.75rem 0;
-  cursor: pointer;
-  list-style: none;
 }
+details.framework > summary::-webkit-details-marker { display: none; }
 
-details.section-fold > summary::-webkit-details-marker { display: none; }
-
-details.section-fold > summary .fold-title {
+.fw-title {
   font-family: var(--serif);
-  font-size: 1.6rem;
   font-style: italic;
-  font-weight: 400;
-  color: #E8E0CC;
-  line-height: 1.15;
+  font-size: 1.2rem;
+  color: #D8D0BC;
 }
-
-@media (min-width: 680px) {
-  details.section-fold > summary .fold-title { font-size: 2rem; }
-}
-
-details.section-fold > summary .fold-hint {
-  font-size: 0.56rem;
+.fw-hint {
+  font-size: 0.54rem;
   letter-spacing: 0.14em;
   color: var(--faint);
-  white-space: nowrap;
-  flex-shrink: 0;
 }
+details.framework[open] .fw-hint { color: var(--amber2); }
 
-details.section-fold[open] > summary .fold-hint { color: var(--amber2); }
-
-details.section-fold > summary .fold-eyebrow {
-  font-size: 0.52rem;
-  letter-spacing: 0.22em;
-  color: var(--faint);
-  margin-bottom: 0.5rem;
+.fw-body {
+  padding: 0 0 2rem;
+  font-size: 0.74rem;
+  line-height: 1.85;
 }
-
-.fold-body {
-  padding-bottom: 3rem;
-}
-
-details.config {
-  margin-top: 1.5rem;
-  background: var(--bg1);
-  border: 1px solid var(--border);
-  padding: 0;
-}
-
-details.config > summary {
-  cursor: pointer;
-  padding: 0.85rem 1.1rem;
+.fw-body p { margin-bottom: 0.9rem; color: var(--text); }
+.fw-body h3 {
   font-size: 0.56rem;
   letter-spacing: 0.18em;
+  color: var(--amber2);
+  text-transform: uppercase;
+  margin: 1.3rem 0 0.4rem;
+}
+.fw-body pre {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.95rem;
+  margin: 0.7rem 0;
+  overflow-x: auto;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: #A89878;
+  font-family: var(--mono);
+}
+.fw-body strong { color: #D8C8A0; font-weight: 500; }
+
+/* ── SATS PLEA ────────────────────────────────────────────── */
+
+.sats {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin: 1rem 0 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  border-left: 2px solid #F7931A;
+}
+.sats-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #D8C8A0;
+  line-height: 1.5;
+}
+.sats-beg {
+  color: #F7931A;
+  margin-bottom: 1rem;
+}
+.sats-addr {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--amber2);
+  margin-bottom: 0.8rem;
+  transition: all 0.15s;
+}
+.sats-addr:hover {
+  text-decoration: none;
+  border-color: #F7931A;
+  color: #F7931A;
+  background: rgba(247,147,26,0.05);
+}
+.sats-note {
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
   color: var(--dim);
-  list-style: none;
 }
-
-details.config > summary::-webkit-details-marker { display: none; }
-details.config > summary::after { content: "▾"; float: right; color: var(--faint); transition: transform 0.2s; }
-details.config[open] > summary::after { transform: rotate(180deg); display: inline-block; }
-
-.config-body { padding: 0 1.1rem 1.1rem; }
-
-.config-label { display: block; font-size: 0.52rem; letter-spacing: 0.16em; color: var(--amber2); margin: 1rem 0 0.3rem; }
-.config-hint  { font-size: 0.6rem; color: var(--faint); line-height: 1.5; margin-bottom: 0.5rem; }
-.config-input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 0.55rem 0.8rem;
-  color: var(--text);
-  outline: none;
-  resize: vertical;
-  line-height: 1.65;
-}
-.config-input:focus { border-color: var(--amber2); }
-
-.btn {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  padding: 0.55rem 1.1rem;
-  border: 1px solid;
-  cursor: pointer;
-  background: transparent;
-  margin-top: 0.85rem;
-  margin-right: 0.5rem;
-}
-
-.btn-amber { border-color: var(--amber); color: var(--amber); }
-.btn-amber:hover { background: #D4B58015; }
-.btn-dim { border-color: var(--line); color: var(--amber2); }
-.btn-dim:hover { border-color: var(--dim); color: var(--dim); }
-
-.config-msg { margin-top: 0.7rem; font-size: 0.58rem; color: var(--amber2); letter-spacing: 0.05em; }
 
 /* ── FOOTER ───────────────────────────────────────────────── */
 
 footer {
   max-width: 720px;
   margin: 0 auto;
-  padding: 2rem 1.25rem 3rem;
-  border-top: 1px solid var(--border);
+  padding: 1.5rem 1.25rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  color: var(--faint);
 }
-
-.relay-status { display: flex; align-items: center; gap: 0.4rem; }
-.relay-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--faint); }
-.relay-dot.on  { background: var(--green); animation: blink 2s ease-in-out infinite; }
-.relay-dot.err { background: #D88870; }
-.relay-label { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.08em; }
-.license { font-size: 0.5rem; color: var(--faint); letter-spacing: 0.1em; }
-
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
+footer a { color: var(--amber2); }
+footer a:hover { color: var(--amber); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="site-title">Open Ring</div>
-  <nav class="anchors">
-    <a href="#start">Start here</a>
-    <a href="#run">Run it</a>
-    <a href="#framework">Framework</a>
-    <a href="#whitepaper">Whitepaper</a>
-    <a href="#manual">Pen &amp; Paper</a>
-    <a href="#cycle">Field cycle</a>
-    <a href="#support">Support</a>
-  </nav>
+  <div class="header-inner">
+    <div class="brand">Open Ring</div>
+    <div class="protocol-chips">
+      <a href="ORP-01-question-protocol.md" class="chip">ORP-01</a>
+      <a href="ORP-02-verdict-protocol.md" class="chip">ORP-02</a>
+      <a href="ORP-03-field-protocol.md" class="chip">ORP-03</a>
+    </div>
+  </div>
 </header>
 
 <main>
 
-  <!-- 1. HOOK — concrete example first, no framework language -->
-  <section id="start">
-    <div class="eyebrow">OPEN RING — START HERE</div>
-    <h1 class="title">Something feels wrong with how this works.</h1>
+  <!-- HOOK -->
+  <div class="hook-eyebrow">DIAGNOSTIC FRAMEWORK · PROTOCOL · MIT</div>
+  <h1 class="title">Find what's locked in place<br>and change it.</h1>
+  <p class="hook-lead">Open Ring identifies structural inversions — arrangements where the wrong things are fixed and the wrong things vary, at the cost of the user. It names what is wrong, where the information chain breaks, and the minimum intervention to release it.</p>
 
-    <p class="lead">Surf fins are sold in sets of three. Not because surfers need three — but because that format serves the manufacturer. The surfer pays for what they don't use and can't buy what they actually need. The industry is stable, profitable, and delivering the wrong product.</p>
+  <!-- ACTIONS -->
+  <div class="actions">
+    <a href="https://yakihonne.com" class="action action-amber">
+      <div class="action-label">POCKET</div>
+      <div class="action-name">Run the diagnostic</div>
+      <div class="action-desc">Two markdown files. Paste into any AI chat — Grok, ChatGPT, Claude. Receive a full nine-field verdict with diagnosis, treatment, and call to action.</div>
+    </a>
+    <a href="signal-ledger-nostr.html" class="action action-blue">
+      <div class="action-label">SIGNAL LEDGER</div>
+      <div class="action-name">File your verdict</div>
+      <div class="action-desc">Sign the verdict with your Nostr key. The record becomes a kind 1337 event — verifiable by anyone, stored by no one. Read all filed records.</div>
+    </a>
+  </div>
 
-    <p class="lead">Bitcoin sits on exchanges because the interface layer presents custodianship as the normal path. Users bear counterparty risk on every unit they hold. The protocol was built for the opposite arrangement — but the interface layer was captured before most users arrived.</p>
+  <!-- PROTOCOL -->
+  <div class="stack-eyebrow">THE OPEN RING PROTOCOL</div>
+  <div class="stack-title">Three documents. One standard.</div>
+  <div class="stack">
+    <a href="ORP-01-question-protocol.md" class="stack-item">
+      <div class="stack-id">ORP-01 · INPUT</div>
+      <div class="stack-name">Question Protocol</div>
+      <div class="stack-desc">Standard questions and answer types.</div>
+    </a>
+    <a href="ORP-02-verdict-protocol.md" class="stack-item">
+      <div class="stack-id">ORP-02 · PROCESSING</div>
+      <div class="stack-name">Verdict Protocol</div>
+      <div class="stack-desc">The nine-field verdict — V.01 through V.09. Three flags.</div>
+    </a>
+    <a href="ORP-03-field-protocol.md" class="stack-item">
+      <div class="stack-id">ORP-03 · OUTPUT</div>
+      <div class="stack-name">Field Protocol</div>
+      <div class="stack-desc">Signed record on Nostr kind 1337. Portable. Queryable.</div>
+    </a>
+  </div>
 
-    <p class="lead">This pattern appears across sectors with no surface relation to each other. A structure delivers systematically inferior outcomes while remaining stable. The people who benefit from that arrangement are the same people who control the conditions that prevent it from changing.</p>
-
-    <blockquote class="pull">Open Ring names what is locked in place, finds where the information chain breaks, and identifies the minimum action to change it.</blockquote>
-
-    <p class="lead">It does not require bad actors. It requires only misaligned incentives — and those are everywhere.</p>
-
-    <div style="margin-top:2rem;padding:1.25rem;background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--amber2)">
-      <div class="eyebrow" style="margin-bottom:0.75rem">WHICH VERSION IS RIGHT FOR YOU</div>
-
-      <div style="display:flex;flex-direction:column;gap:0.85rem">
-        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
-          <div style="font-size:0.62rem;color:var(--amber);letter-spacing:0.08em;margin-bottom:0.3rem">EXPLORING — not sure what's wrong yet</div>
-          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the AI version. You describe what you know. Claude reasons about the structure and produces a verdict, a seed crystal, and a break point. Takes about 10 minutes. Best for first contact.</div>
-          <div style="font-size:0.58rem;letter-spacing:0.12em;color:var(--amber2)">→ Open Ring AI — github.com/bitcoinkook/the-open-ring</div>
-        </div>
-
-        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
-          <div style="font-size:0.62rem;color:#90C8A0;letter-spacing:0.08em;margin-bottom:0.3rem">DEEP EXPERT — years inside this structure, you know what's wrong</div>
-          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the Mechanical version. No AI. You answer every diagnostic question from direct knowledge. The framework applies the logic. Takes 45–60 minutes and produces sharper output — every blank field is a visible gap.</div>
-          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#5A9A70">→ Open Ring Mechanical — github.com/bitcoinkook/the-open-ring</div>
-        </div>
-
-        <div style="padding:0.85rem 1rem;background:var(--bg2);border:1px solid var(--border)">
-          <div style="font-size:0.62rem;color:#8AB8D8;letter-spacing:0.08em;margin-bottom:0.3rem">NO TECHNOLOGY — want to work through it with a pen</div>
-          <div style="font-size:0.7rem;color:var(--text);line-height:1.7;margin-bottom:0.6rem">Use the pen and paper guide. Print it. Fill it in. Same framework, same output, zero dependencies. The guide is below — scroll to Pen & Paper.</div>
-          <div style="font-size:0.58rem;letter-spacing:0.12em;color:#4A6A80">→ Scroll to Pen &amp; Paper below, or download from this page</div>
-        </div>
-      </div>
-
-      <p style="font-size:0.65rem;color:var(--dim);margin-top:1rem;line-height:1.7">One prerequisite across all versions: direct experience inside the structure you are analysing. The framework organises what you already know. It does not replace knowing.</p>
-    </div>
-  </section>
-
-  <!-- 2. RUN IT — tool cards with links -->
-  <section id="run">
-    <div class="eyebrow">OPEN RING — INSTRUMENTS</div>
-    <h1 class="title">Run it</h1>
-    <p class="lead">Three instruments in one cycle. The Gradient finds the inversion and names the seed crystal. SignalChain locates the break point. Field records what happened when you acted.</p>
-    <div class="tools-grid">
-    <div class="tools-grid">
-      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/openring-ai.jsx" class="tool" style="text-decoration:none;color:inherit;display:block">
-        <div class="tool-name">Open Ring — AI</div>
-        <div class="tool-desc">Claude reasons about the structure. You supply context. Best for exploration and first contact with a structure. Takes about 10 minutes to Act.</div>
-        <div class="tool-tag tag-ai">AI-ASSISTED</div>
-      </a>
-      <a href="/mechanical" class="tool" style="text-decoration:none;color:inherit;display:block">
-        <div class="tool-name">Open Ring — Mechanical</div>
-        <div class="tool-desc">No AI. You answer every question from direct knowledge. Sharper output for deep domain experts. Takes 45–60 minutes. Every blank is visible.</div>
-        <div class="tool-tag tag-mech">SELF-HOSTED</div>
-      </a>
-      <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/openring-manual-document.md" class="tool" style="text-decoration:none;color:inherit;display:block">
-        <div class="tool-name">Pen &amp; Paper</div>
-        <div class="tool-desc">No technology required. Print the guide below, work through it with a pen. The same framework, the same output, zero dependencies.</div>
-        <div class="tool-tag tag-mech">PRINTABLE</div>
-      </a>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtbq3LRYc2bLsQRg8JDzGUYgoruFVe4JRguPsokBn006gx8w/viewform" class="tool" style="text-decoration:none;color:inherit;display:block">
-        <div class="tool-name">Field — the commons</div>
-        <div class="tool-desc">Submit what happened when you acted. Records are visible to all users. No identity collected — only structure, action, outcome, experience level.</div>
-        <div class="tool-tag tag-ai">SHARED DATASET</div>
-      </a>
-    </div>
-    <div class="source-note">
-      <div class="label">SOURCE — MIT LICENSE</div>
-      <div>github.com/bitcoinkook/the-open-ring</div>
-    </div>
-  </section>
-
-  <!-- 3. FRAMEWORK — collapsible -->
-  <details class="section-fold" id="framework">
+  <!-- FRAMEWORK (collapsed) -->
+  <details class="framework">
     <summary>
-      <div>
-        <div class="fold-eyebrow">OPEN RING — THE FRAMEWORK</div>
-        <div class="fold-title">How it works</div>
-      </div>
-      <span class="fold-hint">READ ▾</span>
+      <span class="fw-title">The framework</span>
+      <span class="fw-hint">READ ▾</span>
     </summary>
-    <div class="fold-body">
-      <p class="lead">Every system has things locked in place and things allowed to vary. That arrangement is not neutral. When what is locked serves the people running the system, and the cost falls on the people using it, the arrangement is inverted.</p>
-      <blockquote class="pull">A thing only tells you the truth when lying about it costs more than it is worth.</blockquote>
-      <div class="prose">
-        <p>The framework checks whether the fixed element is genuinely fixed — meaning that falsifying it would be both expensive and visible. If either condition fails, the element only appears stable. It is actually drifting, and the arrangement can be shifted with less effort than it appears.</p>
-        <h2>The four ways a locked arrangement stays locked</h2>
-        <p><strong>Knowledge.</strong> The better option is not known, because those who would lose from change control what gets taught, published, or discussed. Medical education funded by pharmaceutical companies. Financial literacy produced by financial institutions.</p>
-        <p><strong>Access.</strong> Even when people know a better option exists, they cannot reach it — because distribution runs through channels owned by the incumbent. Surfboards through brand-controlled shops. Bitcoin through regulated custodians.</p>
-        <p><strong>Money.</strong> Alternatives cannot be funded — because the institutions that allocate capital benefit from the current arrangement and do not finance what would replace it.</p>
-        <p><strong>Authority.</strong> Even when an alternative exists and people can access it, it lacks legitimacy — because the bodies that certify, approve, or endorse are the same ones that benefit from the status quo.</p>
-        <h2>The diagnostic checks all four</h2>
-        <p>If all four return No — the structure may be approaching capture immunity. If any return Yes — there is maintenance energy holding the arrangement in place. The framework locates the exact node where information stops flowing and names the minimum action at that specific point. Not a disruption. A seed crystal.</p>
-        <h2>Known limits</h2>
-        <p>The framework has three documented failure modes: mixed equilibria (some structures have no single natural arrangement), rotated capture (a seed crystal can release one inversion and create another), and the wrong-layer escape hatch (when a seed crystal fails, it is always possible to say the fixed element was mis-specified — which protects the framework from falsification). All three are documented in the whitepaper.</p>
-      </div>
+    <div class="fw-body">
+
+      <p>Every structure has things locked in place and things allowed to vary. When what is locked serves the people running the structure, and the cost falls on the people using it, the arrangement is inverted.</p>
+
+      <p>Open Ring does not require bad actors. It requires only misaligned incentives — and those are everywhere.</p>
+
+      <h3>The core condition</h3>
+      <pre>I(B) is defined  ⟺  α × P(detect) > 1</pre>
+      <p>Information about any variable element B exists only when a constant reference A is genuinely holding still. A is genuinely constant only when falsifying it is both expensive (α) and reliably detectable (P(detect)). A thing only tells you the truth when lying about it costs more than telling the truth.</p>
+
+      <h3>The five states</h3>
+      <pre>A=C, B=V  →  SOUND        information flows
+A=C, B=C  →  FROZEN       nothing moves
+A=V, B=V  →  UNGROUNDED   mutual drift
+A=V, B=C  →  INVERTED     capture — user pays
+—  —  —   →  IMMUNE       cannot be captured</pre>
+
+      <h3>The five strata</h3>
+      <p>Every structure exists at five levels simultaneously. An inversion may be visible at one stratum and held at another. The seed crystal must go where the blockage is held.</p>
+      <pre>1. INDIVIDUAL      Awareness / Capacity / Energy / Identity
+2. RELATIONSHIP    Transparency / Trust / Reciprocity / Status
+3. INSTITUTION     Education / Distribution / Finance / Authority
+4. ENVIRONMENT     Visibility / Infrastructure / Commons / Regulation
+5. CULTURE         Story / Language / Value / Meaning</pre>
+
+      <h3>The seed crystal</h3>
+      <p>The most important output of any diagnostic. The minimum true thing placed at the correct stratum that lets the structure reorganise on its own. Five properties: <strong>minimum</strong>, <strong>placed</strong>, <strong>true</strong>, <strong>open</strong>, <strong>emergent</strong>. If none can be identified, the diagnostic says so. It never invents one.</p>
+
+      <h3>Prerequisite</h3>
+      <p>Direct experience inside the structure. The framework organises what you already know. It does not replace knowing.</p>
+
     </div>
   </details>
 
-  <!-- 4. WHITEPAPER — collapsible, fetched from Nostr -->
-  <details class="section-fold" id="whitepaper">
-    <summary>
-      <div>
-        <div class="fold-eyebrow">OPEN RING — DOCUMENT</div>
-        <div class="fold-title">Whitepaper</div>
-      </div>
-      <span class="fold-hint">READ ▾</span>
-    </summary>
-    <div class="fold-body">
-      <div id="whitepaper-content">
-        <p class="lead" style="color:var(--dim)">Full framework document — the core condition, all five sectors analysed, the three known limits, and the falsification condition.</p>
-        <div class="prose">
-          <p>The whitepaper covers the mathematical basis of the framework (grounded in Becker 1968 and Spence 1973), the five sectors where the capture pattern has been identified through direct domain experience, and three documented limits of the framework — mixed equilibria, rotated capture, and the wrong-layer escape hatch.</p>
-          <p>It also states the falsification condition: if five clean cycles are run and the seed crystal consistently fails to produce movement, the framework is wrong and should be revised or retired.</p>
-        </div>
-        <div class="loading" style="margin-top:1.5rem">
-          <div class="spinner"></div>
-          <div class="loading-text">LOADING FULL DOCUMENT FROM RELAYS</div>
-        </div>
-      </div>
-    </div>
-  </details>
-
-  <!-- 5. PEN AND PAPER — collapsible, fetched from Nostr -->
-  <details class="section-fold" id="manual">
-    <summary>
-      <div>
-        <div class="fold-eyebrow">OPEN RING — DOCUMENT</div>
-        <div class="fold-title">Pen &amp; Paper Guide</div>
-      </div>
-      <span class="fold-hint">READ ▾</span>
-    </summary>
-    <div class="fold-body">
-      <div id="manual-content">
-        <p class="lead" style="color:var(--dim)">The complete diagnostic worksheet. Print it, fill it in. No technology required.</p>
-        <div class="prose">
-          <p>The guide walks through the full Open Ring cycle on paper — Pre-Check, Gradient, SignalChain, Act, and Field. Each section has fill-in spaces, checkbox selects, and the same question framing as the digital tool. The verdict logic and chain state are written out as decision tables the user applies themselves.</p>
-          <p>It works identically to the AI and Mechanical versions. The only difference is you are the computer. The output format is the same. A record completed on paper can be submitted to the shared Field dataset.</p>
-          <p style="color:var(--amber2)">Read the orientation section — Before You Begin — before starting. It takes three minutes and explains the prerequisite clearly.</p>
-        </div>
-        <div class="loading" style="margin-top:1.5rem">
-          <div class="spinner"></div>
-          <div class="loading-text">LOADING FULL GUIDE FROM RELAYS</div>
-        </div>
-      </div>
-    </div>
-  </details>
-
-  <!-- 6. FIELD CYCLE — collapsible -->
-  <details class="section-fold" id="cycle">
-    <summary>
-      <div>
-        <div class="fold-eyebrow">OPEN RING — FIRST COMPLETED CYCLE</div>
-        <div class="fold-title">Bitcoin interface layer</div>
-      </div>
-      <span class="fold-hint">READ ▾</span>
-    </summary>
-    <div class="fold-body">
-      <div id="cycle-content">
-        <p class="lead" style="color:var(--dim)">The first real completed cycle. What the diagnostic found, what action was taken, and what happened.</p>
-        <div class="prose">
-          <p><strong>Structure:</strong> Bitcoin interface layer — the layer of exchanges, custodians, and on-ramps that sits between the protocol and the user.</p>
-          <p><strong>Verdict:</strong> Inversion confirmed. Institutional intermediation is fixed as the default. User sovereignty over their holdings is the variable bearing all counterparty risk. The protocol layer is approaching capture immune — the 21M cap is enforced by proof-of-work and cannot be falsified cheaply. The interface layer above it is inverted.</p>
-          <p><strong>Break point:</strong> Channel. The signal that self-custody is superior is intact and well-documented. The channel is severely asymmetric — exchange marketing budgets, mainstream media, and regulatory framing carry the intermediation message at orders of magnitude greater reach than self-custody education.</p>
-          <p><strong>Action taken:</strong> Published the Sovereignty, Veil, Hydra whitepaper — three properties of the correct Bitcoin arrangement, in plain language, on Nostr. A seed crystal placed in the channel that the incumbent cannot suppress.</p>
-          <p><strong>Outcome:</strong> Moving toward correct orientation. Purchasing power preserved for users who act on it. The correct arrangement is also the one the protocol was designed for.</p>
-        </div>
-        <div class="loading" style="margin-top:1.5rem">
-          <div class="spinner"></div>
-          <div class="loading-text">LOADING FULL CYCLE RECORD FROM RELAYS</div>
-        </div>
-      </div>
-    </div>
-  </details>
-
-  <!-- SUPPORT -->
-  <section id="support">
-    <div class="eyebrow">SUPPORT THIS WORK</div>
-    <h1 class="title">Send sats</h1>
-    <p class="lead">If Open Ring has been useful to you, you can send Lightning sats. Everything here is MIT licensed and freely shared — support is optional and appreciated.</p>
-
-    <div class="ln-card">
-      <div class="ln-row" onclick="copyAddress(this)">
-        <span style="font-size:1rem">⚡</span>
-        <span class="ln-addr">blackfalcon2@primal.net</span>
-        <span style="font-size:0.65rem;color:var(--faint)">⎘</span>
-      </div>
-      <div class="ln-hint">tap address to copy</div>
-      <div id="ln-qr" class="ln-qr"></div>
-    </div>
-
-    <details class="config">
-      <summary>CONFIGURE RELAYS</summary>
-      <div class="config-body">
-        <div class="config-hint" style="margin-top:0.85rem">Settings are saved in this browser only. The reader connects automatically on load.</div>
-        <label class="config-label">NOSTR PUBKEY</label>
-        <input class="config-input" id="cfg-pk" type="text" placeholder="npub1...">
-        <label class="config-label">RELAYS</label>
-        <div class="config-hint">One per line (wss://)</div>
-        <textarea class="config-input" id="cfg-rl" rows="6"></textarea>
-        <button class="btn btn-amber" onclick="saveConfig()">SAVE &amp; RECONNECT</button>
-        <button class="btn btn-dim" onclick="resetConfig()">RESET DEFAULTS</button>
-        <div class="config-msg" id="cfg-msg"></div>
-      </div>
-    </details>
-  </section>
+  <!-- SATS PLEA -->
+  <div class="sats">
+    <div class="sats-line">Running Open Ring on empty pockets.</div>
+    <div class="sats-line sats-beg">Send sats. Keep the signal flowing.</div>
+    <a href="lightning:blackfalcon2@primal.net" class="sats-addr">blackfalcon2@primal.net</a>
+    <div class="sats-note">⚡ Lightning address · every sat is a vote the framework works</div>
+  </div>
 
 </main>
 
 <footer>
-  <div class="relay-status">
-    <div class="relay-dot" id="relay-dot"></div>
-    <span class="relay-label" id="relay-label">connecting...</span>
-  </div>
-  <div class="license">MIT license — share freely</div>
+  <div>OPEN RING · MIT · v2</div>
+  <div><a href="https://github.com/bitcoinkook/the-open-ring">github.com/bitcoinkook/the-open-ring</a></div>
 </footer>
-
-
-<script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
-
-const DEFAULT_PK = "npub15r3rm0jjkqyaqf8e5yrxuu5y0z2xmrypnt6nqtgerdqmahcz29js0xdaeh";
-
-const DEFAULT_RELAYS = [
-  "wss://relay.damus.io",
-  "wss://relay.nostr.band",
-  "wss://nos.lol",
-  "wss://relay.primal.net",
-  "wss://purplepag.es",
-  "wss://relay.yakihonne.com",
-  "wss://relay.snort.social",
-];
-
-// ── LOAD SETTINGS ─────────────────────────────────────────────────────────────
-
-let pubkey, relays;
-try { pubkey = localStorage.getItem("or_pk") || DEFAULT_PK; } catch { pubkey = DEFAULT_PK; }
-try { relays = JSON.parse(localStorage.getItem("or_rl") || "null") || DEFAULT_RELAYS; } catch { relays = DEFAULT_RELAYS; }
-
-// Populate config inputs
-document.addEventListener("DOMContentLoaded", () => {
-  const pkEl = document.getElementById("cfg-pk");
-  const rlEl = document.getElementById("cfg-rl");
-  if (pkEl) pkEl.value = pubkey;
-  if (rlEl) rlEl.value = relays.join("\n");
-});
-
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-
-function esc(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function tag(ev, n) { return (ev?.tags?.find(t => t[0] === n) || [])[1] || ""; }
-
-function pubhex(raw) {
-  if (!raw) return "";
-  const t = raw.trim();
-  if (/^[0-9a-f]{64}$/i.test(t)) return t.toLowerCase();
-  if (!t.startsWith("npub1")) return t;
-  try {
-    const alpha = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-    const d = t.slice(5).toLowerCase().split("").map(c => alpha.indexOf(c));
-    let bits = 0, val = 0; const bytes = [];
-    for (let i = 0; i < d.length - 6; i++) {
-      val = (val << 5) | d[i]; bits += 5;
-      if (bits >= 8) { bytes.push((val >> (bits - 8)) & 255); bits -= 8; }
-    }
-    return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
-  } catch { return ""; }
-}
-
-// ── RENDER ARTICLES ───────────────────────────────────────────────────────────
-
-function titleToSection(t) {
-  if (!t) return null;
-  const l = t.toLowerCase();
-  if (l.includes("whitepaper") || l.includes("diagnostic framework") || l.includes("wrong things are fixed")) return "whitepaper-content";
-  if (l.includes("pen") && (l.includes("paper") || l.includes("manual"))) return "manual-content";
-  if (l.includes("bitcoin") || l.includes("interface layer")) return "cycle-content";
-  return null;
-}
-
-function renderArticle(ev) {
-  const t    = tag(ev, "title") || "";
-  const dest = titleToSection(t);
-  const el   = dest ? document.getElementById(dest) : null;
-  if (!el) return;
-
-  const sum  = tag(ev, "summary");
-  const date = ev.created_at ? new Date(ev.created_at * 1000).toISOString().slice(0, 10) : "";
-  const body = typeof marked !== "undefined" ? marked.parse(ev.content || "") : `<pre>${esc(ev.content || "")}</pre>`;
-
-  el.innerHTML = `
-    <h1 class="title">${esc(t || "Document")}</h1>
-    ${sum ? `<p class="lead" style="color:var(--dim)">${esc(sum)}</p>` : ""}
-    <div class="meta">
-      ${date ? `<div class="meta-item">published <span>${date}</span></div>` : ""}
-      <div class="meta-item">event <span>${esc((ev.id || "").slice(0, 12))}…</span></div>
-    </div>
-    <div class="prose">${body}</div>
-  `;
-}
-
-// ── NOSTR CONNECTION ──────────────────────────────────────────────────────────
-
-const articles = {};  // dtag -> event (keep newest)
-let sockets = [];
-
-function setStatus(state) {
-  const dot = document.getElementById("relay-dot");
-  const lbl = document.getElementById("relay-label");
-  if (!dot || !lbl) return;
-  dot.className = "relay-dot";
-  if (state === "on")  { dot.classList.add("on");  lbl.textContent = relays.length + " relays"; }
-  if (state === "err") { dot.classList.add("err"); lbl.textContent = "connection failed"; }
-  if (state === "...") lbl.textContent = "connecting...";
-}
-
-function handleEvent(ev) {
-  if (!ev || !ev.kind) return;
-
-  if (ev.kind === 30023) {
-    const dtag = tag(ev, "d") || ev.id;
-    const t    = tag(ev, "title");
-    console.log("Article:", dtag, "|", t);
-    if (!articles[dtag] || ev.created_at > articles[dtag].created_at) {
-      articles[dtag] = ev;
-      renderArticle(ev);
-    }
-  }
-}
-
-function connect() {
-  sockets.forEach(ws => { try { ws.close(); } catch {} });
-  sockets = [];
-  setStatus("...");
-
-  const hex = pubhex(pubkey);
-  if (!hex) { setStatus("err"); return; }
-
-  let opened = 0;
-
-  relays.forEach(url => {
-    try {
-      const ws = new WebSocket(url);
-      sockets.push(ws);
-
-      ws.onopen = () => {
-        try {
-          opened++;
-          if (opened === 1) setStatus("on");
-          ws.send(JSON.stringify(["REQ", "a", { kinds: [30023], authors: [hex], limit: 20 }]));
-        } catch {}
-      };
-
-      ws.onmessage = (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg[0] === "EVENT") handleEvent(msg[2]);
-        } catch {}
-      };
-
-      ws.onerror = () => {
-        try {
-          if (opened === 0 && sockets.every(s => s.readyState > 1)) setStatus("err");
-        } catch {}
-      };
-    } catch {}
-  });
-}
-
-// ── CONFIG UI ─────────────────────────────────────────────────────────────────
-
-function saveConfig() {
-  const pk = (document.getElementById("cfg-pk").value || "").trim();
-  const rl = (document.getElementById("cfg-rl").value || "")
-    .split("\n").map(s => s.trim()).filter(s => s.startsWith("wss://"));
-
-  const msg = document.getElementById("cfg-msg");
-  if (!pk) { msg.textContent = "Pubkey required."; return; }
-  if (rl.length === 0) { msg.textContent = "At least one relay required."; return; }
-
-  pubkey = pk;
-  relays = rl;
-  try { localStorage.setItem("or_pk", pk); localStorage.setItem("or_rl", JSON.stringify(rl)); } catch {}
-
-  msg.textContent = "Saved. Reconnecting...";
-  connect();
-  setTimeout(() => { if (msg) msg.textContent = ""; }, 2500);
-}
-
-function resetConfig() {
-  const msg = document.getElementById("cfg-msg");
-  try { localStorage.removeItem("or_pk"); localStorage.removeItem("or_rl"); } catch {}
-  pubkey = DEFAULT_PK;
-  relays = DEFAULT_RELAYS;
-  document.getElementById("cfg-pk").value = pubkey;
-  document.getElementById("cfg-rl").value = relays.join("\n");
-  msg.textContent = "Reset to defaults.";
-  connect();
-  setTimeout(() => { if (msg) msg.textContent = ""; }, 2500);
-}
-
-// ── LIGHTNING COPY ────────────────────────────────────────────────────────────
-
-function copyAddress(row) {
-  const addr = "blackfalcon2@primal.net";
-  const span = row.querySelector(".ln-addr");
-  const confirm = () => {
-    row.style.borderColor = "var(--green)";
-    if (span) span.style.color = "var(--green)";
-    setTimeout(() => { row.style.borderColor = ""; if (span) span.style.color = ""; }, 1600);
-  };
-
-  const fallback = () => {
-    const t = document.createElement("textarea");
-    t.value = addr; t.style.cssText = "position:fixed;opacity:0";
-    document.body.appendChild(t); t.focus(); t.select();
-    try { document.execCommand("copy"); confirm(); } catch {}
-    document.body.removeChild(t);
-  };
-
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(addr).then(confirm).catch(fallback);
-  } else {
-    fallback();
-  }
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-
-try { connect(); } catch (e) { console.error(e); setStatus("err"); }
-
-// Generate Lightning QR code
-function renderQR() {
-  const el = document.getElementById("ln-qr");
-  if (!el || typeof QRCode === "undefined") return;
-  el.innerHTML = "";
-  try {
-    new QRCode(el, {
-      text: "lightning:blackfalcon2@primal.net",
-      width: 164,
-      height: 164,
-      colorDark: "#0A0907",
-      colorLight: "#F0E8D0",
-      correctLevel: QRCode.CorrectLevel.M,
-    });
-  } catch (e) {
-    console.error("QR render failed:", e);
-  }
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", renderQR);
-} else {
-  renderQR();
-}
-</script>
 
 </body>
 </html>
