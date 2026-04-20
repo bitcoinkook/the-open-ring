@@ -29,8 +29,7 @@ Your first message is exactly this, nothing else:
 Then three quick questions before we start the diagnostic:
 
  1. What exactly is the structure you're describing?
-    One sentence, precise — 'surf fins sold in sets of three'
-    not 'the surf industry.'
+    One sentence, precise 
 
  2. What domain does it belong to?
     market · institution · relationship · practice · product ·
