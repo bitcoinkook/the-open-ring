@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pocket · Open Ring · Français</title>
+<meta name="description" content="Exécute le diagnostic Open Ring dans n'importe quel chat IA. Deux fichiers markdown. Copie, colle, reçois un verdict à neuf champs.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0A0907;
+  --bg1: #100D08;
+  --bg2: #0C0A07;
+  --border: #1E1A12;
+  --text: #C8C0B0;
+  --dim: #6A6050;
+  --faint: #3A3628;
+  --amber: #D4B580;
+  --amber2: #6A5A38;
+  --blue: #60B5E5;
+  --green: #70D090;
+  --mono: 'JetBrains Mono', monospace;
+  --serif: 'Libre Baskerville', serif;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  line-height: 1.7;
+  font-size: 14px;
+}
+a { color: var(--amber); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+}
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.brand {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #E8E0CC;
+}
+.back-home {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  border: 1px solid var(--amber2);
+  padding: 0.3rem 0.6rem;
+  transition: all 0.15s;
+}
+.back-home:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+
+/* ── MAIN ── */
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 1rem;
+}
+
+/* ── HOOK ── */
+.hook-eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+  margin-bottom: 0.85rem;
+}
+h1.title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.9rem;
+  color: #E8E0CC;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+@media (min-width: 640px) { h1.title { font-size: 2.2rem; } }
+.hook-lead {
+  font-size: 0.82rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+/* ── SECTION DIVIDER ── */
+.section-eyebrow {
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+  margin: 2.5rem 0 0.6rem;
+}
+h2.section-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.4rem;
+  color: #D8D0BC;
+  margin-bottom: 1rem;
+}
+
+/* ── LEAD PARAGRAPHS ── */
+.lead {
+  font-size: 0.78rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+/* ── FRAMEWORK BLOCK ── */
+.fw-block {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+}
+.fw-block h3 {
+  font-size: 0.56rem;
+  letter-spacing: 0.18em;
+  color: var(--amber2);
+  text-transform: uppercase;
+  margin: 1.3rem 0 0.4rem;
+}
+.fw-block p {
+  font-size: 0.74rem;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 0.9rem;
+}
+.fw-block pre {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.95rem;
+  margin: 0.7rem 0;
+  overflow-x: auto;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: #A89878;
+  font-family: var(--mono);
+  white-space: pre-wrap;
+}
+.fw-block strong { color: #D8C8A0; font-weight: 500; }
+
+/* ── FILE BLOCK ── */
+.file-block {
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  margin: 2rem 0;
+}
+.file-header {
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.file-meta { flex: 1; min-width: 0; }
+.file-label {
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  color: var(--amber);
+  margin-bottom: 0.25rem;
+}
+.file-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #D8D0BC;
+}
+.file-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--amber2);
+  background: transparent;
+  color: var(--amber);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: rgba(212,181,128,0.08);
+  border-color: var(--amber);
+  text-decoration: none;
+}
+.btn.copied {
+  background: rgba(112,208,144,0.1);
+  border-color: var(--green);
+  color: var(--green);
+}
+.file-body {
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--bg2);
+}
+.file-body pre {
+  padding: 1rem 1.1rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.7;
+  color: #A89878;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.file-body-loading {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+.file-body-error {
+  padding: 1.5rem 1.1rem;
+  font-size: 0.68rem;
+  color: #E57070;
+  line-height: 1.7;
+}
+.file-footer {
+  padding: 0.6rem 1.1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ── HINT ── */
+.hint {
+  margin: 2rem 0 1rem;
+  padding: 1rem 1.1rem;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--amber2);
+  font-size: 0.72rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+.hint strong { color: var(--amber); font-weight: 500; }
+
+/* ── SATS ── */
+.sats {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin: 2rem 0 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg1);
+  border-left: 2px solid #F7931A;
+}
+.sats-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #D8C8A0;
+  line-height: 1.5;
+}
+.sats-beg { color: #F7931A; margin-bottom: 1rem; }
+.sats-addr {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--amber2);
+  background: transparent;
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sats-addr:hover { border-color: #F7931A; color: #F7931A; background: rgba(247,147,26,0.05); }
+.sats-addr.copied { border-color: var(--green); color: var(--green); background: rgba(112,208,144,0.08); }
+.sats-note { font-size: 0.56rem; letter-spacing: 0.08em; color: var(--dim); }
+.sats-qr-wrap { margin-top: 1.4rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.sats-qr { padding: 0.5rem; background: #F5F1E8; border: 1px solid var(--border); display: inline-block; line-height: 0; }
+.sats-qr img, .sats-qr canvas { display: block; width: 140px !important; height: 140px !important; }
+.sats-qr-label { font-size: 0.54rem; letter-spacing: 0.08em; color: var(--dim); }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+footer a { color: var(--amber2); }
+footer a:hover { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">Open Ring</div>
+    <a href="/" class="back-home">← Accueil</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. HOOK -->
+  <div class="hook-eyebrow">CADRE DE DIAGNOSTIC · PROTOCOLE · MIT</div>
+  <h1 class="title">Trouve ce qui est bloqué<br>et change-le.</h1>
+  <p class="hook-lead">Open Ring identifie les inversions structurelles : des dispositions où les mauvaises choses sont fixes et les mauvaises choses varient, aux dépens de l'utilisateur. Il nomme ce qui ne va pas, où la chaîne d'information se brise, et l'intervention minimale pour le libérer.</p>
+
+  <!-- 2. EXÉCUTE LE DIAGNOSTIC -->
+  <div class="section-eyebrow">POCKET · DEUX FICHIERS</div>
+  <h2 class="section-title">Exécute le diagnostic<br>dans n'importe quel chat IA.</h2>
+  <p class="lead">Copie le Fichier 1, colle-le dans un nouveau chat avec Grok ou Claude. Puis copie le Fichier 2 et colle-le immédiatement après. L'IA devient un opérateur Open Ring et te guide à travers un diagnostic complet.</p>
+  <p class="lead">L'output est conforme à ORP-02 et se termine par un bloc prêt à archiver : un collage dans le bouton d'importation du Signal Ledger, révision, signature. Cycle complet en moins de dix minutes.</p>
+
+  <!-- 3. FICHIER 1 — FRAMEWORK -->
+  <div class="file-block">
+    <div class="file-header">
+      <div class="file-meta">
+        <div class="file-label">FICHIER 1 SUR 2 · COLLER EN PREMIER</div>
+        <div class="file-name">Le Framework</div>
+      </div>
+      <div class="file-actions">
+        <button class="btn" id="copy-1" onclick="copyFile(1)">Copier</button>
+      </div>
+    </div>
+    <div class="file-body" id="body-1">
+      <div class="file-body-loading">Chargement…</div>
+    </div>
+    <div class="file-footer">
+      <span>openring-fichier1-framework-fr.md</span>
+      <span>MIT</span>
+    </div>
+  </div>
+
+  <!-- 4. FICHIER 2 — OPÉRATEUR -->
+  <div class="file-block">
+    <div class="file-header">
+      <div class="file-meta">
+        <div class="file-label">FICHIER 2 SUR 2 · COLLER IMMÉDIATEMENT APRÈS</div>
+        <div class="file-name">L'Opérateur</div>
+      </div>
+      <div class="file-actions">
+        <button class="btn" id="copy-2" onclick="copyFile(2)">Copier</button>
+      </div>
+    </div>
+    <div class="file-body" id="body-2">
+      <div class="file-body-loading">Chargement…</div>
+    </div>
+    <div class="file-footer">
+      <span>openring-fichier2-operateur-fr.md</span>
+      <span>MIT</span>
+    </div>
+  </div>
+
+  <!-- 5. COMMENT FONCTIONNE OPEN RING -->
+  <div class="fw-block">
+    <h2 class="section-title" style="margin-bottom:1.2rem;">Comment fonctionne Open Ring ?</h2>
+
+    <p>Chaque structure a des choses fixes et des choses qui peuvent varier. Quand ce qui est bloqué sert les personnes qui gèrent la structure, et que le coût retombe sur les personnes qui l'utilisent, la disposition est inversée.</p>
+    <p>Open Ring ne nécessite pas de mauvais acteurs. Il nécessite seulement des incitations mal alignées, et celles-ci sont partout.</p>
+
+    <h3>La condition centrale</h3>
+    <pre>I(B) est définie  ⟺  α × P(détecter) > 1</pre>
+    <p>Les informations sur tout élément variable B n'existent que lorsqu'une référence constante A est genuinement stable. A est genuinement constante seulement quand la falsifier est à la fois coûteux (α) et détectable de manière fiable (P(détecter)). Une chose ne te dit la vérité que lorsque mentir à son sujet coûte plus cher que dire la vérité.</p>
+
+    <h3>Les cinq états</h3>
+    <pre>A=C, B=V  →  SAIN           les informations circulent
+A=C, B=C  →  GELÉ           rien ne bouge
+A=V, B=V  →  SANS ANCRAGE   dérive mutuelle
+A=V, B=C  →  INVERSÉ        capture — l'utilisateur paie
+—  —  —   →  IMMUNE         ne peut pas être capturé</pre>
+
+    <h3>Les cinq strates</h3>
+    <p>Chaque structure existe simultanément sur cinq niveaux. Une inversion peut être visible dans une strate et maintenue dans une autre. Le cristal graine doit aller là où le blocage est maintenu.</p>
+    <pre>1. INDIVIDUEL      Conscience / Capacité / Énergie / Identité
+2. RELATION        Transparence / Confiance / Réciprocité / Statut
+3. INSTITUTION     Éducation / Distribution / Finance / Autorité
+4. ENVIRONNEMENT   Visibilité / Infrastructure / Biens communs / Régulation
+5. CULTURE         Récit / Langage / Valeur / Sens</pre>
+
+    <h3>Le cristal graine</h3>
+    <p>L'output le plus important de tout diagnostic. La chose minimale vraie placée dans la bonne strate qui permet à la structure de se réorganiser d'elle-même. Cinq propriétés : <strong>minimal</strong>, <strong>placé</strong>, <strong>vrai</strong>, <strong>ouvert</strong>, <strong>émergent</strong>. Si aucun ne peut être identifié, le diagnostic le dit. Il n'en invente jamais un.</p>
+
+    <h3>Prérequis</h3>
+    <p>Expérience directe à l'intérieur de la structure. Le framework organise ce que tu sais déjà. Il ne remplace pas le savoir.</p>
+  </div>
+
+  <!-- 6. HINT -->
+  <div class="hint">
+    <strong>Prérequis.</strong> Expérience directe à l'intérieur de la structure que tu analyses. Le framework organise ce que tu sais déjà. Il ne remplace pas le savoir.
+  </div>
+
+  <!-- 7. SATS -->
+  <div class="sats">
+    <div class="sats-line">Exécutant Open Ring avec les poches vides.</div>
+    <div class="sats-line sats-beg">Envoie des sats. Maintiens le signal en marche.</div>
+    <button class="sats-addr" id="sats-btn" onclick="copySats()">blackfalcon2@primal.net</button>
+    <div class="sats-note" id="sats-note">⚡ Adresse Lightning · appuie pour copier</div>
+    <div class="sats-qr-wrap">
+      <div id="sats-qr" class="sats-qr"></div>
+      <div class="sats-qr-label">Ou scanne avec un portefeuille Lightning</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div>OPEN RING · POCKET · FR · MIT</div>
+  <div><a href="https://github.com/bitcoinkook/the-open-ring">github.com/bitcoinkook/the-open-ring</a></div>
+</footer>
+
+<script>
+const BASE = 'https://raw.githubusercontent.com/bitcoinkook/the-open-ring/main/';
+const FILES = {
+  1: 'openring-fichier1-framework-fr.md',
+  2: 'openring-fichier2-operateur-fr.md'
+};
+const cache = {};
+
+async function loadFile(id) {
+  const body = document.getElementById('body-' + id);
+  try {
+    const res = await fetch(BASE + FILES[id]);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    cache[id] = text;
+    const pre = document.createElement('pre');
+    pre.textContent = text;
+    body.innerHTML = '';
+    body.appendChild(pre);
+  } catch(e) {
+    body.innerHTML = '<div class="file-body-error">Impossible de charger le fichier. Récupère-le directement depuis GitHub.</div>';
+  }
+}
+
+function copyFile(id) {
+  const btn = document.getElementById('copy-' + id);
+  const text = cache[id];
+  if (!text) {
+    btn.textContent = 'Pas encore chargé';
+    setTimeout(function() { btn.textContent = 'Copier'; }, 1800);
+    return;
+  }
+  const done = function() {
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copié';
+    setTimeout(function() { btn.classList.remove('copied'); btn.textContent = 'Copier'; }, 2200);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  } else { fallback(); }
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch(e) { btn.textContent = 'Erreur de copie'; }
+    document.body.removeChild(ta);
+  }
+}
+
+function copySats() {
+  const addr = 'blackfalcon2@primal.net';
+  const note = document.getElementById('sats-note');
+  const btn = document.getElementById('sats-btn');
+  const done = function() {
+    note.textContent = '✓ Copié — colle-le dans ton portefeuille Lightning';
+    btn.classList.add('copied');
+    setTimeout(function() { note.textContent = '⚡ Adresse Lightning · appuie pour copier'; btn.classList.remove('copied'); }, 2500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(addr).then(done).catch(fallback);
+  } else { fallback(); }
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = addr;
+    ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch(e) { note.textContent = 'Copie : ' + addr; }
+    document.body.removeChild(ta);
+  }
+}
+
+loadFile(1);
+loadFile(2);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function() {
+  var el = document.getElementById('sats-qr');
+  if (!el || typeof QRCode === 'undefined') return;
+  new QRCode(el, {
+    text: 'lightning:blackfalcon2@primal.net',
+    width: 140, height: 140,
+    colorDark: '#0A0907', colorLight: '#F5F1E8',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+})();
+</script>
+
+</body>
+</html>
