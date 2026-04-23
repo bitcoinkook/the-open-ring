@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Open Ring — Inversion Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0907;--bg2:#0f0d0a;--bg3:#141209;
+  --border:#1E1A12;--dim:#2e2a22;
+  --amber:#D4B580;--amber2:#7a6a48;--amber3:#3a3020;
+  --blue:#60B5E5;--green:#70D090;--red:#E85555;--grey:#888866;
+  --text:#C8C0B0;--muted:#6A6050;
+  --mono:'IBM Plex Mono',monospace;--serif:'Libre Baskerville',serif;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+a{color:var(--amber);text-decoration:none}
+.app{display:flex;flex-direction:column;min-height:100vh}
+header{padding:14px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.brand{color:var(--amber);font-size:13px;letter-spacing:4px;font-weight:500}
+.brand-sub{color:var(--muted);font-size:8px;letter-spacing:3px;margin-top:2px}
+.header-links{display:flex;gap:8px}
+.hlink{font-size:9px;letter-spacing:2px;color:var(--muted);border:1px solid var(--dim);padding:4px 10px;text-decoration:none;transition:all 0.15s}
+.hlink:hover{color:var(--amber);border-color:var(--amber2)}
+.mode-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+.mode-tab{flex:1;padding:12px 8px;font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.mode-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.mode-tab:hover:not(.active){color:var(--text)}
+.tab-icon{display:block;font-size:14px;margin-bottom:3px}
+.panel{display:none;flex:1}
+.panel.active{display:flex;flex-direction:column}
+/* PASTE */
+.paste-panel{padding:20px;display:flex;flex-direction:column;gap:16px}
+.paste-hint{font-size:10px;letter-spacing:1px;color:var(--muted);line-height:1.7}
+.paste-hint strong{color:var(--amber2)}
+#paste-input{width:100%;min-height:180px;background:var(--bg3);border:1px solid var(--dim);color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.6;padding:12px;resize:vertical;outline:none;transition:border-color 0.2s}
+#paste-input:focus{border-color:var(--amber2)}
+#paste-input::placeholder{color:var(--dim)}
+.paste-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-primary{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--amber3);border:1px solid var(--amber2);color:var(--amber);padding:10px 20px;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:rgba(212,181,128,0.12);border-color:var(--amber)}
+.btn-secondary{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--dim);color:var(--muted);padding:10px 20px;cursor:pointer;transition:all 0.2s}
+.btn-secondary:hover{color:var(--text);border-color:var(--muted)}
+.btn-sm{font-size:9px;padding:6px 12px}
+.paste-msg{font-size:10px;line-height:1.6;padding:8px 12px;border-left:2px solid;display:none}
+.paste-msg.success{color:var(--green);border-color:var(--green);background:rgba(112,208,144,0.06);display:block}
+.paste-msg.error{color:var(--red);border-color:var(--red);background:rgba(232,85,85,0.06);display:block}
+/* MAP VIEW */
+.map-view{display:flex;flex-direction:column;flex:1}
+.map-view.hidden{display:none}
+.map-header{padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.map-structure{font-family:var(--serif);font-style:italic;font-size:15px;color:#E8E0CC;line-height:1.3;flex:1;min-width:0}
+.map-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start;flex-shrink:0}
+.badge{font-size:8px;letter-spacing:1.5px;padding:3px 8px;border:1px solid;text-transform:uppercase}
+.badge-INVERTED{color:var(--red);border-color:rgba(232,85,85,0.4);background:rgba(232,85,85,0.06)}
+.badge-SOUND{color:var(--green);border-color:rgba(112,208,144,0.4);background:rgba(112,208,144,0.06)}
+.badge-FROZEN{color:var(--blue);border-color:rgba(96,181,229,0.4);background:rgba(96,181,229,0.06)}
+.badge-UNGROUNDED{color:var(--muted);border-color:var(--dim);background:none}
+.badge-IMMUNE{color:var(--green);border-color:rgba(112,208,144,0.5);background:rgba(112,208,144,0.08)}
+.badge-flag{color:var(--amber);border-color:rgba(212,181,128,0.3);background:none}
+.map-svg-wrap{display:flex;justify-content:center;align-items:center;padding:12px 16px;flex:1}
+.map-footer{border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.map-footer-left{display:flex;gap:8px;flex-wrap:wrap}
+/* VERDICT DRAWER */
+.verdict-drawer{border-top:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.verdict-drawer.open{max-height:600px;overflow-y:auto}
+.verdict-inner{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.v-label{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.v-value{font-size:11px;line-height:1.7;color:var(--text);border-left:2px solid var(--dim);padding-left:10px}
+.v-value.diagnosis{border-color:rgba(232,85,85,0.4)}
+.v-value.treatment{border-color:rgba(212,181,128,0.4);color:var(--amber)}
+.v-value.action{border-color:rgba(112,208,144,0.4);color:var(--green)}
+/* SC BAR */
+.sc-bar{display:flex;gap:4px;align-items:center;padding:0 20px 12px;flex-wrap:wrap}
+.sc-node{font-size:8px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--dim);color:var(--muted);text-transform:uppercase}
+.sc-node.yes{color:var(--green);border-color:rgba(112,208,144,0.4)}
+.sc-node.partial{color:var(--amber);border-color:rgba(212,181,128,0.4)}
+.sc-node.no{color:var(--red);border-color:rgba(232,85,85,0.5);background:rgba(232,85,85,0.06)}
+.sc-node.break{color:var(--red);border-color:var(--red);background:rgba(232,85,85,0.1);font-weight:500}
+.sc-arrow{color:var(--dim);font-size:10px}
+/* FILE BAR */
+.file-bar{background:rgba(96,181,229,0.05);border:1px solid rgba(96,181,229,0.2);border-left:2px solid var(--blue);padding:10px 14px;margin:0 20px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.file-bar-text{font-size:10px;color:var(--blue)}
+.file-bar-text span{color:var(--muted);font-size:9px;display:block;margin-top:2px}
+.btn-file{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--blue);color:var(--blue);padding:7px 14px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn-file:hover{background:rgba(96,181,229,0.1)}
+/* MANUAL */
+.manual-panel{padding:16px;display:flex;flex-direction:column;gap:0;overflow-y:auto}
+.m-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.m-section:last-child{border-bottom:none}
+.m-section-title{font-size:9px;letter-spacing:3px;color:var(--amber2);text-transform:uppercase;margin-bottom:10px}
+.m-field{margin-bottom:10px}
+.m-label{font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:4px;display:block}
+.m-input,.m-select,.m-textarea{width:100%;background:var(--bg3);border:1px solid var(--dim);color:var(--text);font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;transition:border-color 0.2s;-webkit-appearance:none}
+.m-input:focus,.m-select:focus,.m-textarea:focus{border-color:var(--amber2)}
+.m-textarea{resize:vertical;min-height:52px;line-height:1.5}
+select option{background:var(--bg3)}
+.dot-grid{display:flex;flex-direction:column;gap:8px}
+.dot-stratum{background:var(--bg3);border:1px solid var(--dim);padding:8px 10px}
+.dot-stratum-name{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.dot-pillars{display:flex;gap:6px;flex-wrap:wrap}
+.dot-btn-group{display:flex;flex-direction:column;align-items:center;gap:2px}
+.dot-pillar-name{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.dot-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--dim);background:none;color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:500;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.dot-btn.A{border-color:var(--green);color:var(--green);background:rgba(112,208,144,0.1)}
+.dot-btn.I{border-color:var(--red);color:var(--red);background:rgba(232,85,85,0.1)}
+.dot-btn.D{border-color:var(--grey);color:var(--grey);background:rgba(136,136,102,0.1)}
+.dot-btn.U{border-color:var(--dim);color:var(--muted);background:none}
+.imm-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.imm-group{display:flex;flex-direction:column;align-items:center;gap:2px}
+.imm-name{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.imm-btn{font-family:var(--mono);font-size:8px;padding:4px 8px;border:1px solid var(--dim);background:none;color:var(--muted);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.imm-btn.capturable{border-color:rgba(232,85,85,0.4);color:var(--red);background:rgba(232,85,85,0.06)}
+.imm-btn.free{border-color:rgba(112,208,144,0.4);color:var(--green);background:rgba(112,208,144,0.06)}
+/* LEDGER */
+.ledger-panel{padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.ledger-connect{background:var(--bg3);border:1px solid var(--dim);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.conn-status{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.conn-dot.on{background:var(--green);animation:pulse 2s infinite}
+.conn-dot.err{background:var(--red)}
+.ledger-record{background:var(--bg3);border:1px solid var(--dim);padding:12px 14px;cursor:pointer;transition:all 0.15s}
+.ledger-record:hover{border-color:var(--amber2);background:#161310}
+.ledger-record-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.ledger-record-name{font-family:var(--serif);font-style:italic;font-size:13px;color:#D8D0BC;line-height:1.3;flex:1}
+.ledger-record-meta{font-size:9px;color:var(--muted);text-align:right;flex-shrink:0}
+.ledger-record-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.ledger-record-dots{display:flex;gap:2px;flex-wrap:wrap}
+.mini-dot{width:7px;height:7px;border-radius:50%}
+.mini-A{background:var(--green)}.mini-I{background:var(--red)}.mini-D{background:var(--grey)}.mini-U{background:var(--dim)}
+.ledger-empty{text-align:center;padding:2rem;color:var(--muted);font-size:10px;line-height:1.8}
+.ledger-loading{text-align:center;padding:1.5rem;color:var(--muted);font-size:10px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@media(max-width:400px){.mode-tab .tab-icon{font-size:12px}.mode-tab{font-size:8px;letter-spacing:1px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><div class="brand">⭕ OPEN RING</div><div class="brand-sub">INVERSION MAP · ORP-02</div></div>
+  <div class="header-links">
+    <a href="/" class="hlink">HOME</a>
+    <a href="signal-ledger-nostr.html" class="hlink">LEDGER</a>
+  </div>
+</header>
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-paste" onclick="switchMode('paste')"><span class="tab-icon">📋</span>PASTE</button>
+  <button class="mode-tab" id="tab-manual" onclick="switchMode('manual')"><span class="tab-icon">✏️</span>MANUAL</button>
+  <button class="mode-tab" id="tab-ledger" onclick="switchMode('ledger')"><span class="tab-icon">📡</span>LEDGER</button>
+</div>
+<!-- PASTE PANEL -->
+<div class="panel active" id="panel-paste">
+  <div id="paste-entry" class="paste-panel">
+    <div class="paste-hint">Paste the <strong>OPEN RING MAP BLOCK</strong> from the BoB diagnostic.<br>Starts with <strong>OBSERVER</strong>, ends with <strong>FIELD LAYER</strong>.</div>
+    <textarea id="paste-input" placeholder="Paste map block here...&#10;&#10;OBSERVER&#10;position: INSIDE&#10;..."></textarea>
+    <div class="paste-actions">
+      <button class="btn-primary" onclick="drawFromPaste()">Draw map →</button>
+      <button class="btn-secondary" onclick="loadExample()">Load example</button>
+    </div>
+    <div class="paste-msg" id="paste-msg"></div>
+  </div>
+  <div class="map-view hidden" id="paste-map-view">
+    <div class="map-header">
+      <div class="map-structure" id="paste-map-structure">—</div>
+      <div class="map-badges" id="paste-map-badges"></div>
+    </div>
+    <div class="map-svg-wrap" id="paste-svg-wrap"></div>
+    <div class="sc-bar" id="paste-sc-bar"></div>
+    <div class="file-bar" id="paste-file-bar" style="display:none">
+      <div class="file-bar-text">Ready to file<span>Open Signal Ledger → Import → paste map block</span></div>
+      <button class="btn-file" onclick="fileToLedger()">File to Ledger →</button>
+    </div>
+    <div class="verdict-drawer" id="paste-verdict"><div class="verdict-inner" id="paste-verdict-inner"></div></div>
+    <div class="map-footer">
+      <div class="map-footer-left">
+        <button class="btn-secondary btn-sm" onclick="toggleVerdict('paste-verdict')">Verdict ▾</button>
+        <button class="btn-secondary btn-sm" onclick="backToPaste()">← New map</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MANUAL PANEL -->
+<div class="panel" id="panel-manual">
+  <div style="display:flex;flex:1;flex-direction:column">
+    <div class="map-svg-wrap" id="manual-svg-wrap" style="padding:12px;min-height:260px"></div>
+    <div class="sc-bar" id="manual-sc-bar"></div>
+    <div class="manual-panel" style="flex:1;max-height:55vh">
+      <div class="m-section">
+        <div class="m-section-title">Structure</div>
+        <div class="m-field"><label class="m-label">Name</label><input class="m-input" id="m-structure" placeholder="One sentence, precise" oninput="manualUpdate()"></div>
+        <div class="m-field"><label class="m-label">State</label>
+          <select class="m-select" id="m-state" onchange="manualUpdate()">
+            <option value="INVERTED">INVERTED</option><option value="SOUND">SOUND</option>
+            <option value="FROZEN">FROZEN</option><option value="UNGROUNDED">UNGROUNDED</option><option value="IMMUNE">IMMUNE</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Observer</div>
+        <div class="m-field"><label class="m-label">Position</label>
+          <select class="m-select" id="m-obs-pos" onchange="manualUpdate()">
+            <option value="INSIDE">INSIDE</option><option value="ADJACENT">ADJACENT</option><option value="OUTSIDE">OUTSIDE</option>
+          </select>
+        </div>
+        <div class="m-field"><label class="m-label">Relationship</label>
+          <select class="m-select" id="m-obs-rel" onchange="manualUpdate()">
+            <option value="PAYING">PAYING</option><option value="OPERATING">OPERATING</option>
+            <option value="WITNESSING">WITNESSING</option><option value="MIXED">MIXED</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Stratum Map — tap to cycle U→A→I→D</div>
+        <div class="dot-grid" id="manual-dot-grid"></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Immunity Pillars</div>
+        <div class="imm-row" id="manual-imm-row"></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Signal Chain</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="manual-sc-inputs"></div>
+        <div class="m-field" style="margin-top:8px"><label class="m-label">Break Point</label>
+          <select class="m-select" id="m-break" onchange="manualUpdate()">
+            <option value="none">none</option><option value="SIGNAL">SIGNAL</option>
+            <option value="MEDIUM">MEDIUM</option><option value="POTENTIAL">POTENTIAL</option><option value="PHASE">PHASE</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Seed Crystal</div>
+        <div class="m-field"><label class="m-label">Placement</label>
+          <select class="m-select" id="m-seed-stratum" onchange="manualUpdate()">
+            <option value="">— none —</option><option value="INDIVIDUAL">INDIVIDUAL</option>
+            <option value="RELATIONSHIP">RELATIONSHIP</option><option value="INSTITUTION">INSTITUTION</option>
+            <option value="ENVIRONMENT">ENVIRONMENT</option><option value="SOUL">SOUL</option>
+          </select>
+        </div>
+        <div class="m-field"><label class="m-label">Description</label><textarea class="m-textarea" id="m-seed-desc" placeholder="The minimum intervention..." oninput="manualUpdate()"></textarea></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Verdict</div>
+        <div class="m-field"><label class="m-label">Diagnosis</label><textarea class="m-textarea" id="m-diagnosis" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+        <div class="m-field"><label class="m-label">Treatment</label><textarea class="m-textarea" id="m-treatment" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+        <div class="m-field"><label class="m-label">Call to Action</label><textarea class="m-textarea" id="m-action" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- LEDGER PANEL -->
+<div class="panel" id="panel-ledger">
+  <div class="ledger-panel" id="ledger-list">
+    <div class="ledger-connect">
+      <div class="conn-status"><div class="conn-dot" id="ledger-dot"></div><span id="ledger-conn-label">Not connected to relays</span></div>
+      <button class="btn-secondary btn-sm" onclick="loadLedger()">Load records</button>
+    </div>
+    <div id="ledger-records"><div class="ledger-loading">Press "Load records" to query Nostr relays.</div></div>
+  </div>
+  <div class="map-view hidden" id="ledger-map-view">
+    <div class="map-header">
+      <div class="map-structure" id="ledger-map-structure">—</div>
+      <div class="map-badges" id="ledger-map-badges"></div>
+    </div>
+    <div class="map-svg-wrap" id="ledger-svg-wrap"></div>
+    <div class="sc-bar" id="ledger-sc-bar"></div>
+    <div class="verdict-drawer" id="ledger-verdict"><div class="verdict-inner" id="ledger-verdict-inner"></div></div>
+    <div class="map-footer">
+      <div class="map-footer-left">
+        <button class="btn-secondary btn-sm" onclick="toggleVerdict('ledger-verdict')">Verdict ▾</button>
+        <button class="btn-secondary btn-sm" onclick="backToLedger()">← Records</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script type="module">
+const STRATA=[
+  {name:'INDIVIDUAL',short:'IND',pillars:['awareness','capacity','energy','identity'],color:'#E8E87C'},
+  {name:'RELATIONSHIP',short:'REL',pillars:['transparency','trust','reciprocity','status'],color:'#7CE8B4'},
+  {name:'INSTITUTION',short:'INST',pillars:['education','distribution','finance','authority'],color:'#A87CE8'},
+  {name:'ENVIRONMENT',short:'ENV',pillars:['visibility','infrastructure','commons','regulation'],color:'#7CB9E8'},
+  {name:'SOUL',short:'SOL',pillars:['story','language','value','meaning'],color:'#E8A87C'},
+]
+const IMMUNITY_KEYS=['education','distribution','finance','legitimacy']
+const SC_NODES=['signal','medium','potential','phase']
+const STATE_CYCLE={U:'A',A:'I',I:'D',D:'U'}
+const STATE_COLORS={A:'#70D090',I:'#E85555',D:'#888866',U:'#2A2A2A'}
+const OBS_COLORS={PAYING:'#D4B580',OPERATING:'#60B5E5',WITNESSING:'#888',MIXED:'#A87CE8'}
+const RELAYS=['wss://relay.damus.io','wss://relay.nostr.band','wss://nos.lol','wss://relay.snort.social']
+
+function defaultData(){
+  const strata={}
+  STRATA.forEach(s=>{strata[s.name]={};s.pillars.forEach(p=>strata[s.name][p]='U')})
+  const immunity={}
+  IMMUNITY_KEYS.forEach(k=>immunity[k]='capturable')
+  return{structure:'',observer:{position:'INSIDE',relationship:'PAYING'},
+    strata,immunity,
+    signalchain:{signal:'yes',medium:'yes',potential:'yes',phase:'local',break_point:'none'},
+    seed_crystal:{placement:'',description:''},
+    verdict:{state:'INVERTED',diagnosis:'',treatment:'',call_to_action:''},
+    flags:{flag_a:false,flag_b:false,flag_c:false}}
+}
+
+let currentData=defaultData()
+let pool=null
+
+window.switchMode=function(mode){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'))
+  document.getElementById('panel-'+mode).classList.add('active')
+  document.getElementById('tab-'+mode).classList.add('active')
+  if(mode==='manual')renderManualMap()
+}
+
+// SVG MAP
+function px(cx,cy,r,a){const rad=((a-90)*Math.PI)/180;return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)}}
+function ns(){return'http://www.w3.org/2000/svg'}
+function el(tag,attrs={},text=null){
+  const e=document.createElementNS(ns(),tag)
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v))
+  if(text!=null)e.textContent=text
+  return e
+}
+
+function buildMap(data,size){
+  const cx=size/2,cy=size/2,innerR=size*0.08,ringW=(size*0.36)/5,immunityR=size*0.47
+  const obsR={INSIDE:innerR*0.4,ADJACENT:innerR*0.7,OUTSIDE:innerR*0.95}[data.observer?.position]||innerR*0.5
+  const obsColor=OBS_COLORS[data.observer?.relationship]||'#888'
+  const svg=el('svg',{width:size,height:size,viewBox:`0 0 ${size} ${size}`})
+  svg.style.cssText='display:block;max-width:100%;margin:0 auto'
+  const defs=el('defs')
+  const bg=el('radialGradient',{id:'mapbg',cx:'50%',cy:'50%',r:'50%'})
+  bg.appendChild(el('stop',{'offset':'0%','stop-color':'#1a1209'}))
+  bg.appendChild(el('stop',{'offset':'100%','stop-color':'#0A0907'}))
+  defs.appendChild(bg)
+  const gf=el('filter',{id:'glow'})
+  const gb=el('feGaussianBlur',{stdDeviation:'3',result:'blur'})
+  const fm=el('feMerge')
+  fm.appendChild(el('feMergeNode',{in:'blur'}))
+  fm.appendChild(el('feMergeNode',{in:'SourceGraphic'}))
+  gf.appendChild(gb);gf.appendChild(fm);defs.appendChild(gf)
+  const sgf=el('filter',{id:'softglow'})
+  const sgb=el('feGaussianBlur',{stdDeviation:'6',result:'blur'})
+  const sfm=el('feMerge')
+  sfm.appendChild(el('feMergeNode',{in:'blur'}))
+  sfm.appendChild(el('feMergeNode',{in:'SourceGraphic'}))
+  sgf.appendChild(sgb);sgf.appendChild(sfm);defs.appendChild(sgf)
+  svg.appendChild(defs)
+  svg.appendChild(el('circle',{cx,cy,r:size/2,fill:'url(#mapbg)'}))
+  ;[0,90,180,270].forEach(a=>{const p=px(cx,cy,size*0.48,a);svg.appendChild(el('line',{x1:cx,y1:cy,x2:p.x,y2:p.y,stroke:'#ffffff08','stroke-width':1}))})
+  STRATA.forEach((s,si)=>{
+    const r=innerR+ringW*(si+1),rInner=innerR+ringW*si
+    svg.appendChild(el('circle',{cx,cy,r,fill:'none',stroke:s.color,'stroke-width':0.5,'stroke-opacity':0.15}))
+    const lp=px(cx,cy,rInner+ringW/2,2)
+    svg.appendChild(el('text',{x:lp.x+4,y:lp.y,'text-anchor':'start','dominant-baseline':'middle',fill:s.color,'fill-opacity':0.4,'font-size':7,'font-family':'monospace','letter-spacing':1},s.short))
+  })
+  svg.appendChild(el('circle',{cx,cy,r:innerR,fill:'#0A0907',stroke:'#ffffff10','stroke-width':1}))
+  STRATA.forEach((s,si)=>{
+    s.pillars.forEach((p,pi)=>{
+      const r=innerR+ringW*si+ringW/2,pos=px(cx,cy,r,pi*90+45)
+      const val=data.strata?.[s.name]?.[p]||'U',col=STATE_COLORS[val],inv=val==='I'
+      if(inv)svg.appendChild(el('circle',{cx:pos.x,cy:pos.y,r:10,fill:col,'fill-opacity':0.15,filter:'url(#glow)'}))
+      const dot=el('circle',{cx:pos.x,cy:pos.y,r:val==='U'?4:6})
+      if(val==='U'){dot.setAttribute('fill','transparent');dot.setAttribute('stroke',col);dot.setAttribute('stroke-width',1)}
+      else{dot.setAttribute('fill',col);dot.setAttribute('fill-opacity','0.85');if(inv)dot.setAttribute('filter','url(#glow)')}
+      const t=el('title');t.textContent=`${s.name}·${p}·${val}`;dot.appendChild(t)
+      svg.appendChild(dot)
+    })
+  })
+  IMMUNITY_KEYS.forEach((im,i)=>{
+    const pos=px(cx,cy,immunityR,i*90+45),free=data.immunity?.[im]==='free',col=free?'#70D090':'#E85555'
+    svg.appendChild(el('circle',{cx:pos.x,cy:pos.y,r:5,fill:col+(free?'44':'22'),stroke:col,'stroke-width':1.5,filter:free?'none':'url(#glow)'}))
+    svg.appendChild(el('text',{x:pos.x,y:pos.y+14,'text-anchor':'middle','dominant-baseline':'middle',fill:col,'fill-opacity':0.6,'font-size':6.5,'font-family':'monospace'},im.slice(0,3).toUpperCase()))
+  })
+  SC_NODES.forEach((node,i)=>{
+    const val=data.signalchain?.[node],isBreak=data.signalchain?.break_point===node.toUpperCase()
+    const col=isBreak?'#E85555':val==='yes'?'#70D090':val==='partial'?'#D4B580':'#E85555'
+    const a=i*90-45,p1=px(cx,cy,immunityR+12,a),p2=px(cx,cy,immunityR+12,a+88),mid=px(cx,cy,immunityR+18,a+44)
+    const path=el('path',{d:`M ${p1.x} ${p1.y} Q ${mid.x} ${mid.y} ${p2.x} ${p2.y}`,fill:'none',stroke:col,'stroke-width':isBreak?2:1,'stroke-opacity':isBreak?0.9:0.4})
+    if(isBreak)path.setAttribute('filter','url(#glow)')
+    svg.appendChild(path)
+  })
+  svg.appendChild(el('circle',{cx,cy,r:obsR,fill:obsColor,'fill-opacity':0.7,filter:'url(#softglow)'}))
+  svg.appendChild(el('circle',{cx,cy,r:obsR*0.5,fill:obsColor,'fill-opacity':0.9}))
+  if(data.seed_crystal?.placement){
+    const si=STRATA.findIndex(s=>s.name===data.seed_crystal.placement)
+    if(si>=0){
+      const pos=px(cx,cy,innerR+ringW*si+ringW/2,225)
+      const tri=el('polygon',{points:`${pos.x},${pos.y-9} ${pos.x+8},${pos.y+5} ${pos.x-8},${pos.y+5}`,fill:'#D4B580','fill-opacity':0.9,filter:'url(#softglow)'})
+      const t=el('title');t.textContent=`Seed Crystal — ${data.seed_crystal.placement}`;tri.appendChild(t)
+      svg.appendChild(tri)
+    }
+  }
+  Object.entries({A:'Aligned',I:'Inverted',D:'Drifting',U:'Unknown'}).forEach(([k,v],i)=>{
+    const g=document.createElementNS(ns(),'g')
+    g.setAttribute('transform',`translate(${12+i*58},${size-18})`)
+    const c=el('circle',{cx:6,cy:0,r:4})
+    if(k==='U'){c.setAttribute('fill','transparent');c.setAttribute('stroke',STATE_COLORS[k]);c.setAttribute('stroke-width',1)}
+    else{c.setAttribute('fill',STATE_COLORS[k]);c.setAttribute('fill-opacity','0.85')}
+    g.appendChild(c)
+    g.appendChild(el('text',{x:13,y:4,fill:STATE_COLORS[k],'fill-opacity':0.7,'font-size':8,'font-family':'monospace'},v))
+    svg.appendChild(g)
+  })
+  return svg
+}
+
+function renderMapTo(id,data){
+  const wrap=document.getElementById(id);wrap.innerHTML=''
+  const size=Math.min(480,window.innerWidth-32)
+  wrap.appendChild(buildMap(data,size))
+}
+
+function buildBadges(data){
+  const s=data.verdict?.state||'INVERTED'
+  let h=`<span class="badge badge-${s}">${s}</span>`
+  if(data.flags?.flag_b)h+=`<span class="badge badge-flag">PRELIMINARY</span>`
+  if(data.flags?.flag_a)h+=`<span class="badge badge-flag">NOM.CONST</span>`
+  if(data.flags?.flag_c)h+=`<span class="badge badge-flag">STRATUM≠</span>`
+  return h
+}
+
+function buildSCBar(data){
+  const sc=data.signalchain||{},bp=sc.break_point||'none'
+  return SC_NODES.map((node,i)=>{
+    const val=sc[node]||'unclear',isBreak=bp===node.toUpperCase()
+    const cls=isBreak?'break':val
+    const arrow=i<SC_NODES.length-1?`<span class="sc-arrow">›</span>`:''
+    return`<span class="sc-node ${cls}">${node.toUpperCase()}${isBreak?' ✕':''}</span>${arrow}`
+  }).join('')
+}
+
+function buildVerdictHTML(data){
+  const v=data.verdict||{},sc=data.seed_crystal||{}
+  let h=''
+  if(v.diagnosis)h+=`<div><div class="v-label">Diagnosis</div><div class="v-value diagnosis">${esc(v.diagnosis)}</div></div>`
+  if(v.treatment||sc.description)h+=`<div><div class="v-label">Treatment — Seed Crystal</div><div class="v-value treatment">${esc(v.treatment||sc.description)}</div></div>`
+  if(sc.placement)h+=`<div><div class="v-label">Placed at</div><div class="v-value">${esc(sc.placement)}</div></div>`
+  if(v.call_to_action)h+=`<div><div class="v-label">Call to Action</div><div class="v-value action">${esc(v.call_to_action)}</div></div>`
+  return h||'<div style="color:var(--muted);font-size:10px">No verdict fields filled.</div>'
+}
+
+window.toggleVerdict=function(id){document.getElementById(id).classList.toggle('open')}
+
+// PARSE
+function parseMapBlock(text){
+  text=text.replace(/```[^\n]*\n?/g,'').replace(/```/g,'')
+  const data=defaultData()
+  const lines=text.split('\n')
+  lines.forEach(line=>{
+    const m=line.match(/^\s*([a-zA-Z_0-9]+)\s*:\s*(.+)$/)
+    if(!m)return
+    const k=m[1].trim().toLowerCase(),v=m[2].trim()
+    if(k==='position')data.observer.position=v.toUpperCase()
+    if(k==='relationship')data.observer.relationship=v.toUpperCase()
+    if(k==='signal_weight')data.observer.signal_weight=v.toUpperCase()
+    if(k==='name')data.structure=v
+    if(k==='state')data.verdict.state=v.toUpperCase()
+    if(k==='diagnosis')data.verdict.diagnosis=v
+    if(k==='treatment')data.verdict.treatment=v
+    if(k==='call_to_action')data.verdict.call_to_action=v
+    if(k==='placement')data.seed_crystal.placement=v.toUpperCase()
+    if(k==='description')data.seed_crystal.description=v
+    if(k==='signal')data.signalchain.signal=v.toLowerCase()
+    if(k==='medium')data.signalchain.medium=v.toLowerCase()
+    if(k==='potential')data.signalchain.potential=v.toLowerCase()
+    if(k==='phase')data.signalchain.phase=v.toLowerCase()
+    if(k==='break_point')data.signalchain.break_point=v.toUpperCase()==='NONE'?'none':v.toUpperCase()
+    if(k==='flag_a')data.flags.flag_a=v==='true'
+    if(k==='flag_b')data.flags.flag_b=v==='true'
+    if(k==='flag_c')data.flags.flag_c=v==='true'
+    if(IMMUNITY_KEYS.includes(k))data.immunity[k]=v.toLowerCase()
+  })
+  STRATA.forEach(s=>{
+    s.pillars.forEach(p=>{
+      const line=lines.find(l=>{const m2=l.match(/^\s+([a-z_]+)\s*:\s*([AIDU])\s*$/);return m2&&m2[1]===p})
+      if(line){const val=line.match(/:\s*([AIDU])/)?.[1];if(val)data.strata[s.name][p]=val}
+    })
+  })
+  return data
+}
+
+// PASTE MODE
+window.drawFromPaste=function(){
+  const text=document.getElementById('paste-input').value
+  const msg=document.getElementById('paste-msg')
+  if(!text.trim()){msg.className='paste-msg error';msg.textContent='Paste a map block first.';return}
+  try{
+    const data=parseMapBlock(text)
+    currentData=data
+    document.getElementById('paste-entry').style.display='none'
+    const mv=document.getElementById('paste-map-view');mv.classList.remove('hidden')
+    document.getElementById('paste-map-structure').textContent=data.structure||'—'
+    document.getElementById('paste-map-badges').innerHTML=buildBadges(data)
+    renderMapTo('paste-svg-wrap',data)
+    document.getElementById('paste-sc-bar').innerHTML=buildSCBar(data)
+    document.getElementById('paste-verdict-inner').innerHTML=buildVerdictHTML(data)
+    document.getElementById('paste-file-bar').style.display='flex'
+    msg.className='';msg.style.display='none'
+  }catch(e){msg.className='paste-msg error';msg.textContent='Parse error: '+e.message}
+}
+
+window.backToPaste=function(){
+  document.getElementById('paste-entry').style.display='flex'
+  document.getElementById('paste-map-view').classList.add('hidden')
+}
+
+window.fileToLedger=function(){window.open('signal-ledger-nostr.html','_blank')}
+
+window.loadExample=function(){
+  document.getElementById('paste-input').value=`OBSERVER
+position:           INSIDE
+relationship:       PAYING
+signal_channel:     BODY
+signal_weight:      STRONG
+
+STRUCTURE
+name:               Daily alcohol habit
+
+STRATUM MAP
+
+1. INDIVIDUAL
+   awareness:        I
+   capacity:         I
+   energy:           I
+   identity:         D
+
+2. RELATIONSHIP
+   transparency:     I
+   trust:            D
+   reciprocity:      D
+   status:           U
+
+3. INSTITUTION
+   education:        I
+   distribution:     I
+   finance:          I
+   authority:        I
+
+4. ENVIRONMENT
+   visibility:       I
+   infrastructure:   I
+   commons:          D
+   regulation:       D
+
+5. SOUL
+   story:            I
+   language:         I
+   value:            D
+   meaning:          D
+
+IMMUNITY
+   education:        capturable
+   distribution:     capturable
+   finance:          capturable
+   legitimacy:       capturable
+
+SIGNAL CHAIN
+   signal:           no
+   medium:           partial
+   potential:        no
+   phase:            global
+   break_point:      SIGNAL
+
+SEED CRYSTAL
+   placement:        INDIVIDUAL
+   description:      A documented honest account of what daily drinking actually costs — written by someone who stopped.
+
+GRADIENT
+   direction:        Toward honest self-assessment and then free choice.
+
+VERDICT
+   state:            INVERTED
+   diagnosis:        The habit is fixed as default; honest information about its cost is suppressed by the culture that profits from it.
+   treatment:        One honest first-person account placed where the person can find it without being judged.
+   call_to_action:   Write down what it costs you this week — time, money, energy, clarity — and read it back.
+
+FLAGS
+   flag_a:           false
+   flag_b:           false
+   flag_c:           false`
+  document.getElementById('paste-msg').style.display='none'
+}
+
+// MANUAL MODE
+function buildManualUI(){
+  const grid=document.getElementById('manual-dot-grid')
+  STRATA.forEach(s=>{
+    const row=document.createElement('div');row.className='dot-stratum'
+    row.innerHTML=`<div class="dot-stratum-name" style="color:${s.color}88">${s.name}</div><div class="dot-pillars" id="mdots-${s.name}"></div>`
+    grid.appendChild(row)
+    const pd=row.querySelector('.dot-pillars')
+    s.pillars.forEach(p=>{
+      const g=document.createElement('div');g.className='dot-btn-group'
+      const btn=document.createElement('button');btn.className='dot-btn U';btn.textContent='U'
+      btn.onclick=()=>{const cur=currentData.strata[s.name][p],next=STATE_CYCLE[cur];currentData.strata[s.name][p]=next;btn.textContent=next;btn.className=`dot-btn ${next}`;renderManualMap()}
+      const lbl=document.createElement('div');lbl.className='dot-pillar-name';lbl.textContent=p.slice(0,4).toUpperCase()
+      g.appendChild(btn);g.appendChild(lbl);pd.appendChild(g)
+    })
+  })
+  const ir=document.getElementById('manual-imm-row')
+  IMMUNITY_KEYS.forEach(k=>{
+    const g=document.createElement('div');g.className='imm-group'
+    const btn=document.createElement('button');btn.className='imm-btn capturable';btn.textContent='CAP';btn.id=`mimm-${k}`
+    btn.onclick=()=>{const next=currentData.immunity[k]==='capturable'?'free':'capturable';currentData.immunity[k]=next;btn.textContent=next==='free'?'FREE':'CAP';btn.className=`imm-btn ${next}`;renderManualMap()}
+    const lbl=document.createElement('div');lbl.className='imm-name';lbl.textContent=k.slice(0,4).toUpperCase()
+    g.appendChild(btn);g.appendChild(lbl);ir.appendChild(g)
+  })
+  const scDiv=document.getElementById('manual-sc-inputs')
+  SC_NODES.forEach(node=>{
+    const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;align-items:center'
+    const lbl=document.createElement('span');lbl.style.cssText='font-size:9px;color:var(--muted);min-width:64px;letter-spacing:1px;text-transform:uppercase';lbl.textContent=node
+    const sel=document.createElement('select');sel.className='m-select';sel.id=`msc-${node}`;sel.style.flex='1'
+    const opts=node==='phase'?['local','regional','global']:['yes','partial','no','unclear']
+    opts.forEach(o=>{const op=document.createElement('option');op.value=op.textContent=o;sel.appendChild(op)})
+    sel.onchange=()=>{currentData.signalchain[node]=sel.value;renderManualMap()}
+    row.appendChild(lbl);row.appendChild(sel);scDiv.appendChild(row)
+  })
+}
+
+function renderManualMap(){
+  currentData.structure=document.getElementById('m-structure')?.value||''
+  currentData.verdict.state=document.getElementById('m-state')?.value||'INVERTED'
+  currentData.observer.position=document.getElementById('m-obs-pos')?.value||'INSIDE'
+  currentData.observer.relationship=document.getElementById('m-obs-rel')?.value||'PAYING'
+  currentData.signalchain.break_point=document.getElementById('m-break')?.value||'none'
+  currentData.seed_crystal.placement=document.getElementById('m-seed-stratum')?.value||''
+  currentData.seed_crystal.description=document.getElementById('m-seed-desc')?.value||''
+  currentData.verdict.diagnosis=document.getElementById('m-diagnosis')?.value||''
+  currentData.verdict.treatment=document.getElementById('m-treatment')?.value||''
+  currentData.verdict.call_to_action=document.getElementById('m-action')?.value||''
+  SC_NODES.forEach(n=>{const e=document.getElementById(`msc-${n}`);if(e)currentData.signalchain[n]=e.value})
+  renderMapTo('manual-svg-wrap',currentData)
+  document.getElementById('manual-sc-bar').innerHTML=buildSCBar(currentData)
+}
+window.manualUpdate=renderManualMap
+
+// LEDGER MODE
+window.loadLedger=async function(){
+  const container=document.getElementById('ledger-records')
+  const dot=document.getElementById('ledger-dot'),label=document.getElementById('ledger-conn-label')
+  container.innerHTML='<div class="ledger-loading">Connecting to relays...</div>'
+  dot.className='conn-dot'
+  try{
+    const{SimplePool}=await import('https://esm.sh/nostr-tools@2.3.1')
+    if(!pool)pool=new SimplePool()
+    dot.className='conn-dot on';label.textContent='Connected — loading...'
+    const events=await new Promise(resolve=>{
+      const collected=[],timeout=setTimeout(()=>resolve(collected),6000)
+      pool.subscribeMany(RELAYS,[{kinds:[1337],'#t':['signal-ledger'],limit:30}],{
+        onevent(ev){collected.push(ev)},
+        oneose(){clearTimeout(timeout);resolve(collected)}
+      })
+    })
+    const records=events.sort((a,b)=>b.created_at-a.created_at)
+    label.textContent=`Connected — ${records.length} record${records.length!==1?'s':''}`
+    window._ledgerRecords=records
+    if(!records.length){container.innerHTML='<div class="ledger-empty">No records yet.<br>Run a diagnostic and file the first signal.</div>';return}
+    container.innerHTML=records.map((e,i)=>{
+      let c={};try{c=JSON.parse(e.content)}catch(_){}
+      const v=c.verdict||{},sm=c.stratum_map||{}
+      const structure=v.structure||c.identification?.structure||''
+      const state=v.state||''
+      const date=new Date(e.created_at*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+      let dots=''
+      if(Object.keys(sm).length>0)STRATA.forEach(s=>s.pillars.forEach(p=>{const val=sm[s.name]?.[p]||'U';dots+=`<div class="mini-dot mini-${val}" title="${s.name}·${p}·${val}"></div>`}))
+      return`<div class="ledger-record" onclick="openLedgerRecord(${i})">
+        <div class="ledger-record-top"><div class="ledger-record-name">${esc(structure||'Untitled')}</div><div class="ledger-record-meta">${date}</div></div>
+        <div class="ledger-record-badges">${state?`<span class="badge badge-${state}" style="font-size:8px">${state}</span>`:''}</div>
+        ${dots?`<div class="ledger-record-dots">${dots}</div>`:''}
+      </div>`
+    }).join('')
+  }catch(e){
+    dot.className='conn-dot err';label.textContent='Connection failed'
+    container.innerHTML=`<div class="ledger-empty">Could not reach relays.<br>${e.message||''}</div>`
+  }
+}
+
+window.openLedgerRecord=function(i){
+  const e=window._ledgerRecords?.[i];if(!e)return
+  let c={};try{c=JSON.parse(e.content)}catch(_){}
+  const data=defaultData()
+  const v=c.verdict||{},sm=c.stratum_map||{},obs=c.observer||{},sc=c.signalchain||{},imm=c.immunity||{},seed=c.gradient||{},flags=c.flags||{}
+  data.structure=v.structure||c.identification?.structure||''
+  data.verdict.state=v.state||'INVERTED'
+  data.verdict.diagnosis=v.diagnosis||''
+  data.verdict.treatment=v.treatment||seed.seed_crystal||''
+  data.verdict.call_to_action=v.call_to_action||''
+  data.observer.position=obs.position||'OUTSIDE'
+  data.observer.relationship=obs.relationship||'WITNESSING'
+  data.signalchain.break_point=v.break_point||sc.break_point||'none'
+  data.signalchain.signal=sc.signal_node||'unclear'
+  data.signalchain.medium=sc.medium_node||'unclear'
+  data.signalchain.potential=sc.potential_node||'unclear'
+  data.signalchain.phase=sc.phase_node||'unclear'
+  data.seed_crystal.placement=seed.seed_crystal_stratum||''
+  data.seed_crystal.description=seed.seed_crystal||''
+  data.flags.flag_a=flags.nominally_constant||false
+  data.flags.flag_b=flags.preliminary||false
+  data.flags.flag_c=flags.stratum_mismatch||false
+  STRATA.forEach(s=>s.pillars.forEach(p=>{const val=sm[s.name]?.[p];if(val&&'AIDU'.includes(val))data.strata[s.name][p]=val}))
+  IMMUNITY_KEYS.forEach(k=>{if(imm[k])data.immunity[k]=imm[k]})
+  document.getElementById('ledger-list').style.display='none'
+  const mv=document.getElementById('ledger-map-view');mv.classList.remove('hidden')
+  document.getElementById('ledger-map-structure').textContent=data.structure||'—'
+  document.getElementById('ledger-map-badges').innerHTML=buildBadges(data)
+  renderMapTo('ledger-svg-wrap',data)
+  document.getElementById('ledger-sc-bar').innerHTML=buildSCBar(data)
+  document.getElementById('ledger-verdict-inner').innerHTML=buildVerdictHTML(data)
+}
+
+window.backToLedger=function(){
+  document.getElementById('ledger-list').style.display='flex'
+  document.getElementById('ledger-map-view').classList.add('hidden')
+}
+
+function esc(str){return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+buildManualUI()
+renderManualMap()
+</script>
+</body>
+</html>
