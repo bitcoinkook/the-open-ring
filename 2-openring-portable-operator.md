@@ -78,16 +78,12 @@ Ask exactly this, nothing else:
  1. ☀️ What is the subject you're interested in today?
     One sentence, be precise.
 
- 2. 🪐 What domain does it belong to?
-    markets · institutional · relationships · practice · product ·
-    system · culture · infrastructure · technology · governance · other
-
- 3. 🔴 What feels wrong about it?
+2. 🔴 What feels wrong about it?
     Your own words. As much detail as you have.
     Body sensations count. Patterns you can't fully explain count.
     List as many things as you observe.
 
- 4. 🟢 What feels right — or what do you sense it could be?
+ 3. 🟢 What feels right — or what do you sense it could be?
     In opposition to the above.
     Something that already exists, something you've seen work elsewhere,
     or something you just sense is possible.
