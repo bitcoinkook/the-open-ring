@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Open Ring — Inversion Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0907;--bg2:#0f0d0a;--bg3:#141209;
+  --border:#1E1A12;--dim:#2e2a22;
+  --amber:#D4B580;--amber2:#7a6a48;--amber3:#3a3020;
+  --blue:#60B5E5;--green:#70D090;--red:#E85555;--grey:#888866;
+  --text:#C8C0B0;--muted:#6A6050;
+  --mono:'IBM Plex Mono',monospace;--serif:'Libre Baskerville',serif;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+a{color:var(--amber);text-decoration:none}
+.app{display:flex;flex-direction:column;min-height:100vh}
+header{padding:14px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.brand{color:var(--amber);font-size:13px;letter-spacing:4px;font-weight:500}
+.brand-sub{color:var(--muted);font-size:8px;letter-spacing:3px;margin-top:2px}
+.header-links{display:flex;gap:8px}
+.hlink{font-size:9px;letter-spacing:2px;color:var(--muted);border:1px solid var(--dim);padding:4px 10px;text-decoration:none;transition:all 0.15s}
+.hlink:hover{color:var(--amber);border-color:var(--amber2)}
+.mode-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+.mode-tab{flex:1;padding:12px 8px;font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+.mode-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.mode-tab:hover:not(.active){color:var(--text)}
+.tab-icon{display:block;font-size:14px;margin-bottom:3px}
+.panel{display:none;flex:1}
+.panel.active{display:flex;flex-direction:column}
+/* PASTE */
+.paste-panel{padding:20px;display:flex;flex-direction:column;gap:16px}
+.paste-hint{font-size:10px;letter-spacing:1px;color:var(--muted);line-height:1.7}
+.paste-hint strong{color:var(--amber2)}
+#paste-input{width:100%;min-height:180px;background:var(--bg3);border:1px solid var(--dim);color:var(--text);font-family:var(--mono);font-size:11px;line-height:1.6;padding:12px;resize:vertical;outline:none;transition:border-color 0.2s}
+#paste-input:focus{border-color:var(--amber2)}
+#paste-input::placeholder{color:var(--dim)}
+.paste-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-primary{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--amber3);border:1px solid var(--amber2);color:var(--amber);padding:10px 20px;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:rgba(212,181,128,0.12);border-color:var(--amber)}
+.btn-secondary{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--dim);color:var(--muted);padding:10px 20px;cursor:pointer;transition:all 0.2s}
+.btn-secondary:hover{color:var(--text);border-color:var(--muted)}
+.btn-sm{font-size:9px;padding:6px 12px}
+.paste-msg{font-size:10px;line-height:1.6;padding:8px 12px;border-left:2px solid;display:none}
+.paste-msg.success{color:var(--green);border-color:var(--green);background:rgba(112,208,144,0.06);display:block}
+.paste-msg.error{color:var(--red);border-color:var(--red);background:rgba(232,85,85,0.06);display:block}
+/* MAP VIEW */
+.map-view{display:flex;flex-direction:column;flex:1}
+.map-view.hidden{display:none}
+.map-header{padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.map-structure{font-family:var(--serif);font-style:italic;font-size:15px;color:#E8E0CC;line-height:1.3;flex:1;min-width:0}
+.map-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start;flex-shrink:0}
+.badge{font-size:8px;letter-spacing:1.5px;padding:3px 8px;border:1px solid;text-transform:uppercase}
+.badge-INVERTED{color:var(--red);border-color:rgba(232,85,85,0.4);background:rgba(232,85,85,0.06)}
+.badge-SOUND{color:var(--green);border-color:rgba(112,208,144,0.4);background:rgba(112,208,144,0.06)}
+.badge-FROZEN{color:var(--blue);border-color:rgba(96,181,229,0.4);background:rgba(96,181,229,0.06)}
+.badge-UNGROUNDED{color:var(--muted);border-color:var(--dim);background:none}
+.badge-IMMUNE{color:var(--green);border-color:rgba(112,208,144,0.5);background:rgba(112,208,144,0.08)}
+.badge-flag{color:var(--amber);border-color:rgba(212,181,128,0.3);background:none}
+.map-svg-wrap{display:flex;justify-content:center;align-items:center;padding:12px 16px;flex:1}
+.map-footer{border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.map-footer-left{display:flex;gap:8px;flex-wrap:wrap}
+/* HOW TO READ — collapsible */
+.how-to-read{margin:0 20px 0;border:1px solid var(--dim);background:var(--bg3)}
+.how-to-read-toggle{width:100%;background:none;border:none;color:var(--amber2);font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 12px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.how-to-read-toggle:hover{color:var(--amber)}
+.how-to-read-body{display:none;padding:10px 14px 12px;border-top:1px solid var(--dim)}
+.how-to-read-body.open{display:block}
+.htr-line{font-size:10px;line-height:1.8;color:var(--muted);margin-bottom:2px}
+.htr-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+/* MAP READING */
+.map-reading{margin:0 20px 12px;padding:12px 14px;border:1px solid var(--dim);background:var(--bg3);border-left:2px solid var(--amber2)}
+.map-reading-title{font-size:8px;letter-spacing:2px;color:var(--amber2);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.map-reading-text{font-size:10px;line-height:1.8;color:var(--text)}
+.map-reading-text p{margin-bottom:6px}
+.map-reading-text p:last-child{margin-bottom:0}
+/* ACTION BUTTONS */
+.map-actions{display:flex;gap:6px;flex-wrap:wrap;padding:0 20px 12px}
+.btn-action{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid var(--dim);color:var(--muted);padding:7px 12px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.btn-action:hover{color:var(--text);border-color:var(--muted)}
+.btn-action.amber{border-color:var(--amber2);color:var(--amber)}
+.btn-action.amber:hover{background:rgba(212,181,128,0.08)}
+/* VERDICT DRAWER */
+.verdict-drawer{border-top:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.verdict-drawer.open{max-height:600px;overflow-y:auto}
+.verdict-inner{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.v-label{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.v-value{font-size:11px;line-height:1.7;color:var(--text);border-left:2px solid var(--dim);padding-left:10px}
+.v-value.diagnosis{border-color:rgba(232,85,85,0.4)}
+.v-value.treatment{border-color:rgba(212,181,128,0.4);color:var(--amber)}
+.v-value.action{border-color:rgba(112,208,144,0.4);color:var(--green)}
+/* SC BAR */
+.sc-bar{display:flex;gap:4px;align-items:center;padding:0 20px 12px;flex-wrap:wrap}
+.sc-node{font-size:8px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--dim);color:var(--muted);text-transform:uppercase}
+.sc-node.yes{color:var(--green);border-color:rgba(112,208,144,0.4)}
+.sc-node.partial{color:var(--amber);border-color:rgba(212,181,128,0.4)}
+.sc-node.no{color:var(--red);border-color:rgba(232,85,85,0.5);background:rgba(232,85,85,0.06)}
+.sc-node.break{color:var(--red);border-color:var(--red);background:rgba(232,85,85,0.1);font-weight:500}
+.sc-arrow{color:var(--dim);font-size:10px}
+/* FILE BAR */
+.file-bar{background:rgba(96,181,229,0.05);border:1px solid rgba(96,181,229,0.2);border-left:2px solid var(--blue);padding:10px 14px;margin:0 20px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.file-bar-text{font-size:10px;color:var(--blue)}
+.file-bar-text span{color:var(--muted);font-size:9px;display:block;margin-top:2px}
+.btn-file{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid var(--blue);color:var(--blue);padding:7px 14px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn-file:hover{background:rgba(96,181,229,0.1)}
+/* MANUAL */
+.manual-panel{padding:16px;display:flex;flex-direction:column;gap:0;overflow-y:auto}
+.m-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.m-section:last-child{border-bottom:none}
+.m-section-title{font-size:9px;letter-spacing:3px;color:var(--amber2);text-transform:uppercase;margin-bottom:10px}
+.m-field{margin-bottom:10px}
+.m-label{font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:4px;display:block}
+.m-input,.m-select,.m-textarea{width:100%;background:var(--bg3);border:1px solid var(--dim);color:var(--text);font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;transition:border-color 0.2s;-webkit-appearance:none}
+.m-input:focus,.m-select:focus,.m-textarea:focus{border-color:var(--amber2)}
+.m-textarea{resize:vertical;min-height:52px;line-height:1.5}
+select option{background:var(--bg3)}
+.dot-grid{display:flex;flex-direction:column;gap:8px}
+.dot-stratum{background:var(--bg3);border:1px solid var(--dim);padding:8px 10px}
+.dot-stratum-name{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.dot-pillars{display:flex;gap:6px;flex-wrap:wrap}
+.dot-btn-group{display:flex;flex-direction:column;align-items:center;gap:2px}
+.dot-pillar-name{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.dot-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--dim);background:none;color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:500;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.dot-btn.A{border-color:var(--green);color:var(--green);background:rgba(112,208,144,0.1)}
+.dot-btn.I{border-color:var(--red);color:var(--red);background:rgba(232,85,85,0.1)}
+.dot-btn.D{border-color:var(--grey);color:var(--grey);background:rgba(136,136,102,0.1)}
+.dot-btn.U{border-color:var(--dim);color:var(--muted);background:none}
+.imm-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.imm-group{display:flex;flex-direction:column;align-items:center;gap:2px}
+.imm-name{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.imm-btn{font-family:var(--mono);font-size:8px;padding:4px 8px;border:1px solid var(--dim);background:none;color:var(--muted);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.imm-btn.capturable{border-color:rgba(232,85,85,0.4);color:var(--red);background:rgba(232,85,85,0.06)}
+.imm-btn.free{border-color:rgba(112,208,144,0.4);color:var(--green);background:rgba(112,208,144,0.06)}
+/* LEDGER */
+.ledger-panel{padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.ledger-connect{background:var(--bg3);border:1px solid var(--dim);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.conn-status{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.conn-dot.on{background:var(--green);animation:pulse 2s infinite}
+.conn-dot.err{background:var(--red)}
+.ledger-record{background:var(--bg3);border:1px solid var(--dim);padding:12px 14px;cursor:pointer;transition:all 0.15s}
+.ledger-record:hover{border-color:var(--amber2);background:#161310}
+.ledger-record-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.ledger-record-name{font-family:var(--serif);font-style:italic;font-size:13px;color:#D8D0BC;line-height:1.3;flex:1}
+.ledger-record-meta{font-size:9px;color:var(--muted);text-align:right;flex-shrink:0}
+.ledger-record-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.ledger-record-dots{display:flex;gap:2px;flex-wrap:wrap}
+.mini-dot{width:7px;height:7px;border-radius:50%}
+.mini-A{background:var(--green)}.mini-I{background:var(--red)}.mini-D{background:var(--grey)}.mini-U{background:var(--dim)}
+.ledger-empty{text-align:center;padding:2rem;color:var(--muted);font-size:10px;line-height:1.8}
+.ledger-loading{text-align:center;padding:1.5rem;color:var(--muted);font-size:10px}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--amber2);color:var(--amber);font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:8px 16px;opacity:0;transition:all 0.3s;z-index:100;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@media(max-width:400px){.mode-tab .tab-icon{font-size:12px}.mode-tab{font-size:8px;letter-spacing:1px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><div class="brand">⭕ OPEN RING</div><div class="brand-sub">INVERSION MAP · ORP-02</div></div>
+  <div class="header-links">
+    <a href="/" class="hlink">HOME</a>
+    <a href="signal-ledger-nostr.html" class="hlink">LEDGER</a>
+  </div>
+</header>
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-paste" onclick="switchMode('paste')"><span class="tab-icon">📋</span>PASTE</button>
+  <button class="mode-tab" id="tab-manual" onclick="switchMode('manual')"><span class="tab-icon">✏️</span>MANUAL</button>
+  <button class="mode-tab" id="tab-ledger" onclick="switchMode('ledger')"><span class="tab-icon">📡</span>LEDGER</button>
+</div>
+
+<!-- PASTE PANEL -->
+<div class="panel active" id="panel-paste">
+  <div id="paste-entry" class="paste-panel">
+    <div class="paste-hint">Paste the <strong>OPEN RING MAP BLOCK</strong> from the BoB diagnostic.<br>Starts with <strong>OBSERVER</strong>, ends with <strong>FIELD LAYER</strong>.</div>
+    <textarea id="paste-input" placeholder="Paste map block here...&#10;&#10;OBSERVER&#10;position: INSIDE&#10;..."></textarea>
+    <div class="paste-actions">
+      <button class="btn-primary" onclick="drawFromPaste()">Draw map →</button>
+      <button class="btn-secondary" onclick="loadExample()">Load example</button>
+    </div>
+    <div class="paste-msg" id="paste-msg"></div>
+  </div>
+  <div class="map-view hidden" id="paste-map-view">
+    <div class="map-header">
+      <div class="map-structure" id="paste-map-structure">—</div>
+      <div class="map-badges" id="paste-map-badges"></div>
+    </div>
+
+    <!-- HOW TO READ -->
+    <div class="how-to-read" id="paste-htr">
+      <button class="how-to-read-toggle" onclick="toggleHowToRead('paste-htr')">
+        <span>🗺️ How to read this map</span><span id="paste-htr-arrow">▾</span>
+      </button>
+      <div class="how-to-read-body" id="paste-htr-body">
+        <div class="htr-line">The ring has <strong style="color:var(--amber2)">5 layers</strong> — inside out: <strong style="color:var(--amber2)">Individual → Relationship → Institution → Environment → Soul</strong></div>
+        <div class="htr-line">Each layer has <strong style="color:var(--amber2)">4 dots</strong> — one per pillar of that stratum.</div>
+        <div style="margin-top:6px">
+          <div class="htr-line"><span class="htr-dot" style="background:#70D090"></span><strong style="color:#70D090">Aligned</strong> — working for you. Reference holds, information flows.</div>
+          <div class="htr-line"><span class="htr-dot" style="background:#E85555"></span><strong style="color:#E85555">Inverted</strong> — captured. Wrong thing fixed, you pay the cost.</div>
+          <div class="htr-line"><span class="htr-dot" style="background:#888866"></span><strong style="color:#888866">Drifting</strong> — no stable reference. Neither captured nor free.</div>
+          <div class="htr-line"><span class="htr-dot" style="border:1px solid #2e2a22;background:transparent;display:inline-block"></span><strong style="color:var(--muted)">Unknown</strong> — not enough signal to call it.</div>
+        </div>
+        <div style="margin-top:6px">
+          <div class="htr-line">The <strong style="color:var(--amber)">▲ triangle</strong> marks the seed crystal — where the minimum intervention goes.</div>
+          <div class="htr-line">The <strong style="color:var(--red)">bold red arc with ✕</strong> marks the break point — the signal chain node where information flow is blocked.</div>
+          <div class="htr-line"><span style="display:inline-block;width:8px;height:8px;background:#E85555;margin-right:6px;vertical-align:middle"></span><span style="display:inline-block;width:8px;height:8px;border:1px solid #70D090;background:rgba(112,208,144,0.27);margin-right:6px;vertical-align:middle"></span><strong style="color:var(--amber)">Immunity squares</strong> (outer dashed ring) — four capture conditions: education, distribution, finance, legitimacy. Red = capturable. Green = free.</div>
+        </div>
+        <div style="margin-top:6px;font-size:9px;color:var(--muted)">A healthy map is mostly green. A captured map clusters red at Institution and Environment. Your map is a snapshot of one structure, right now.</div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--dim);font-size:9px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--amber2);letter-spacing:1px">📡 SIGNAL WEIGHT</strong><br>
+          The dots carry the observer's confidence:<br>
+          <span style="color:#70D090">● STRONG</span> — solid dots, direct experience<br>
+          <span style="color:#D4B580">◐ ADEQUATE</span> — softened, familiar but not lived<br>
+          <span style="color:#E85555">○ THIN</span> — dashed outlines, secondhand or intuited — read as working hypothesis
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--dim);font-size:9px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--amber2);letter-spacing:1px">🔄 FLIP PERSPECTIVE</strong><br>
+          Two valid readings of the same data:<br>
+          <strong style="color:var(--text)">Individual inward</strong> — you are the center, culture wraps around you.<br>
+          <strong style="color:var(--text)">Soul inward</strong> — meaning is the root, you sit at the surface.<br>
+          Same dots, same truth. Tap flip to see both.
+        </div>
+      </div>
+    </div>
+
+    <!-- FLIP CONTROL — just above map -->
+    <div style="display:flex;justify-content:center;padding:0 20px 4px">
+      <button class="btn-action" onclick="flipMap('paste')" style="font-size:9px">🔄 <span id="paste-flip-label">Individual inward</span></button>
+    </div>
+
+    <div class="map-svg-wrap" id="paste-svg-wrap"></div>
+    <div class="sc-bar" id="paste-sc-bar"></div>
+
+    <!-- MAP READING -->
+    <div class="map-reading" id="paste-map-reading">
+      <div class="map-reading-title">
+        <span>📖 What this map shows</span>
+        <button class="btn-action" onclick="copyMapReading('paste')" style="border:none;padding:2px 6px;font-size:8px">Copy text</button>
+      </div>
+      <div class="map-reading-text" id="paste-reading-text">—</div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="map-actions">
+      <button class="btn-action amber" onclick="downloadMapImage('paste')">⬇ Download map</button>
+      <button class="btn-action" onclick="copyMapReading('paste')">📋 Copy reading</button>
+    </div>
+
+    <div class="file-bar" id="paste-file-bar" style="display:none">
+      <div class="file-bar-text">Ready to file<span>Open Signal Ledger → Import → paste map block</span></div>
+      <button class="btn-file" onclick="fileToLedger()">File to Ledger →</button>
+    </div>
+    <div class="verdict-drawer" id="paste-verdict"><div class="verdict-inner" id="paste-verdict-inner"></div></div>
+    <div class="map-footer">
+      <div class="map-footer-left">
+        <button class="btn-secondary btn-sm" onclick="toggleVerdict('paste-verdict')">Verdict ▾</button>
+        <button class="btn-secondary btn-sm" onclick="backToPaste()">← New map</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANUAL PANEL -->
+<div class="panel" id="panel-manual">
+  <div style="display:flex;flex:1;flex-direction:column">
+    <div class="map-svg-wrap" id="manual-svg-wrap" style="padding:12px;min-height:260px"></div>
+    <div class="sc-bar" id="manual-sc-bar"></div>
+    <div class="manual-panel" style="flex:1;max-height:55vh">
+      <div class="m-section">
+        <div class="m-section-title">Structure</div>
+        <div class="m-field"><label class="m-label">Name</label><input class="m-input" id="m-structure" placeholder="One sentence, precise" oninput="manualUpdate()"></div>
+        <div class="m-field"><label class="m-label">State</label>
+          <select class="m-select" id="m-state" onchange="manualUpdate()">
+            <option value="INVERTED">INVERTED</option><option value="SOUND">SOUND</option>
+            <option value="FROZEN">FROZEN</option><option value="UNGROUNDED">UNGROUNDED</option><option value="IMMUNE">IMMUNE</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Observer</div>
+        <div class="m-field"><label class="m-label">Position</label>
+          <select class="m-select" id="m-obs-pos" onchange="manualUpdate()">
+            <option value="INSIDE">INSIDE</option><option value="ADJACENT">ADJACENT</option><option value="OUTSIDE">OUTSIDE</option>
+          </select>
+        </div>
+        <div class="m-field"><label class="m-label">Relationship</label>
+          <select class="m-select" id="m-obs-rel" onchange="manualUpdate()">
+            <option value="PAYING">PAYING</option><option value="OPERATING">OPERATING</option>
+            <option value="WITNESSING">WITNESSING</option><option value="MIXED">MIXED</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Stratum Map — tap to cycle U→A→I→D</div>
+        <div class="dot-grid" id="manual-dot-grid"></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Immunity Pillars</div>
+        <div class="imm-row" id="manual-imm-row"></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Signal Chain</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="manual-sc-inputs"></div>
+        <div class="m-field" style="margin-top:8px"><label class="m-label">Break Point</label>
+          <select class="m-select" id="m-break" onchange="manualUpdate()">
+            <option value="none">none</option><option value="SIGNAL">SIGNAL</option>
+            <option value="MEDIUM">MEDIUM</option><option value="POTENTIAL">POTENTIAL</option><option value="PHASE">PHASE</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Seed Crystal</div>
+        <div class="m-field"><label class="m-label">Placement (stratum)</label>
+          <select class="m-select" id="m-seed-stratum" onchange="onSeedStratumChange()">
+            <option value="">— none —</option><option value="INDIVIDUAL">INDIVIDUAL</option>
+            <option value="RELATIONSHIP">RELATIONSHIP</option><option value="INSTITUTION">INSTITUTION</option>
+            <option value="ENVIRONMENT">ENVIRONMENT</option><option value="SOUL">SOUL</option>
+          </select>
+        </div>
+        <div class="m-field"><label class="m-label">Pillar (required — specific pillar or "unknown")</label>
+          <select class="m-select" id="m-seed-pillar" onchange="manualUpdate()">
+            <option value="">— select stratum first —</option>
+          </select>
+        </div>
+        <div class="m-field"><label class="m-label">Description</label><textarea class="m-textarea" id="m-seed-desc" placeholder="The minimum intervention..." oninput="manualUpdate()"></textarea></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title">Verdict</div>
+        <div class="m-field"><label class="m-label">Diagnosis</label><textarea class="m-textarea" id="m-diagnosis" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+        <div class="m-field"><label class="m-label">Treatment</label><textarea class="m-textarea" id="m-treatment" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+        <div class="m-field"><label class="m-label">Call to Action</label><textarea class="m-textarea" id="m-action" placeholder="One sentence" oninput="manualUpdate()"></textarea></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEDGER PANEL -->
+<div class="panel" id="panel-ledger">
+  <div class="ledger-panel" id="ledger-list">
+    <div class="ledger-connect">
+      <div class="conn-status"><div class="conn-dot" id="ledger-dot"></div><span id="ledger-conn-label">Not connected to relays</span></div>
+      <button class="btn-secondary btn-sm" onclick="loadLedger()">Load records</button>
+    </div>
+    <div id="ledger-records"><div class="ledger-loading">Press "Load records" to query Nostr relays.</div></div>
+  </div>
+  <div class="map-view hidden" id="ledger-map-view">
+    <div class="map-header">
+      <div class="map-structure" id="ledger-map-structure">—</div>
+      <div class="map-badges" id="ledger-map-badges"></div>
+    </div>
+
+    <!-- HOW TO READ -->
+    <div class="how-to-read" id="ledger-htr">
+      <button class="how-to-read-toggle" onclick="toggleHowToRead('ledger-htr')">
+        <span>🗺️ How to read this map</span><span id="ledger-htr-arrow">▾</span>
+      </button>
+      <div class="how-to-read-body" id="ledger-htr-body">
+        <div class="htr-line">The ring has <strong style="color:var(--amber2)">5 layers</strong> — inside out: <strong style="color:var(--amber2)">Individual → Relationship → Institution → Environment → Soul</strong></div>
+        <div class="htr-line">Each layer has <strong style="color:var(--amber2)">4 dots</strong> — one per pillar of that stratum.</div>
+        <div style="margin-top:6px">
+          <div class="htr-line"><span class="htr-dot" style="background:#70D090"></span><strong style="color:#70D090">Aligned</strong> — working for you. Reference holds, information flows.</div>
+          <div class="htr-line"><span class="htr-dot" style="background:#E85555"></span><strong style="color:#E85555">Inverted</strong> — captured. Wrong thing fixed, you pay the cost.</div>
+          <div class="htr-line"><span class="htr-dot" style="background:#888866"></span><strong style="color:#888866">Drifting</strong> — no stable reference. Neither captured nor free.</div>
+          <div class="htr-line"><span class="htr-dot" style="border:1px solid #2e2a22;background:transparent;display:inline-block"></span><strong style="color:var(--muted)">Unknown</strong> — not enough signal to call it.</div>
+        </div>
+        <div style="margin-top:6px">
+          <div class="htr-line">The <strong style="color:var(--amber)">▲ triangle</strong> marks the seed crystal — where the minimum intervention goes.</div>
+          <div class="htr-line">The <strong style="color:var(--red)">bold red arc with ✕</strong> marks the break point — the signal chain node where information flow is blocked.</div>
+          <div class="htr-line"><span style="display:inline-block;width:8px;height:8px;background:#E85555;margin-right:6px;vertical-align:middle"></span><span style="display:inline-block;width:8px;height:8px;border:1px solid #70D090;background:rgba(112,208,144,0.27);margin-right:6px;vertical-align:middle"></span><strong style="color:var(--amber)">Immunity squares</strong> (outer dashed ring) — four capture conditions: education, distribution, finance, legitimacy. Red = capturable. Green = free.</div>
+        </div>
+        <div style="margin-top:6px;font-size:9px;color:var(--muted)">A healthy map is mostly green. A captured map clusters red at Institution and Environment. Your map is a snapshot of one structure, right now.</div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--dim);font-size:9px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--amber2);letter-spacing:1px">📡 SIGNAL WEIGHT</strong><br>
+          The dots carry the observer's confidence:<br>
+          <span style="color:#70D090">● STRONG</span> — solid dots, direct experience<br>
+          <span style="color:#D4B580">◐ ADEQUATE</span> — softened, familiar but not lived<br>
+          <span style="color:#E85555">○ THIN</span> — dashed outlines, secondhand or intuited — read as working hypothesis
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--dim);font-size:9px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--amber2);letter-spacing:1px">🔄 FLIP PERSPECTIVE</strong><br>
+          Two valid readings of the same data:<br>
+          <strong style="color:var(--text)">Individual inward</strong> — you are the center, culture wraps around you.<br>
+          <strong style="color:var(--text)">Soul inward</strong> — meaning is the root, you sit at the surface.<br>
+          Same dots, same truth. Tap flip to see both.
+        </div>
+      </div>
+    </div>
+
+    <!-- FLIP CONTROL -->
+    <div style="display:flex;justify-content:center;padding:0 20px 4px">
+      <button class="btn-action" onclick="flipMap('ledger')" style="font-size:9px">🔄 <span id="ledger-flip-label">Individual inward</span></button>
+    </div>
+
+    <div class="map-svg-wrap" id="ledger-svg-wrap"></div>
+    <div class="sc-bar" id="ledger-sc-bar"></div>
+
+    <!-- MAP READING -->
+    <div class="map-reading" id="ledger-map-reading">
+      <div class="map-reading-title">
+        <span>📖 What this map shows</span>
+        <button class="btn-action" onclick="copyMapReading('ledger')" style="border:none;padding:2px 6px;font-size:8px">Copy text</button>
+      </div>
+      <div class="map-reading-text" id="ledger-reading-text">—</div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="map-actions">
+      <button class="btn-action amber" onclick="downloadMapImage('ledger')">⬇ Download map</button>
+      <button class="btn-action" onclick="copyMapReading('ledger')">📋 Copy reading</button>
+    </div>
+
+    <div class="verdict-drawer" id="ledger-verdict"><div class="verdict-inner" id="ledger-verdict-inner"></div></div>
+    <div class="map-footer">
+      <div class="map-footer-left">
+        <button class="btn-secondary btn-sm" onclick="toggleVerdict('ledger-verdict')">Verdict ▾</button>
+        <button class="btn-secondary btn-sm" onclick="backToLedger()">← Records</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// FIX 1: SOUL short label corrected from 'SOL' to 'SOUL'
+// FIX 2: STRATA order is Individual (innermost) → Soul (outermost) — index 0 = smallest ring
+const STRATA=[
+  {name:'INDIVIDUAL',short:'IND',pillars:['awareness','capacity','energy','identity'],color:'#E8E87C'},
+  {name:'RELATIONSHIP',short:'REL',pillars:['transparency','trust','reciprocity','status'],color:'#7CE8B4'},
+  {name:'INSTITUTION',short:'INST',pillars:['education','distribution','finance','authority'],color:'#A87CE8'},
+  {name:'ENVIRONMENT',short:'ENV',pillars:['visibility','infrastructure','commons','regulation'],color:'#7CB9E8'},
+  {name:'SOUL',short:'SOUL',pillars:['story','language','value','meaning'],color:'#E8A87C'},
+]
+const IMMUNITY_KEYS=['education','distribution','finance','legitimacy']
+const SC_NODES=['signal','medium','potential','phase']
+const STATE_CYCLE={U:'A',A:'I',I:'D',D:'U'}
+const STATE_COLORS={A:'#70D090',I:'#E85555',D:'#888866',U:'#2A2A2A'}
+const OBS_COLORS={PAYING:'#D4B580',OPERATING:'#60B5E5',WITNESSING:'#70D090',MIXED:'#A87CE8',INSIDE:'#D4B580',ADJACENT:'#60B5E5',OUTSIDE:'#888866'}
+const RELAYS=['wss://relay.damus.io','wss://relay.nostr.band','wss://nos.lol','wss://relay.snort.social']
+let currentData=defaultData(),pool=null
+const flipState={paste:false,manual:false,ledger:false}
+
+function defaultData(){
+  const d={observer:{position:'INSIDE',relationship:'PAYING',signal_weight:'ADEQUATE'},structure:'',verdict:{state:'INVERTED',diagnosis:'',treatment:'',call_to_action:''},seed_crystal:{placement:'',pillar:'',description:''},signalchain:{signal:'unclear',medium:'unclear',potential:'unclear',phase:'local',break_point:'none'},immunity:{},flags:{flag_a:false,flag_b:false,flag_c:false},strata:{}}
+  STRATA.forEach(s=>{d.strata[s.name]={};s.pillars.forEach(p=>d.strata[s.name][p]='U')})
+  IMMUNITY_KEYS.forEach(k=>d.immunity[k]='capturable')
+  return d
+}
+
+function ns(){return 'http://www.w3.org/2000/svg'}
+function el(tag,attrs={},text){
+  const e=document.createElementNS(ns(),tag)
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v))
+  if(text!=null)e.textContent=text
+  return e
+}
+function px(cx,cy,r,angleDeg){
+  const a=(angleDeg-90)*Math.PI/180
+  return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}
+}
+
+window.switchMode=function(m){
+  document.querySelectorAll('.panel,.mode-tab').forEach(e=>e.classList.remove('active'))
+  document.getElementById('panel-'+m).classList.add('active')
+  document.getElementById('tab-'+m).classList.add('active')
+}
+
+function buildMap(data,size,flipped){
+  const cx=size/2,cy=size/2
+  // Strata order controlled by flipped flag
+  // flipped=false (default): Individual innermost → Soul outermost (self radiates outward)
+  // flipped=true: Soul innermost → Individual outermost (meaning as root, self at surface)
+  const orderedStrata=flipped?[...STRATA].reverse():STRATA
+  const obsR=size*0.06
+  const innerR=obsR+size*0.03
+  const ringW=(size*0.5-innerR-size*0.12)/STRATA.length
+  const immunityR=size*0.5-size*0.045
+
+  const svg=el('svg',{viewBox:`0 0 ${size} ${size}`,width:size,height:size})
+  const defs=el('defs')
+  const glow=el('filter',{id:'glow',x:'-50%',y:'-50%',width:'200%',height:'200%'})
+  const fe1=el('feGaussianBlur',{stdDeviation:'3',result:'blur'})
+  const fe2=el('feComposite',{in:'SourceGraphic',in2:'blur',operator:'over'})
+  glow.appendChild(fe1);glow.appendChild(fe2)
+  const sglow=el('filter',{id:'softglow',x:'-50%',y:'-50%',width:'200%',height:'200%'})
+  const sfe=el('feGaussianBlur',{stdDeviation:'2',result:'blur'})
+  const sfe2=el('feComposite',{in:'SourceGraphic',in2:'blur',operator:'over'})
+  sglow.appendChild(sfe);sglow.appendChild(sfe2)
+  defs.appendChild(glow);defs.appendChild(sglow)
+
+  // Background gradient
+  const bgr=el('radialGradient',{id:'mapbg',cx:'50%',cy:'50%',r:'50%'})
+  const bs1=el('stop',{'offset':'0%','stop-color':'#141209','stop-opacity':'1'})
+  const bs2=el('stop',{'offset':'100%','stop-color':'#0A0907','stop-opacity':'1'})
+  bgr.appendChild(bs1);bgr.appendChild(bs2);defs.appendChild(bgr)
+  svg.appendChild(defs)
+  svg.appendChild(el('circle',{cx,cy,r:size/2,fill:'url(#mapbg)'}))
+
+  // Guide lines at 4 angles
+  ;[0,90,180,270].forEach(a=>{
+    const p=px(cx,cy,size*0.48,a)
+    svg.appendChild(el('line',{x1:cx,y1:cy,x2:p.x,y2:p.y,stroke:'#ffffff08','stroke-width':1}))
+  })
+
+  // Draw rings — uses orderedStrata for flip support
+  orderedStrata.forEach((s,si)=>{
+    const r=innerR+ringW*(si+1)
+    const rMid=innerR+ringW*si+ringW/2
+    svg.appendChild(el('circle',{cx,cy,r,fill:'none',stroke:s.color,'stroke-width':0.5,'stroke-opacity':0.15}))
+    // Label at top (0°), stacked vertically by ring radius
+    const lp=px(cx,cy,rMid,0)
+    svg.appendChild(el('text',{
+      x:lp.x,y:lp.y,
+      'text-anchor':'middle',
+      'dominant-baseline':'middle',
+      fill:s.color,
+      'fill-opacity':0.55,
+      'font-size':7,
+      'font-family':'monospace',
+      'letter-spacing':0.5
+    },s.short))
+  })
+
+  // Center
+  svg.appendChild(el('circle',{cx,cy,r:innerR,fill:'#0A0907',stroke:'#ffffff10','stroke-width':1}))
+
+  // Dots — positioned by orderedStrata; data still references s.name so values stay correct
+  // Signal weight from the observer calibrates visual confidence:
+  //   STRONG   → full opacity, solid dots (default)
+  //   ADEQUATE → slight reduction (0.75), subtle thinner outline hint
+  //   THIN     → dashed outline, reduced opacity (0.5), hollow fill for non-U states
+  const sigWeight=(data.observer?.signal_weight||'').toUpperCase()
+  const weightProfile=(()=>{
+    if(sigWeight==='THIN')return{fillOpacity:0.5,glowOpacity:0.08,dashed:true,coreOpacity:0.45}
+    if(sigWeight==='ADEQUATE')return{fillOpacity:0.75,glowOpacity:0.12,dashed:false,coreOpacity:0.78}
+    // STRONG or unset: original look
+    return{fillOpacity:0.85,glowOpacity:0.15,dashed:false,coreOpacity:0.85}
+  })()
+
+  orderedStrata.forEach((s,si)=>{
+    s.pillars.forEach((p,pi)=>{
+      const r=innerR+ringW*si+ringW/2
+      const pos=px(cx,cy,r,pi*90+45)
+      const val=data.strata?.[s.name]?.[p]||'U'
+      const col=STATE_COLORS[val]
+      const inv=val==='I'
+      // Halo for inverted dots — attenuated by signal weight
+      if(inv)svg.appendChild(el('circle',{
+        cx:pos.x,cy:pos.y,r:10,fill:col,
+        'fill-opacity':weightProfile.glowOpacity,filter:'url(#glow)'
+      }))
+      const dot=el('circle',{cx:pos.x,cy:pos.y,r:val==='U'?4:6})
+      if(val==='U'){
+        // U always hollow
+        dot.setAttribute('fill','transparent')
+        dot.setAttribute('stroke',col)
+        dot.setAttribute('stroke-width',1)
+      }else if(weightProfile.dashed){
+        // THIN signal: hollow fill with dashed outline — communicates "tentative"
+        dot.setAttribute('fill',col)
+        dot.setAttribute('fill-opacity',0.2)
+        dot.setAttribute('stroke',col)
+        dot.setAttribute('stroke-width',1.3)
+        dot.setAttribute('stroke-opacity',weightProfile.coreOpacity)
+        dot.setAttribute('stroke-dasharray','2,1.5')
+        if(inv)dot.setAttribute('filter','url(#glow)')
+      }else{
+        dot.setAttribute('fill',col)
+        dot.setAttribute('fill-opacity',weightProfile.fillOpacity)
+        if(inv)dot.setAttribute('filter','url(#glow)')
+      }
+      const t=el('title')
+      t.textContent=`${s.name}·${p}·${val}${sigWeight?' · signal: '+sigWeight:''}`
+      dot.appendChild(t)
+      svg.appendChild(dot)
+    })
+  })
+
+  // Immunity dots (outermost ring)
+  // Immunity band — visually distinct from strata rings
+  // Dashed guide ring marks it as a separate category
+  svg.appendChild(el('circle',{cx,cy,r:immunityR,fill:'none',stroke:'#D4B580','stroke-width':0.5,'stroke-opacity':0.25,'stroke-dasharray':'2,3'}))
+  // "IMMUNITY" label — sits on the dashed ring at the top, with a small background pill
+  const immLabelPos=px(cx,cy,immunityR,0)
+  // Background pill to break the dashed line behind the text
+  svg.appendChild(el('rect',{
+    x:immLabelPos.x-26,y:immLabelPos.y-5,width:52,height:10,
+    fill:'#0A0907','fill-opacity':0.95
+  }))
+  svg.appendChild(el('text',{
+    x:immLabelPos.x,y:immLabelPos.y+1,
+    'text-anchor':'middle','dominant-baseline':'middle',
+    fill:'#D4B580','fill-opacity':0.65,
+    'font-size':6.5,'font-family':'monospace','letter-spacing':2
+  },'IMMUNITY'))
+
+  // Immunity markers — squares (not circles) to signal different category
+  IMMUNITY_KEYS.forEach((im,i)=>{
+    const pos=px(cx,cy,immunityR,i*90+45)
+    const free=data.immunity?.[im]==='free'
+    const col=free?'#70D090':'#E85555'
+    const sq=8
+    svg.appendChild(el('rect',{
+      x:pos.x-sq/2,y:pos.y-sq/2,width:sq,height:sq,
+      fill:col+(free?'44':'22'),
+      stroke:col,'stroke-width':1.5,
+      filter:free?'none':'url(#glow)'
+    }))
+    const t=el('title');t.textContent=`Immunity · ${im} · ${free?'free':'capturable'}`
+    svg.lastChild.appendChild(t)
+    svg.appendChild(el('text',{x:pos.x,y:pos.y+16,'text-anchor':'middle','dominant-baseline':'middle',fill:col,'fill-opacity':0.7,'font-size':6.5,'font-family':'monospace'},im.slice(0,3).toUpperCase()))
+  })
+
+  // Signal chain arcs — normal rendering for non-break nodes
+  SC_NODES.forEach((node,i)=>{
+    const val=data.signalchain?.[node]
+    const isBreak=data.signalchain?.break_point===node.toUpperCase()
+    if(isBreak)return // skip here; drawn below with prominence
+    const col=val==='yes'?'#70D090':val==='partial'?'#D4B580':'#888866'
+    const a=i*90-45,p1=px(cx,cy,immunityR+12,a),p2=px(cx,cy,immunityR+12,a+88),mid=px(cx,cy,immunityR+18,a+44)
+    const path=el('path',{
+      d:`M ${p1.x} ${p1.y} Q ${mid.x} ${mid.y} ${p2.x} ${p2.y}`,
+      fill:'none',stroke:col,'stroke-width':1,'stroke-opacity':0.4
+    })
+    svg.appendChild(path)
+  })
+
+  // BREAK POINT — prominent signal chain arc marker
+  // Lives at the SignalChain layer (where it belongs semantically)
+  // Three visual layers on the broken arc: wide halo, bold stroke, core highlight
+  // Plus a ✕ badge sitting outside the immunity ring at the arc midpoint
+  const breakNode=(data.signalchain?.break_point||'none').toUpperCase()
+  if(breakNode!=='NONE'&&breakNode!==''){
+    const breakIndex=SC_NODES.findIndex(n=>n.toUpperCase()===breakNode)
+    if(breakIndex>=0){
+      const a=breakIndex*90-45
+      const arcR=immunityR+12
+      const p1=px(cx,cy,arcR,a)
+      const p2=px(cx,cy,arcR,a+88)
+      const midCtrl=px(cx,cy,arcR+6,a+44)
+      const arcD=`M ${p1.x} ${p1.y} Q ${midCtrl.x} ${midCtrl.y} ${p2.x} ${p2.y}`
+
+      // Layer 1: wide outer halo
+      svg.appendChild(el('path',{
+        d:arcD,fill:'none',stroke:'#E85555','stroke-width':10,
+        'stroke-opacity':0.15,'stroke-linecap':'round',filter:'url(#glow)'
+      }))
+      // Layer 2: bold red body
+      svg.appendChild(el('path',{
+        d:arcD,fill:'none',stroke:'#E85555','stroke-width':3.5,
+        'stroke-opacity':0.85,'stroke-linecap':'round',filter:'url(#glow)'
+      }))
+      // Layer 3: bright core stripe
+      svg.appendChild(el('path',{
+        d:arcD,fill:'none',stroke:'#ffb5b5','stroke-width':1.2,
+        'stroke-opacity':0.85,'stroke-linecap':'round'
+      }))
+
+      // Short inward dashes — "flow tried to pass here and was blocked"
+      // Three small radial dashes spanning the arc, pointing inward toward the immunity ring
+      const dashCount=5
+      for(let j=0;j<dashCount;j++){
+        const t=(j+1)/(dashCount+1)
+        const dashAngle=a+88*t
+        const dashOuter=px(cx,cy,arcR-1,dashAngle)
+        const dashInner=px(cx,cy,immunityR-3,dashAngle)
+        svg.appendChild(el('line',{
+          x1:dashOuter.x,y1:dashOuter.y,x2:dashInner.x,y2:dashInner.y,
+          stroke:'#E85555','stroke-width':1,'stroke-opacity':0.5,
+          'stroke-dasharray':'2,2'
+        }))
+      }
+
+      // ✕ badge — positioned outside the arc (further from center) so it doesn't overlap IMMUNITY label
+      const badgeR=arcR+14
+      const badgeAngle=a+44
+      const badgePos=px(cx,cy,badgeR,badgeAngle)
+      const xSize=7
+      // Background pill
+      svg.appendChild(el('circle',{
+        cx:badgePos.x,cy:badgePos.y,r:xSize+4,
+        fill:'#0A0907','fill-opacity':0.95
+      }))
+      // Red halo ring
+      svg.appendChild(el('circle',{
+        cx:badgePos.x,cy:badgePos.y,r:xSize+3,
+        fill:'none',stroke:'#E85555','stroke-width':1.5,
+        'stroke-opacity':0.95,filter:'url(#glow)'
+      }))
+      // The ✕
+      svg.appendChild(el('line',{
+        x1:badgePos.x-xSize*0.55,y1:badgePos.y-xSize*0.55,
+        x2:badgePos.x+xSize*0.55,y2:badgePos.y+xSize*0.55,
+        stroke:'#ffb5b5','stroke-width':2.2,'stroke-linecap':'round'
+      }))
+      svg.appendChild(el('line',{
+        x1:badgePos.x+xSize*0.55,y1:badgePos.y-xSize*0.55,
+        x2:badgePos.x-xSize*0.55,y2:badgePos.y+xSize*0.55,
+        stroke:'#ffb5b5','stroke-width':2.2,'stroke-linecap':'round'
+      }))
+      const t=el('title');t.textContent=`Break point — ${breakNode}: information flow blocked at this signal chain node`
+      svg.lastChild.appendChild(t)
+    }
+  }
+
+  // Observer center dot
+  const obsColor=OBS_COLORS[data.observer?.relationship]||OBS_COLORS[data.observer?.position]||'#D4B580'
+  svg.appendChild(el('circle',{cx,cy,r:obsR,fill:obsColor,'fill-opacity':0.7,filter:'url(#softglow)'}))
+  svg.appendChild(el('circle',{cx,cy,r:obsR*0.5,fill:obsColor,'fill-opacity':0.9}))
+
+  // Seed crystal marker — pillar-aware
+  // Three states:
+  //   (1) specific pillar named → amber glow ring around that dot + small triangle beside it
+  //   (2) pillar = "unknown" OR missing → stratum-level triangle at 225°
+  //   (3) no placement at all → no marker
+  if(data.seed_crystal?.placement){
+    const seedStratum=data.seed_crystal.placement
+    const rawPillar=(data.seed_crystal.pillar||'').toLowerCase()
+    const si=orderedStrata.findIndex(s=>s.name===seedStratum)
+    if(si>=0){
+      const stratumDef=orderedStrata[si]
+      const r=innerR+ringW*si+ringW/2
+      // Resolve pillar: specific, unknown, or absent (legacy)
+      const isSpecific=rawPillar&&rawPillar!=='unknown'&&stratumDef.pillars.includes(rawPillar)
+      const pi=isSpecific?stratumDef.pillars.indexOf(rawPillar):-1
+
+      if(pi>=0){
+        // PRECISE: glow ring around specific dot + small triangle tangent to it
+        const dotPos=px(cx,cy,r,pi*90+45)
+        // Amber glow ring around the target dot
+        svg.appendChild(el('circle',{
+          cx:dotPos.x,cy:dotPos.y,r:12,
+          fill:'none',stroke:'#D4B580','stroke-width':1.5,
+          'stroke-opacity':0.8,filter:'url(#softglow)'
+        }))
+        // Second fainter outer ring for stronger signal
+        svg.appendChild(el('circle',{
+          cx:dotPos.x,cy:dotPos.y,r:16,
+          fill:'none',stroke:'#D4B580','stroke-width':0.5,
+          'stroke-opacity':0.4
+        }))
+        // Small triangle pointing at the dot from its outer side
+        const outAngle=pi*90+45
+        const triPos=px(cx,cy,r+ringW*0.35,outAngle)
+        const dx=dotPos.x-triPos.x,dy=dotPos.y-triPos.y
+        const len=Math.sqrt(dx*dx+dy*dy)||1
+        const ux=dx/len,uy=dy/len
+        const px_=-uy,py_=ux
+        const tip={x:triPos.x+ux*4,y:triPos.y+uy*4}
+        const b1={x:triPos.x-ux*4+px_*4,y:triPos.y-uy*4+py_*4}
+        const b2={x:triPos.x-ux*4-px_*4,y:triPos.y-uy*4-py_*4}
+        const tri=el('polygon',{
+          points:`${tip.x},${tip.y} ${b1.x},${b1.y} ${b2.x},${b2.y}`,
+          fill:'#D4B580','fill-opacity':0.95,
+          filter:'url(#softglow)'
+        })
+        const t=el('title');t.textContent=`Seed Crystal — ${seedStratum} / ${rawPillar}`;tri.appendChild(t)
+        svg.appendChild(tri)
+      } else {
+        // STRATUM-ONLY: pillar unknown or absent — triangle at 225° on the ring
+        const pos=px(cx,cy,r,225)
+        const tri=el('polygon',{
+          points:`${pos.x},${pos.y-9} ${pos.x+8},${pos.y+5} ${pos.x-8},${pos.y+5}`,
+          fill:'#D4B580','fill-opacity':0.9,filter:'url(#softglow)'
+        })
+        const pillarNote=rawPillar==='unknown'?' (pillar: unknown)':''
+        const t=el('title');t.textContent=`Seed Crystal — ${seedStratum}${pillarNote}`;tri.appendChild(t)
+        svg.appendChild(tri)
+      }
+    }
+  }
+
+  // Legend — two rows: states top, markers bottom
+  // Row 1: state dots
+  Object.entries({A:'Aligned',I:'Inverted',D:'Drifting',U:'Unknown'}).forEach(([k,v],i)=>{
+    const g=document.createElementNS(ns(),'g')
+    g.setAttribute('transform',`translate(${8+i*54},${size-34})`)
+    const c=el('circle',{cx:5,cy:0,r:4})
+    if(k==='U'){c.setAttribute('fill','transparent');c.setAttribute('stroke',STATE_COLORS[k]);c.setAttribute('stroke-width',1)}
+    else{c.setAttribute('fill',STATE_COLORS[k]);c.setAttribute('fill-opacity','0.85')}
+    g.appendChild(c)
+    g.appendChild(el('text',{x:12,y:3,fill:STATE_COLORS[k],'fill-opacity':0.7,'font-size':7.5,'font-family':'monospace'},v))
+    svg.appendChild(g)
+  })
+
+  // Row 2: markers — seed crystal triangle, break point ✕, immunity square
+  // Seed crystal
+  const gSeed=document.createElementNS(ns(),'g')
+  gSeed.setAttribute('transform',`translate(${8},${size-14})`)
+  gSeed.appendChild(el('polygon',{
+    points:`5,-5 10,3 0,3`,
+    fill:'#D4B580','fill-opacity':0.9
+  }))
+  gSeed.appendChild(el('text',{x:14,y:3,fill:'#D4B580','fill-opacity':0.7,'font-size':7.5,'font-family':'monospace'},'Seed'))
+  svg.appendChild(gSeed)
+
+  // Break point
+  const gBreak=document.createElementNS(ns(),'g')
+  gBreak.setAttribute('transform',`translate(${68},${size-14})`)
+  gBreak.appendChild(el('text',{x:5,y:4,'text-anchor':'middle','dominant-baseline':'middle',fill:'#E85555','font-size':11,'font-family':'monospace','font-weight':'bold'},'✕'))
+  gBreak.appendChild(el('text',{x:13,y:3,fill:'#E85555','fill-opacity':0.8,'font-size':7.5,'font-family':'monospace'},'Break'))
+  svg.appendChild(gBreak)
+
+  // Immunity square
+  const gImm=document.createElementNS(ns(),'g')
+  gImm.setAttribute('transform',`translate(${128},${size-14})`)
+  gImm.appendChild(el('rect',{x:1,y:-4,width:8,height:8,fill:'rgba(212,181,128,0.15)',stroke:'#D4B580','stroke-width':1}))
+  gImm.appendChild(el('text',{x:13,y:3,fill:'#D4B580','fill-opacity':0.7,'font-size':7.5,'font-family':'monospace'},'Immunity'))
+  svg.appendChild(gImm)
+
+  return svg
+}
+
+function renderMapTo(id,data,flipped){
+  const wrap=document.getElementById(id);wrap.innerHTML=''
+  const size=Math.min(480,window.innerWidth-32)
+  wrap.appendChild(buildMap(data,size,!!flipped))
+}
+
+// Flip the map view for a given panel and re-render
+window.flipMap=function(prefix){
+  flipState[prefix]=!flipState[prefix]
+  const btnLabel=document.getElementById(prefix+'-flip-label')
+  if(btnLabel)btnLabel.textContent=flipState[prefix]?'Soul inward':'Individual inward'
+  if(prefix==='paste'){
+    renderMapTo('paste-svg-wrap',currentData,flipState.paste)
+  }else if(prefix==='manual'){
+    renderMapTo('manual-svg-wrap',currentData,flipState.manual)
+  }else if(prefix==='ledger'){
+    renderMapTo('ledger-svg-wrap',window._currentLedgerData||currentData,flipState.ledger)
+  }
+}
+
+function buildBadges(data){
+  const s=data.verdict?.state||'INVERTED'
+  let h=`<span class="badge badge-${s}">${s}</span>`
+  // Signal weight badge — shows dot confidence visually
+  const sw=(data.observer?.signal_weight||'').toUpperCase()
+  if(sw==='STRONG')h+=`<span class="badge" style="color:#70D090;border-color:rgba(112,208,144,0.4);background:rgba(112,208,144,0.08)">● SIGNAL STRONG</span>`
+  else if(sw==='ADEQUATE')h+=`<span class="badge" style="color:#D4B580;border-color:rgba(212,181,128,0.4);background:rgba(212,181,128,0.06)">◐ SIGNAL ADEQUATE</span>`
+  else if(sw==='THIN')h+=`<span class="badge" style="color:#E85555;border-color:rgba(232,85,85,0.4);background:rgba(232,85,85,0.06)">○ SIGNAL THIN</span>`
+  if(data.flags?.flag_b)h+=`<span class="badge badge-flag">PRELIMINARY</span>`
+  if(data.flags?.flag_a)h+=`<span class="badge badge-flag">NOM.CONST</span>`
+  if(data.flags?.flag_c)h+=`<span class="badge badge-flag">STRATUM≠</span>`
+  return h
+}
+
+function buildSCBar(data){
+  const sc=data.signalchain||{},bp=sc.break_point||'none'
+  return SC_NODES.map((node,i)=>{
+    const val=sc[node]||'unclear',isBreak=bp===node.toUpperCase()
+    const cls=isBreak?'break':val
+    const arrow=i<SC_NODES.length-1?`<span class="sc-arrow">›</span>`:''
+    return`<span class="sc-node ${cls}">${node.toUpperCase()}${isBreak?' ✕':''}</span>${arrow}`
+  }).join('')
+}
+
+function buildVerdictHTML(data){
+  const v=data.verdict||{},sc=data.seed_crystal||{}
+  let h=''
+  if(v.diagnosis)h+=`<div><div class="v-label">Diagnosis</div><div class="v-value diagnosis">${esc(v.diagnosis)}</div></div>`
+  if(v.treatment||sc.description)h+=`<div><div class="v-label">Treatment — Seed Crystal</div><div class="v-value treatment">${esc(v.treatment||sc.description)}</div></div>`
+  if(sc.placement){
+    const hasSpecific=sc.pillar&&sc.pillar!=='unknown'
+    const placementLabel=hasSpecific
+      ?`${esc(sc.placement)} / ${esc(sc.pillar)}`
+      :sc.pillar==='unknown'?`${esc(sc.placement)} <span style="color:var(--muted);font-size:9px">(pillar: unknown)</span>`:esc(sc.placement)
+    h+=`<div><div class="v-label">Placed at</div><div class="v-value">${placementLabel}</div></div>`
+  }
+  if(v.call_to_action)h+=`<div><div class="v-label">Call to Action</div><div class="v-value action">${esc(v.call_to_action)}</div></div>`
+  return h||'<div style="color:var(--muted);font-size:10px">No verdict fields filled.</div>'
+}
+
+// MAP READING — generated from dot data, branches on signal density, detects named patterns
+function buildMapReading(data){
+  const strata=data.strata||{}
+  const counts={A:0,I:0,D:0,U:0}
+  const strataCounts={}
+  STRATA.forEach(s=>{
+    strataCounts[s.name]={A:0,I:0,D:0,U:0}
+    s.pillars.forEach(p=>{
+      const v=strata[s.name]?.[p]||'U'
+      counts[v]++
+      strataCounts[s.name][v]++
+    })
+  })
+
+  const total=20 // 5 strata × 4 pillars
+  const unknownRatio=counts.U/total
+
+  const invertedStrata=STRATA.filter(s=>strataCounts[s.name].I>=2).map(s=>s.name)
+  const heavilyInvertedStrata=STRATA.filter(s=>strataCounts[s.name].I>=3).map(s=>s.name)
+  const alignedStrata=STRATA.filter(s=>strataCounts[s.name].A>=2).map(s=>s.name)
+  const driftingStrata=STRATA.filter(s=>strataCounts[s.name].D>=2).map(s=>s.name)
+
+  const bp=data.signalchain?.break_point||'none'
+  const seed=data.seed_crystal?.placement||''
+  const seedPillar=data.seed_crystal?.pillar||''
+
+  const imm=data.immunity||{}
+  const freeImm=IMMUNITY_KEYS.filter(k=>imm[k]==='free')
+  const capImm=IMMUNITY_KEYS.filter(k=>imm[k]==='capturable')
+
+  // ── DETECT NAMED PATTERNS ──
+  let pattern=null
+  // Total capture: 12+ I dots across 3+ strata
+  if(counts.I>=12&&invertedStrata.length>=3){
+    pattern={name:'Total capture',color:'#E85555',desc:'Inversions spread across most of the map. The structure is fully enclosed — the call to action is the single lever with the most leverage, not the most fixes.'}
+  }
+  // Institutional capture: Institution 4 I, others mostly A or D
+  else if(strataCounts.INSTITUTION?.I===4&&heavilyInvertedStrata.length<=2){
+    pattern={name:'Institutional capture',color:'#E85555',desc:'Institution is fully inverted while other strata hold or drift. Classic incumbent control pattern — the blockage is concentrated at a single layer.'}
+  }
+  // Aware but trapped: Individual has 2+ A, Institution has 3+ I
+  else if(strataCounts.INDIVIDUAL?.A>=2&&strataCounts.INSTITUTION?.I>=3){
+    pattern={name:'Aware but trapped',color:'#D4B580',desc:'You know the problem but the institutions around you don\'t respond. Awareness is strong, the system is deaf. The leverage is in finding or building an alternative channel.'}
+  }
+  // Seed ready: break point stratum hints align with seed crystal placement
+  else if(bp!=='none'&&seed&&counts.I>=4){
+    pattern={name:'Seed ready',color:'#70D090',desc:'The break point is identified and the seed crystal is placed at the correct stratum. All that remains is placing the seed — the map shows the shape, the action is specific.'}
+  }
+  // Drift pattern: 8+ D dots, few I, few A
+  else if(counts.D>=8&&counts.I<=3&&counts.A<=3){
+    pattern={name:'Drift pattern',color:'#888866',desc:'Most of the map is drifting — no stable references in either direction. Before an intervention can work, a genuine fixed point needs to be named. Start by finding what should be constant.'}
+  }
+  // Approaching immune: all free
+  else if(freeImm.length===4&&counts.I===0){
+    pattern={name:'Approaching capture immune',color:'#70D090',desc:'All four immunity conditions are free and no inversions remain. This is the terminal healthy state — the structure cannot be easily captured.'}
+  }
+  // Mostly sound: lots of A, few I
+  else if(counts.A>=10&&counts.I<=2){
+    pattern={name:'Mostly sound',color:'#70D090',desc:'Most of the structure is aligned. A few inversions exist but they are isolated. This map probably doesn\'t need a major intervention — small adjustments at the inverted spots.'}
+  }
+
+  // ── BUILD READING ──
+  let parts=[]
+
+  // LOW-SIGNAL CASE: mostly unknown
+  if(unknownRatio>0.6){
+    parts.push(`<strong style="color:var(--amber)">This map is mostly unknown.</strong> ${counts.U} of ${total} dots have no signal yet. The pattern is not readable at this density.`)
+    parts.push(`<strong>Next step:</strong> fill in the stratum you know best first. You don't need perfect knowledge everywhere — you need enough signal to locate the break and the seed. Start where your direct experience is strongest.`)
+    return parts.map(p=>`<p>${p}</p>`).join('')
+  }
+
+  // PATTERN HEADER — only when something meaningful is detected
+  if(pattern){
+    parts.push(`<div style="padding:6px 10px;margin-bottom:4px;background:${pattern.color}15;border-left:2px solid ${pattern.color};border-radius:2px">
+      <div style="font-size:9px;letter-spacing:1.5px;color:${pattern.color};margin-bottom:4px">🎯 NAMED PATTERN</div>
+      <div style="font-size:12px;color:${pattern.color};font-weight:500;margin-bottom:4px">${pattern.name}</div>
+      <div style="font-size:10px;line-height:1.7;color:var(--text)">${pattern.desc}</div>
+    </div>`)
+  }
+
+  // DAMAGE DESCRIPTION — scaled to actual signal
+  if(invertedStrata.length>=2){
+    parts.push(`The damage concentrates at <strong style="color:#E85555">${invertedStrata.join(' and ')}</strong> — that is where the cost lands and where the blockage is held.`)
+  } else if(invertedStrata.length===1){
+    parts.push(`The damage concentrates at <strong style="color:#E85555">${invertedStrata[0]}</strong>. Other strata have scattered signal but no clear secondary pattern.`)
+  } else if(counts.I===0&&unknownRatio<0.3){
+    parts.push(`No inversions are confirmed. The structure is either sound, or the capture pattern hasn't crystallised at 2+ pillars on any single stratum yet.`)
+  } else if(counts.I>0&&counts.I<=3){
+    parts.push(`<strong style="color:var(--amber)">Sparse inversions.</strong> Only ${counts.I} of ${total} dots are inverted, none concentrated in one stratum. Pressure may be diffuse, or the signal may be incomplete. Proceed with care — the pattern isn't crystallised enough for a confident diagnosis.`)
+  } else if(counts.I>3){
+    parts.push(`Inversions are scattered across the map rather than concentrated — no single stratum carries the full weight. This suggests either multiple blockages or diffuse capture.`)
+  }
+
+  // ALIGNED SIGNAL
+  if(alignedStrata.length>0){
+    parts.push(`<strong style="color:#70D090">${alignedStrata.join(' and ')}</strong> ${alignedStrata.length===1?'is':'are'} holding. That is where genuine signal still exists and where any intervention has the most traction.`)
+  }
+
+  // DRIFTING
+  if(driftingStrata.length>0){
+    parts.push(`<strong style="color:#888866">${driftingStrata.join(' and ')}</strong> ${driftingStrata.length===1?'is':'are'} drifting — no stable reference in either direction. Not captured but not free. These won't anchor anything until a genuine fixed point is named.`)
+  }
+
+  // BREAK POINT
+  if(bp&&bp!=='none'){
+    const bpExplain={
+      SIGNAL:'Honest information is not reaching the people who need it — the problem starts at the source.',
+      MEDIUM:'The transmission channel is captured. Information exists but cannot travel freely.',
+      POTENTIAL:'The reference is only nominally constant — lying about it is cheap or invisible.',
+      PHASE:'The signal is local only. It hasn\'t distributed far enough to matter at scale.'
+    }
+    parts.push(`The break at <strong style="color:#E85555">${bp}</strong> explains why the inversions persist — ${bpExplain[bp]||''}`)
+  }
+
+  // SEED CRYSTAL
+  if(seed){
+    const hasSpecificPillar=seedPillar&&seedPillar!=='unknown'
+    const seedTarget=hasSpecificPillar
+      ?`<strong style="color:#D4B580">${seed} / ${seedPillar}</strong>`
+      :`<strong style="color:#D4B580">${seed}</strong>`
+    const pillarNote=seedPillar==='unknown'
+      ?` <span style="color:var(--muted);font-size:10px">(specific pillar not yet located — stratum-level placement)</span>`
+      :''
+    parts.push(`The seed crystal goes to ${seedTarget}${pillarNote} — that is where the blockage is held, not just where it shows up. Fix it there and the layers above it start to reorganise on their own.`)
+  }
+
+  // IMMUNITY
+  if(freeImm.length>0&&capImm.length>0){
+    parts.push(`Immunity: <strong style="color:#70D090">${freeImm.join(', ')}</strong> ${freeImm.length===1?'is':'are'} free. <strong style="color:#E85555">${capImm.join(', ')}</strong> ${capImm.length===1?'remains':'remain'} capturable. The closest condition to free is the lever.`)
+  } else if(freeImm.length===4){
+    parts.push(`All four immunity conditions are free — this structure is approaching capture immune.`)
+  } else if(capImm.length===4){
+    parts.push(`All four immunity conditions are capturable — the structure is fully enclosed. The path to immunity starts with whichever condition requires the least energy to flip.`)
+  }
+
+  // PRELIMINARY FLAG — if signal is thin but not empty
+  if(unknownRatio>=0.3&&unknownRatio<=0.6){
+    parts.push(`<div style="font-size:9px;color:var(--amber-dim);font-style:italic;margin-top:4px">⚠ ${counts.U} of ${total} dots remain unknown. The reading above is a working hypothesis — fill in more signal to sharpen it.</div>`)
+  }
+
+  return parts.map(p=>p.startsWith('<div')?p:`<p>${p}</p>`).join('')
+}
+
+window.toggleVerdict=function(id){document.getElementById(id).classList.toggle('open')}
+
+window.toggleHowToRead=function(id){
+  const body=document.getElementById(id+'-body')
+  const arrow=document.getElementById(id+'-arrow')
+  const open=body.classList.toggle('open')
+  if(arrow)arrow.textContent=open?'▴':'▾'
+}
+
+// COPY MAP READING
+window.copyMapReading=function(prefix){
+  const el=document.getElementById(prefix+'-reading-text')
+  if(!el)return
+  const text=el.innerText||el.textContent
+  navigator.clipboard.writeText(text).then(()=>showToast('Reading copied ✓')).catch(()=>showToast('Copy failed'))
+}
+
+// DOWNLOAD MAP AS PNG (map + reading baked in)
+window.downloadMapImage=function(prefix){
+  const svgWrap=document.getElementById(prefix+'-svg-wrap')
+  const svgEl=svgWrap?.querySelector('svg')
+  const readingEl=document.getElementById(prefix+'-reading-text')
+  if(!svgEl){showToast('No map to download');return}
+
+  const size=parseInt(svgEl.getAttribute('width'))||400
+  const readingText=readingEl?readingEl.innerText||readingEl.textContent:''
+
+  // Build combined canvas: map on top, text below
+  const padding=20
+  const lineH=16
+  const textW=size
+  const words=readingText.split(' ')
+  const maxChars=Math.floor(textW/7)
+  const lines=[]
+  let cur=''
+  words.forEach(w=>{
+    if((cur+' '+w).trim().length>maxChars){lines.push(cur.trim());cur=w}
+    else cur=(cur+' '+w).trim()
+  })
+  if(cur)lines.push(cur)
+  const textH=lines.length*lineH+padding*3
+
+  const canvas=document.createElement('canvas')
+  canvas.width=size
+  canvas.height=size+textH
+  const ctx=canvas.getContext('2d')
+
+  // Background
+  ctx.fillStyle='#0A0907'
+  ctx.fillRect(0,0,canvas.width,canvas.height)
+
+  // Draw SVG
+  const svgData=new XMLSerializer().serializeToString(svgEl)
+  const img=new Image()
+  const blob=new Blob([svgData],{type:'image/svg+xml'})
+  const url=URL.createObjectURL(blob)
+  img.onload=()=>{
+    ctx.drawImage(img,0,0,size,size)
+    URL.revokeObjectURL(url)
+
+    // Divider
+    ctx.strokeStyle='#1E1A12'
+    ctx.lineWidth=1
+    ctx.beginPath()
+    ctx.moveTo(padding,size+padding)
+    ctx.lineTo(size-padding,size+padding)
+    ctx.stroke()
+
+    // Reading text
+    ctx.fillStyle='#C8C0B0'
+    ctx.font=`11px "IBM Plex Mono", monospace`
+    lines.forEach((line,i)=>{
+      ctx.fillText(line,padding,size+padding*2+i*lineH)
+    })
+
+    // Download
+    const a=document.createElement('a')
+    const suffix=flipState[prefix]?'-soul-inward':'-individual-inward'
+    a.download=`openring-map${suffix}.png`
+    a.href=canvas.toDataURL('image/png')
+    a.click()
+    showToast('Map downloaded ✓')
+  }
+  img.onerror=()=>showToast('Download failed')
+  img.src=url
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast')
+  t.textContent=msg
+  t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2200)
+}
+
+// PARSE
+function parseMapBlock(text){
+  text=text.replace(/```[^\n]*\n?/g,'').replace(/```/g,'')
+  const data=defaultData()
+  const lines=text.split('\n')
+  lines.forEach(line=>{
+    const m=line.match(/^\s*([a-zA-Z_0-9]+)\s*:\s*(.+)$/)
+    if(!m)return
+    const k=m[1].trim().toLowerCase(),v=m[2].trim()
+    if(k==='position')data.observer.position=v.toUpperCase()
+    if(k==='relationship')data.observer.relationship=v.toUpperCase()
+    if(k==='signal_weight')data.observer.signal_weight=v.toUpperCase()
+    if(k==='name')data.structure=v
+    if(k==='state')data.verdict.state=v.toUpperCase()
+    if(k==='diagnosis')data.verdict.diagnosis=v
+    if(k==='treatment')data.verdict.treatment=v
+    if(k==='call_to_action')data.verdict.call_to_action=v
+    if(k==='placement')data.seed_crystal.placement=v.toUpperCase()
+    if(k==='pillar')data.seed_crystal.pillar=v.toLowerCase()
+    if(k==='description')data.seed_crystal.description=v
+    if(k==='signal')data.signalchain.signal=v.toLowerCase()
+    if(k==='medium')data.signalchain.medium=v.toLowerCase()
+    if(k==='potential')data.signalchain.potential=v.toLowerCase()
+    if(k==='phase')data.signalchain.phase=v.toLowerCase()
+    if(k==='break_point')data.signalchain.break_point=v.toUpperCase()==='NONE'?'none':v.toUpperCase()
+    if(k==='flag_a')data.flags.flag_a=v==='true'
+    if(k==='flag_b')data.flags.flag_b=v==='true'
+    if(k==='flag_c')data.flags.flag_c=v==='true'
+    if(IMMUNITY_KEYS.includes(k))data.immunity[k]=v.toLowerCase()
+  })
+  STRATA.forEach(s=>{
+    s.pillars.forEach(p=>{
+      const line=lines.find(l=>{const m2=l.match(/^\s+([a-z_]+)\s*:\s*([AIDU])\s*$/);return m2&&m2[1]===p})
+      if(line){const val=line.match(/:\s*([AIDU])/)?.[1];if(val)data.strata[s.name][p]=val}
+    })
+  })
+  return data
+}
+
+// PASTE MODE
+window.drawFromPaste=function(){
+  const text=document.getElementById('paste-input').value
+  const msg=document.getElementById('paste-msg')
+  if(!text.trim()){msg.className='paste-msg error';msg.textContent='Paste a map block first.';return}
+  try{
+    const data=parseMapBlock(text)
+    currentData=data
+    document.getElementById('paste-entry').style.display='none'
+    const mv=document.getElementById('paste-map-view');mv.classList.remove('hidden')
+    document.getElementById('paste-map-structure').textContent=data.structure||'—'
+    document.getElementById('paste-map-badges').innerHTML=buildBadges(data)
+    renderMapTo('paste-svg-wrap',data,flipState.paste)
+    document.getElementById('paste-sc-bar').innerHTML=buildSCBar(data)
+    document.getElementById('paste-verdict-inner').innerHTML=buildVerdictHTML(data)
+    document.getElementById('paste-file-bar').style.display='flex'
+    document.getElementById('paste-reading-text').innerHTML=buildMapReading(data)
+    msg.className='';msg.style.display='none'
+  }catch(e){msg.className='paste-msg error';msg.textContent='Parse error: '+e.message}
+}
+
+window.backToPaste=function(){
+  document.getElementById('paste-entry').style.display='flex'
+  document.getElementById('paste-map-view').classList.add('hidden')
+}
+
+window.fileToLedger=function(){window.open('signal-ledger-nostr.html','_blank')}
+
+window.loadExample=function(){
+  document.getElementById('paste-input').value=`OBSERVER
+position:           INSIDE
+relationship:       PAYING
+signal_channel:     BODY
+signal_weight:      STRONG
+
+STRUCTURE
+name:               Daily alcohol habit
+
+STRATUM MAP
+
+1. INDIVIDUAL
+   awareness:        I
+   capacity:         I
+   energy:           I
+   identity:         D
+
+2. RELATIONSHIP
+   transparency:     I
+   trust:            D
+   reciprocity:      D
+   status:           U
+
+3. INSTITUTION
+   education:        I
+   distribution:     I
+   finance:          I
+   authority:        I
+
+4. ENVIRONMENT
+   visibility:       I
+   infrastructure:   I
+   commons:          D
+   regulation:       D
+
+5. SOUL
+   story:            I
+   language:         I
+   value:            D
+   meaning:          D
+
+IMMUNITY
+   education:        capturable
+   distribution:     capturable
+   finance:          capturable
+   legitimacy:       capturable
+
+SIGNAL CHAIN
+   signal:           no
+   medium:           partial
+   potential:        no
+   phase:            global
+   break_point:      SIGNAL
+
+SEED CRYSTAL
+   placement:        INDIVIDUAL
+   pillar:           awareness
+   description:      A documented honest account of what daily drinking actually costs — written by someone who stopped.
+
+GRADIENT
+   direction:        Toward honest self-assessment and then free choice.
+
+VERDICT
+   state:            INVERTED
+   diagnosis:        The habit is fixed as default; honest information about its cost is suppressed by the culture that profits from it.
+   treatment:        One honest first-person account placed where the person can find it without being judged.
+   call_to_action:   Write down what it costs you this week — time, money, energy, clarity — and read it back.
+
+FLAGS
+   flag_a:           false
+   flag_b:           false
+   flag_c:           false`
+  document.getElementById('paste-msg').style.display='none'
+}
+
+// MANUAL MODE
+function buildManualUI(){
+  const grid=document.getElementById('manual-dot-grid')
+  STRATA.forEach(s=>{
+    const row=document.createElement('div');row.className='dot-stratum'
+    row.innerHTML=`<div class="dot-stratum-name" style="color:${s.color}88">${s.name}</div><div class="dot-pillars" id="mdots-${s.name}"></div>`
+    grid.appendChild(row)
+    const pd=row.querySelector('.dot-pillars')
+    s.pillars.forEach(p=>{
+      const g=document.createElement('div');g.className='dot-btn-group'
+      const btn=document.createElement('button');btn.className='dot-btn U';btn.textContent='U'
+      btn.onclick=()=>{const cur=currentData.strata[s.name][p],next=STATE_CYCLE[cur];currentData.strata[s.name][p]=next;btn.textContent=next;btn.className=`dot-btn ${next}`;renderManualMap()}
+      const lbl=document.createElement('div');lbl.className='dot-pillar-name';lbl.textContent=p.slice(0,4).toUpperCase()
+      g.appendChild(btn);g.appendChild(lbl);pd.appendChild(g)
+    })
+  })
+  const ir=document.getElementById('manual-imm-row')
+  IMMUNITY_KEYS.forEach(k=>{
+    const g=document.createElement('div');g.className='imm-group'
+    const btn=document.createElement('button');btn.className='imm-btn capturable';btn.textContent='CAP';btn.id=`mimm-${k}`
+    btn.onclick=()=>{const next=currentData.immunity[k]==='capturable'?'free':'capturable';currentData.immunity[k]=next;btn.textContent=next==='free'?'FREE':'CAP';btn.className=`imm-btn ${next}`;renderManualMap()}
+    const lbl=document.createElement('div');lbl.className='imm-name';lbl.textContent=k.slice(0,4).toUpperCase()
+    g.appendChild(btn);g.appendChild(lbl);ir.appendChild(g)
+  })
+  const scDiv=document.getElementById('manual-sc-inputs')
+  SC_NODES.forEach(node=>{
+    const row=document.createElement('div');row.style.cssText='display:flex;gap:6px;align-items:center'
+    const lbl=document.createElement('span');lbl.style.cssText='font-size:9px;color:var(--muted);min-width:64px;letter-spacing:1px;text-transform:uppercase';lbl.textContent=node
+    const sel=document.createElement('select');sel.className='m-select';sel.id=`msc-${node}`;sel.style.flex='1'
+    const opts=node==='phase'?['local','regional','global']:['yes','partial','no','unclear']
+    opts.forEach(o=>{const op=document.createElement('option');op.value=op.textContent=o;sel.appendChild(op)})
+    sel.onchange=()=>{currentData.signalchain[node]=sel.value;renderManualMap()}
+    row.appendChild(lbl);row.appendChild(sel);scDiv.appendChild(row)
+  })
+}
+
+function renderManualMap(){
+  currentData.structure=document.getElementById('m-structure')?.value||''
+  currentData.verdict.state=document.getElementById('m-state')?.value||'INVERTED'
+  currentData.observer.position=document.getElementById('m-obs-pos')?.value||'INSIDE'
+  currentData.observer.relationship=document.getElementById('m-obs-rel')?.value||'PAYING'
+  currentData.signalchain.break_point=document.getElementById('m-break')?.value||'none'
+  currentData.seed_crystal.placement=document.getElementById('m-seed-stratum')?.value||''
+  currentData.seed_crystal.pillar=document.getElementById('m-seed-pillar')?.value||''
+  currentData.seed_crystal.description=document.getElementById('m-seed-desc')?.value||''
+  currentData.verdict.diagnosis=document.getElementById('m-diagnosis')?.value||''
+  currentData.verdict.treatment=document.getElementById('m-treatment')?.value||''
+  currentData.verdict.call_to_action=document.getElementById('m-action')?.value||''
+  SC_NODES.forEach(n=>{const e=document.getElementById(`msc-${n}`);if(e)currentData.signalchain[n]=e.value})
+  renderMapTo('manual-svg-wrap',currentData,flipState.manual)
+  document.getElementById('manual-sc-bar').innerHTML=buildSCBar(currentData)
+}
+window.manualUpdate=renderManualMap
+
+// When seed stratum changes, repopulate the pillar dropdown with that stratum's pillars
+window.onSeedStratumChange=function(){
+  const stratumName=document.getElementById('m-seed-stratum')?.value||''
+  const pillarSel=document.getElementById('m-seed-pillar')
+  if(!pillarSel)return
+  pillarSel.innerHTML=''
+  if(stratumName){
+    // Always include "unknown" as honest choice when pillar can't be located
+    const unk=document.createElement('option')
+    unk.value='unknown';unk.textContent='unknown (honest: pillar not yet located)'
+    pillarSel.appendChild(unk)
+    const s=STRATA.find(s=>s.name===stratumName)
+    if(s){
+      s.pillars.forEach(p=>{
+        const op=document.createElement('option')
+        op.value=p;op.textContent=p
+        pillarSel.appendChild(op)
+      })
+    }
+  } else {
+    // No stratum selected — only blank option
+    const none=document.createElement('option')
+    none.value='';none.textContent='— select stratum first —'
+    pillarSel.appendChild(none)
+  }
+  // Default to unknown when stratum is set (honest default)
+  currentData.seed_crystal.pillar=stratumName?'unknown':''
+  pillarSel.value=currentData.seed_crystal.pillar
+  renderManualMap()
+}
+
+// LEDGER MODE
+window.loadLedger=async function(){
+  const container=document.getElementById('ledger-records')
+  const dot=document.getElementById('ledger-dot'),label=document.getElementById('ledger-conn-label')
+  container.innerHTML='<div class="ledger-loading">Connecting to relays...</div>'
+  dot.className='conn-dot'
+  try{
+    const{SimplePool}=await import('https://esm.sh/nostr-tools@2.3.1')
+    if(!pool)pool=new SimplePool()
+    dot.className='conn-dot on';label.textContent='Connected — loading...'
+    const events=await new Promise(resolve=>{
+      const collected=[],timeout=setTimeout(()=>resolve(collected),6000)
+      pool.subscribeMany(RELAYS,[{kinds:[1337],'#t':['signal-ledger'],limit:30}],{
+        onevent(ev){collected.push(ev)},
+        oneose(){clearTimeout(timeout);resolve(collected)}
+      })
+    })
+    const records=events.sort((a,b)=>b.created_at-a.created_at)
+    label.textContent=`Connected — ${records.length} record${records.length!==1?'s':''}`
+    window._ledgerRecords=records
+    if(!records.length){container.innerHTML='<div class="ledger-empty">No records yet.<br>Run a diagnostic and file the first signal.</div>';return}
+    container.innerHTML=records.map((e,i)=>{
+      let c={};try{c=JSON.parse(e.content)}catch(_){}
+      const v=c.verdict||{},sm=c.stratum_map||{}
+      const structure=v.structure||c.identification?.structure||''
+      const state=v.state||''
+      const date=new Date(e.created_at*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+      let dots=''
+      if(Object.keys(sm).length>0)STRATA.forEach(s=>s.pillars.forEach(p=>{const val=sm[s.name]?.[p]||'U';dots+=`<div class="mini-dot mini-${val}" title="${s.name}·${p}·${val}"></div>`}))
+      return`<div class="ledger-record" onclick="openLedgerRecord(${i})">
+        <div class="ledger-record-top"><div class="ledger-record-name">${esc(structure||'Untitled')}</div><div class="ledger-record-meta">${date}</div></div>
+        <div class="ledger-record-badges">${state?`<span class="badge badge-${state}" style="font-size:8px">${state}</span>`:''}</div>
+        ${dots?`<div class="ledger-record-dots">${dots}</div>`:''}
+      </div>`
+    }).join('')
+  }catch(e){
+    dot.className='conn-dot err';label.textContent='Connection failed'
+    container.innerHTML=`<div class="ledger-empty">Could not reach relays.<br>${e.message||''}</div>`
+  }
+}
+
+window.openLedgerRecord=function(i){
+  const e=window._ledgerRecords?.[i];if(!e)return
+  let c={};try{c=JSON.parse(e.content)}catch(_){}
+  const data=defaultData()
+  const v=c.verdict||{},sm=c.stratum_map||{},obs=c.observer||{},sc=c.signalchain||{},imm=c.immunity||{},seed=c.gradient||{},flags=c.flags||{}
+  data.structure=v.structure||c.identification?.structure||''
+  data.verdict.state=v.state||'INVERTED'
+  data.verdict.diagnosis=v.diagnosis||''
+  data.verdict.treatment=v.treatment||seed.seed_crystal||''
+  data.verdict.call_to_action=v.call_to_action||''
+  data.observer.position=obs.position||'OUTSIDE'
+  data.observer.relationship=obs.relationship||'WITNESSING'
+  data.signalchain.break_point=v.break_point||sc.break_point||'none'
+  data.signalchain.signal=sc.signal_node||'unclear'
+  data.signalchain.medium=sc.medium_node||'unclear'
+  data.signalchain.potential=sc.potential_node||'unclear'
+  data.signalchain.phase=sc.phase_node||'unclear'
+  data.seed_crystal.placement=seed.seed_crystal_stratum||''
+  data.seed_crystal.pillar=seed.seed_crystal_pillar||''
+  data.seed_crystal.description=seed.seed_crystal||''
+  data.flags.flag_a=flags.nominally_constant||false
+  data.flags.flag_b=flags.preliminary||false
+  data.flags.flag_c=flags.stratum_mismatch||false
+  STRATA.forEach(s=>s.pillars.forEach(p=>{const val=sm[s.name]?.[p];if(val&&'AIDU'.includes(val))data.strata[s.name][p]=val}))
+  IMMUNITY_KEYS.forEach(k=>{if(imm[k])data.immunity[k]=imm[k]})
+  document.getElementById('ledger-list').style.display='none'
+  const mv=document.getElementById('ledger-map-view');mv.classList.remove('hidden')
+  document.getElementById('ledger-map-structure').textContent=data.structure||'—'
+  document.getElementById('ledger-map-badges').innerHTML=buildBadges(data)
+  window._currentLedgerData=data
+  renderMapTo('ledger-svg-wrap',data,flipState.ledger)
+  document.getElementById('ledger-sc-bar').innerHTML=buildSCBar(data)
+  document.getElementById('ledger-verdict-inner').innerHTML=buildVerdictHTML(data)
+  document.getElementById('ledger-reading-text').innerHTML=buildMapReading(data)
+}
+
+window.backToLedger=function(){
+  document.getElementById('ledger-list').style.display='flex'
+  document.getElementById('ledger-map-view').classList.add('hidden')
+}
+
+function esc(str){return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+buildManualUI()
+renderManualMap()
+</script>
+</body>
+</html>
