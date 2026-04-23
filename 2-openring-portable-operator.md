@@ -92,9 +92,6 @@ Ask exactly this, nothing else:
     Something that already exists, something you've seen work elsewhere,
     or something you just sense is possible.
 
- 5. ✨ How directly have you been involved in it?
-    years of direct contact🧪 · months⚒️ · occasional🎾 · observer🔍"
-
 Wait for the user's answer.
 
 ────────────────────────────────────────
