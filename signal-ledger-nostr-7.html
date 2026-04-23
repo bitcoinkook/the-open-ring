@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Ledger — Open Ring</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+    :root {
+      --bg:         #0A0907;
+      --bg2:        #111009;
+      --amber:      #D4B580;
+      --amber-dim:  #7a6a48;
+      --amber-bg:   rgba(212,181,128,0.05);
+      --blue:       #60B5E5;
+      --blue-bg:    rgba(96,181,229,0.06);
+      --green:      #70D090;
+      --green-bg:   rgba(112,208,144,0.06);
+      --red:        #E57070;
+      --red-bg:     rgba(229,112,112,0.06);
+      --text:       #c8bfaa;
+      --dim:        #2e2a22;
+      --dim2:       #1e1c16;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    .app { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── HEADER ── */
+    .header { margin-bottom: 2.5rem; }
+    .header-top {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 1rem;
+      margin-bottom: 0.75rem; flex-wrap: wrap;
+    }
+    .header-label { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--amber-dim); }
+    .header-actions { display: flex; gap: 0.4rem; }
+    .back-home {
+      font-size: 0.58rem; letter-spacing: 0.12em; color: var(--amber);
+      border: 1px solid var(--amber-dim); padding: 0.3rem 0.6rem;
+      text-decoration: none; transition: all 0.15s; white-space: nowrap;
+    }
+    .back-home:hover { background: var(--amber-bg); border-color: var(--amber); }
+    .github-link { color: var(--blue); border-color: rgba(96,181,229,0.35); }
+    .github-link:hover { background: var(--blue-bg); border-color: var(--blue); }
+    .header-title { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 500; color: var(--amber); line-height: 1.2; margin-bottom: 1rem; }
+    .header-sub { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 300; color: var(--amber-dim); line-height: 1.7; }
+    .protocol-badge { display: inline-flex; gap: 0.4rem; margin-top: 0.8rem; flex-wrap: wrap; }
+    .protocol-badge span { font-size: 0.6rem; letter-spacing: 0.1em; padding: 0.2rem 0.5rem; border: 1px solid var(--dim); color: var(--amber-dim); }
+
+    /* ── TABS ── */
+    .tabs { display: flex; border-bottom: 1px solid var(--dim); margin-bottom: 2rem; }
+    .tab {
+      padding: 0.6rem 1.2rem; font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: none; border: none; color: var(--amber-dim); cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s;
+    }
+    .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+    .tab:hover:not(.active) { color: var(--text); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CONNECTION BAR ── */
+    .connect-bar {
+      background: var(--dim2); border: 1px solid var(--dim);
+      padding: 1rem 1.2rem; margin-bottom: 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .connect-status { display: flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber-dim); flex-shrink: 0; }
+    .dot.connected { background: var(--green); animation: pulse 2s infinite; }
+    .dot.error { background: var(--red); }
+    .connect-btn {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase; background: none; border: 1px solid var(--amber-dim);
+      color: var(--amber); padding: 0.4rem 0.9rem; cursor: pointer; transition: all 0.2s;
+    }
+    .connect-btn:hover { background: var(--amber-bg); border-color: var(--amber); }
+    .pubkey-display { font-size: 0.62rem; color: var(--amber-dim); word-break: break-all; margin-bottom: 1.5rem; }
+
+    /* ── IMPORT BAR ── */
+    .import-bar {
+      background: var(--blue-bg); border: 1px solid rgba(96,181,229,0.25);
+      border-left: 2px solid var(--blue); padding: 0.9rem 1.1rem; margin-bottom: 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .import-info { flex: 1; min-width: 0; }
+    .import-label { font-size: 0.72rem; color: var(--blue); margin-bottom: 0.15rem; font-weight: 500; }
+    .import-sub { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.68rem; color: var(--amber-dim); font-weight: 300; }
+    .import-btn {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em;
+      text-transform: uppercase; background: none; border: 1px solid var(--blue);
+      color: var(--blue); padding: 0.45rem 0.95rem; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .import-btn:hover { background: rgba(96,181,229,0.12); }
+
+    /* ── IMPORT MODAL ── */
+    .import-modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75); z-index: 1000;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .import-modal-inner {
+      background: #14120C; border: 1px solid var(--dim);
+      max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem;
+    }
+    .import-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+    .import-modal-title { font-size: 0.95rem; font-weight: 500; color: var(--amber); }
+    .import-close { background: none; border: none; color: var(--amber-dim); font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; }
+    .import-close:hover { color: var(--amber); }
+    .import-modal-desc { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; color: var(--text); font-weight: 300; line-height: 1.7; margin-bottom: 1rem; }
+    .import-modal-desc code { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; background: var(--dim2); padding: 0.05rem 0.3rem; color: var(--blue); }
+    .import-modal-desc strong { color: var(--amber); font-weight: 500; }
+    #import-text {
+      width: 100%; background: var(--bg); border: 1px solid var(--dim); color: var(--text);
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; line-height: 1.6;
+      padding: 0.7rem 0.9rem; outline: none; resize: vertical; min-height: 160px;
+    }
+    #import-text:focus { border-color: var(--amber-dim); }
+    .import-actions { display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end; }
+    .import-cancel, .import-apply {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.5rem 1rem; cursor: pointer; transition: all 0.2s; border: 1px solid;
+    }
+    .import-cancel { background: none; border-color: var(--dim); color: var(--amber-dim); }
+    .import-cancel:hover { border-color: var(--amber-dim); color: var(--amber); }
+    .import-apply { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+    .import-apply:hover { background: rgba(212,181,128,0.15); }
+    .import-msg { margin-top: 0.8rem; font-size: 0.68rem; line-height: 1.6; font-family: 'IBM Plex Mono', monospace; display: none; }
+    .import-msg.success { background: var(--green-bg); border-left: 2px solid var(--green); color: var(--green); padding: 0.7rem 0.9rem; display: block; }
+    .import-msg.error { background: var(--red-bg); border-left: 2px solid var(--red); color: var(--red); padding: 0.7rem 0.9rem; display: block; }
+
+    /* ── FORM SECTION ── */
+    .form-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--dim); }
+    .form-section:last-of-type { border-bottom: none; }
+    .section-header { display: flex; align-items: baseline; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .section-num { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--amber-dim); }
+    .section-title { font-size: 0.85rem; font-weight: 500; color: var(--amber); letter-spacing: 0.05em; }
+    .section-subtitle { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.75rem; color: var(--amber-dim); margin-bottom: 1.2rem; font-weight: 300; }
+
+    /* ── FIELD ── */
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--amber-dim); margin-bottom: 0.4rem; font-family: 'IBM Plex Mono', monospace; }
+    .field label .q-id { color: var(--blue); margin-right: 0.4rem; }
+    .field label .req { color: var(--red); margin-left: 0.3rem; }
+    .field input, .field textarea, .field select {
+      width: 100%; background: var(--dim2); border: 1px solid var(--dim); color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 300;
+      padding: 0.65rem 0.9rem; transition: border-color 0.2s; outline: none; -webkit-appearance: none;
+    }
+    .field select { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; cursor: pointer; }
+    select option { background: #1a1810; }
+    .field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--amber-dim); }
+    .field-hint { font-size: 0.63rem; color: var(--amber-dim); margin-top: 0.3rem; line-height: 1.5; font-family: 'IBM Plex Sans', sans-serif; }
+
+    /* ── REVIEW MODE ── */
+    .review-banner {
+      background: var(--green-bg); border: 1px solid rgba(112,208,144,0.3);
+      border-left: 2px solid var(--green); padding: 0.8rem 1.1rem; margin-bottom: 1.5rem;
+      display: none; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap;
+    }
+    .review-banner.visible { display: flex; }
+    .review-banner-text { font-size: 0.72rem; color: var(--green); line-height: 1.6; }
+    .review-banner-text strong { font-weight: 500; }
+    .review-exit {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em;
+      background: none; border: 1px solid rgba(112,208,144,0.4); color: var(--green);
+      padding: 0.3rem 0.6rem; cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    }
+    .review-exit:hover { background: rgba(112,208,144,0.1); }
+
+    /* ── DUAL FIELD ── */
+    .dual-field { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+    /* ── STRATUM MAP GRID ── */
+    .stratum-map { display: flex; flex-direction: column; gap: 0.6rem; }
+    .stratum-row { background: var(--dim2); border: 1px solid var(--dim); padding: 0.7rem 0.9rem; }
+    .stratum-row-label { font-size: 0.6rem; letter-spacing: 0.12em; color: var(--amber-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
+    .stratum-pillars { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .pillar-btn-group { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .pillar-label { font-size: 0.55rem; color: var(--amber-dim); letter-spacing: 0.06em; text-transform: uppercase; }
+    .pillar-btn {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; font-weight: 500;
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--dim); background: none; color: var(--amber-dim);
+      cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    }
+    .pillar-btn:hover { border-color: var(--amber-dim); color: var(--text); }
+    .pillar-btn.state-A { border-color: #70D090; color: #70D090; background: rgba(112,208,144,0.1); }
+    .pillar-btn.state-I { border-color: #E57070; color: #E57070; background: rgba(229,112,112,0.1); }
+    .pillar-btn.state-D { border-color: #888866; color: #888866; background: rgba(136,136,102,0.1); }
+    .pillar-btn.state-U { border-color: var(--dim); color: var(--amber-dim); background: none; }
+
+    /* ── IMMUNITY DOTS ── */
+    .immunity-dots { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .immunity-btn-group { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .immunity-label { font-size: 0.55rem; color: var(--amber-dim); letter-spacing: 0.06em; text-transform: uppercase; }
+    .immunity-btn {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+      width: 48px; height: 28px; border: 1px solid var(--dim);
+      background: none; color: var(--amber-dim); cursor: pointer; transition: all 0.15s;
+    }
+    .immunity-btn:hover { border-color: var(--amber-dim); color: var(--text); }
+    .immunity-btn.state-capturable { border-color: #E57070; color: #E57070; background: rgba(229,112,112,0.1); }
+    .immunity-btn.state-free { border-color: #70D090; color: #70D090; background: rgba(112,208,144,0.1); }
+
+    /* ── BINARY GROUP ── */
+    .binary-group { display: flex; flex-direction: column; gap: 0.8rem; }
+    .binary-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; padding: 0.5rem 0.9rem; background: var(--dim2); border: 1px solid var(--dim); }
+    .binary-q { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; font-weight: 300; color: var(--text); line-height: 1.5; }
+    .binary-options { display: flex; gap: 0.3rem; }
+    .binary-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; background: none; border: 1px solid var(--dim); color: var(--amber-dim); padding: 0.3rem 0.6rem; cursor: pointer; transition: all 0.15s; }
+    .binary-btn:hover { color: var(--text); }
+    .binary-btn.active-yes { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+    .binary-btn.active-no  { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .binary-btn.active-unclear { background: var(--amber-bg); border-color: var(--amber-dim); color: var(--amber); }
+
+    /* ── SUBMIT ── */
+    .submit-btn {
+      width: 100%; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.12em; text-transform: uppercase; background: var(--amber-bg);
+      border: 1px solid var(--amber-dim); color: var(--amber); padding: 0.95rem;
+      cursor: pointer; transition: all 0.2s; margin-top: 1rem;
+    }
+    .submit-btn:hover:not(:disabled) { background: rgba(212,181,128,0.12); border-color: var(--amber); }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── MSG ── */
+    .msg { margin-top: 1rem; padding: 0.8rem 1rem; font-size: 0.72rem; line-height: 1.6; display: none; font-family: 'IBM Plex Mono', monospace; }
+    .msg.success { background: var(--green-bg); border-left: 2px solid var(--green); color: var(--green); display: block; }
+    .msg.error   { background: var(--red-bg); border-left: 2px solid var(--red); color: var(--red); display: block; }
+    .msg.loading { background: var(--amber-bg); border-left: 2px solid var(--amber-dim); color: var(--amber-dim); display: block; }
+
+    /* ── FEED ── */
+    .feed-controls { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .feed-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; background: none; border: 1px solid var(--dim); color: var(--amber-dim); padding: 0.35rem 0.7rem; cursor: pointer; transition: all 0.2s; }
+    .feed-btn:hover, .feed-btn.active { border-color: var(--amber-dim); color: var(--amber); }
+    .record { background: var(--dim2); border: 1px solid var(--dim); padding: 1.2rem; margin-bottom: 1rem; transition: border-color 0.2s; }
+    .record:hover { border-color: var(--amber-dim); }
+    .record-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+    .record-structure { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; font-weight: 500; color: var(--amber); line-height: 1.4; }
+    .record-meta { font-size: 0.62rem; color: var(--amber-dim); text-align: right; line-height: 1.5; flex-shrink: 0; }
+    .record-flags { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+    .flag-badge { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem; border: 1px solid; }
+    .flag-state.INVERTED  { background: var(--red-bg);   color: var(--red);   border-color: rgba(229,112,112,0.3); }
+    .flag-state.SOUND     { background: var(--green-bg); color: var(--green); border-color: rgba(112,208,144,0.3); }
+    .flag-state.FROZEN    { background: var(--blue-bg);  color: var(--blue);  border-color: rgba(96,181,229,0.3); }
+    .flag-state.UNGROUNDED{ background: var(--amber-bg); color: var(--amber-dim); border-color: var(--dim); }
+    .flag-state.IMMUNE    { background: var(--green-bg); color: var(--green); border-color: rgba(112,208,144,0.5); }
+    .flag-warning { background: var(--red-bg); color: var(--red); border-color: rgba(229,112,112,0.3); }
+    .flag-info    { background: var(--amber-bg); color: var(--amber-dim); border-color: var(--dim); }
+    .record-field { margin-bottom: 0.7rem; }
+    .record-field-label { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-dim); margin-bottom: 0.2rem; }
+    .record-field-label .f-id { color: var(--blue); margin-right: 0.3rem; }
+    .record-field-value { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; font-weight: 300; color: var(--text); line-height: 1.6; }
+    .record-toggle { font-size: 0.62rem; color: var(--amber-dim); background: none; border: none; cursor: pointer; padding: 0; margin-top: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .record-toggle:hover { color: var(--amber); }
+    .record-full { margin-top: 0.8rem; display: none; }
+    .record-full.open { display: block; }
+    .record-pubkey { font-size: 0.56rem; color: var(--dim); margin-top: 0.8rem; word-break: break-all; }
+    .stratum-mini { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 0.4rem; }
+    .stratum-mini-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-A { background: #70D090; }
+    .dot-I { background: #E57070; }
+    .dot-D { background: #888866; }
+    .dot-U { background: var(--dim); }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--amber-dim); font-size: 0.78rem; line-height: 1.8; }
+    .loading-state { text-align: center; padding: 2rem; color: var(--amber-dim); font-size: 0.72rem; }
+
+    /* ── ABOUT ── */
+    .about-prose { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 300; line-height: 1.8; color: var(--text); margin-bottom: 1rem; }
+    .about-prose strong { color: var(--amber); font-weight: 400; }
+    .code-block { background: var(--blue-bg); border-left: 2px solid var(--blue); padding: 0.9rem 1.1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--blue); line-height: 1.8; white-space: pre; overflow-x: auto; margin: 1rem 0; }
+    .link-row { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.8rem; }
+    .link-row a { font-size: 0.72rem; color: var(--amber); text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    .link-row a:hover { color: var(--blue); }
+
+    /* ── FOOTER ── */
+    .footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--dim); font-size: 0.62rem; color: var(--amber-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .footer a { color: var(--amber-dim); text-decoration: none; }
+    .footer a:hover { color: var(--amber); }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    @media (max-width: 480px) {
+      .app { padding: 1.5rem 1rem 3rem; }
+      .connect-bar { flex-direction: column; align-items: flex-start; }
+      .dual-field { grid-template-columns: 1fr; }
+      .binary-row { grid-template-columns: 1fr; }
+      .binary-options { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-label">Open Ring · Signal Ledger</div>
+      <div class="header-actions">
+        <a href="/" class="back-home">← Home</a>
+        <a href="https://github.com/bitcoinkook/the-open-ring/blob/main/signal-ledger-nostr.html" target="_blank" class="back-home github-link">GitHub ↗</a>
+      </div>
+    </div>
+    <h1 class="header-title">The Field.<br>Signed. Owned by nobody.</h1>
+    <p class="header-sub">Reference implementation of the Open Ring Protocol stack. Records live on Nostr as kind 1337 events — verifiable by anyone, stored by no one.</p>
+    <div class="protocol-badge">
+      <span>ORP-01 v2</span><span>ORP-02</span><span>ORP-03</span><span>STACK v2</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('submit', this)">File a record</button>
+    <button class="tab" onclick="switchTab('ledger', this)">Read the ledger</button>
+    <button class="tab" onclick="switchTab('about', this)">About</button>
+  </div>
+
+  <!-- ══════ SUBMIT PANEL ══════ -->
+  <div id="panel-submit" class="panel active">
+
+    <div class="connect-bar">
+      <div class="connect-status">
+        <div class="dot" id="conn-dot"></div>
+        <span id="conn-label">Not connected — connect your Nostr key to sign records</span>
+      </div>
+      <button class="connect-btn" id="conn-btn" onclick="connectNostr()">Connect</button>
+    </div>
+    <div id="pubkey-display" class="pubkey-display" style="display:none;"></div>
+
+    <div class="review-banner" id="review-banner">
+      <div class="review-banner-text"><strong>Review mode.</strong> Form filled from diagnostic. Check each field, then sign below.</div>
+      <button class="review-exit" onclick="exitReviewMode()">Show full form</button>
+    </div>
+
+    <div class="import-bar">
+      <div class="import-info">
+        <div class="import-label">Have a map block from the diagnostic?</div>
+        <div class="import-sub">Paste the OPEN RING MAP BLOCK. Every field auto-fills.</div>
+      </div>
+      <button class="import-btn" onclick="openImportModal()">Import ↓</button>
+    </div>
+
+    <!-- IMPORT MODAL -->
+    <div class="import-modal" id="import-modal" style="display:none;">
+      <div class="import-modal-inner">
+        <div class="import-modal-header">
+          <div class="import-modal-title">Import map block</div>
+          <button class="import-close" onclick="closeImportModal()">×</button>
+        </div>
+        <p class="import-modal-desc">
+          Paste the <strong>OPEN RING MAP BLOCK</strong> from the operator — the code-fenced block starting with <code>OBSERVER</code>. Every matching field auto-fills. Review before signing.
+        </p>
+        <textarea id="import-text" placeholder="Paste the OPEN RING MAP BLOCK here..." rows="10"></textarea>
+        <div class="import-actions">
+          <button class="import-cancel" onclick="closeImportModal()">Cancel</button>
+          <button class="import-apply" onclick="applyImport()">Fill form</button>
+        </div>
+        <div class="import-msg" id="import-msg"></div>
+      </div>
+    </div>
+
+    <!-- ═══ §0 OBSERVER ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §0</span>
+        <span class="section-title">Observer</span>
+      </div>
+      <p class="section-subtitle">Where you stand relative to the structure. Calibrates signal weight.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q0.01</span>Position<span class="req">*</span></label>
+        <select id="q0_01">
+          <option value="">— select —</option>
+          <option value="INSIDE">INSIDE — directly affects your body, money, time, or health</option>
+          <option value="ADJACENT">ADJACENT — work near it, see it regularly</option>
+          <option value="OUTSIDE">OUTSIDE — know about it, haven't lived it</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q0.02</span>Relationship to cost<span class="req">*</span></label>
+        <select id="q0_02">
+          <option value="">— select —</option>
+          <option value="PAYING">PAYING — you bear the cost</option>
+          <option value="OPERATING">OPERATING — you work inside the structure</option>
+          <option value="WITNESSING">WITNESSING — you see the cost falling on others</option>
+          <option value="MIXED">MIXED — more than one</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q0.03</span>Signal channel<span class="req">*</span></label>
+        <select id="q0_03">
+          <option value="">— select —</option>
+          <option value="BODY">BODY — physical, direct, lived</option>
+          <option value="FINANCIAL">FINANCIAL — money, time, opportunity cost</option>
+          <option value="RELATIONAL">RELATIONAL — someone trusted lived it, you witnessed it</option>
+          <option value="RESEARCH">RESEARCH — secondhand, read or studied</option>
+          <option value="INTUITION">INTUITION — pattern recognition, not yet articulable</option>
+          <option value="MIXED">MIXED — several of the above</option>
+        </select>
+        <div class="field-hint">INSIDE + PAYING + BODY/FINANCIAL = strong signal. OUTSIDE + RESEARCH = thin → PRELIMINARY flag.</div>
+      </div>
+    </div>
+
+    <!-- ═══ §1 IDENTIFICATION ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §1</span>
+        <span class="section-title">Identification</span>
+      </div>
+      <p class="section-subtitle">What is being examined.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q1.01</span>Structure<span class="req">*</span></label>
+        <input type="text" id="q1_01" placeholder="One sentence · precise · name the specific thing">
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.02</span>Domain<span class="req">*</span></label>
+        <select id="q1_02">
+          <option value="">— select —</option>
+          <option value="market">market</option>
+          <option value="institution">institution</option>
+          <option value="relationship">relationship</option>
+          <option value="practice">practice</option>
+          <option value="product">product</option>
+          <option value="system">system</option>
+          <option value="culture">culture</option>
+          <option value="infrastructure">infrastructure</option>
+          <option value="technology">technology</option>
+          <option value="governance">governance</option>
+          <option value="other">other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.03</span>What feels wrong<span class="req">*</span></label>
+        <textarea id="q1_03" placeholder="Your own words. As much detail as you have. Preserved verbatim."></textarea>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.04</span>What feels right</label>
+        <textarea id="q1_04" placeholder="In opposition to the above. What already works, what you sense could exist. Preserved verbatim."></textarea>
+      </div>
+
+      <div class="field">
+        <label><span class="q-id">Q1.05</span>Direct experience<span class="req">*</span></label>
+        <select id="q1_05">
+          <option value="">— select —</option>
+          <option value="years">years of direct contact</option>
+          <option value="months">months of direct contact</option>
+          <option value="occasional">occasional direct contact</option>
+          <option value="observer">observer — know it, haven't lived it</option>
+        </select>
+        <div class="field-hint">Observer triggers PRELIMINARY flag.</div>
+      </div>
+    </div>
+
+    <!-- ═══ §2 INVERSION ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §2</span>
+        <span class="section-title">Inversion Diagnostic</span>
+      </div>
+      <p class="section-subtitle">What is fixed · what varies · who pays.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q2.01</span>What is fixed<span class="req">*</span></label>
+        <input type="text" id="q2_01" placeholder="The specific element that does not change">
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q2.02</span>What varies<span class="req">*</span></label>
+        <input type="text" id="q2_02" placeholder="What changes as a result of that fixedness">
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q2.03</span>Who bears the cost<span class="req">*</span></label>
+        <select id="q2_03">
+          <option value="">— select —</option>
+          <option value="user">user</option>
+          <option value="incumbent">incumbent</option>
+          <option value="both">both</option>
+          <option value="unclear">unclear</option>
+        </select>
+        <input type="text" id="q2_03_cost" placeholder="What is the cost? (money / time / health / opportunity / autonomy...)" style="margin-top:0.4rem;">
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q2.04</span>Cost magnitude</label>
+        <select id="q2_04">
+          <option value="unclear">unclear</option>
+          <option value="severe">severe</option>
+          <option value="significant">significant</option>
+          <option value="moderate">moderate</option>
+          <option value="minor">minor</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q2.05</span>Capture type</label>
+        <select id="q2_05">
+          <option value="unclear">unclear</option>
+          <option value="accretion">accretion — accumulated by default</option>
+          <option value="intentional">intentional — actively defended</option>
+          <option value="mixed">mixed</option>
+          <option value="none">none</option>
+        </select>
+        <input type="text" id="q2_05_evidence" placeholder="Evidence" style="margin-top:0.4rem;">
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q2.06</span>Cost-detection check</label>
+        <div class="dual-field">
+          <select id="q2_06_alpha">
+            <option value="">α — cost of lying</option>
+            <option value="high">α high — expensive</option>
+            <option value="low">α low — cheap</option>
+            <option value="unclear">α unclear</option>
+          </select>
+          <select id="q2_06_pdetect">
+            <option value="">P(detect) — visibility</option>
+            <option value="high">P(detect) high — visible</option>
+            <option value="low">P(detect) low — hidden</option>
+            <option value="unclear">P(detect) unclear</option>
+          </select>
+        </div>
+        <div class="field-hint">If α or P(detect) = low → NOMINALLY CONSTANT flag.</div>
+      </div>
+    </div>
+
+    <!-- ═══ STRATUM MAP ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §2 MAP</span>
+        <span class="section-title">Stratum Map</span>
+      </div>
+      <p class="section-subtitle">Click each pillar to cycle: U → A → I → D → U</p>
+
+      <div class="stratum-map" id="stratum-map-ui"></div>
+    </div>
+
+    <!-- ═══ IMMUNITY PILLARS ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §4</span>
+        <span class="section-title">Immunity Pillars</span>
+      </div>
+      <p class="section-subtitle">Click to toggle capturable / free. All four free = approaching immune.</p>
+
+      <div class="immunity-dots" id="immunity-dots-ui"></div>
+      <div class="field-hint" style="margin-top:0.6rem;">All four free → approaching capture immune.</div>
+    </div>
+
+    <!-- ═══ §3 GRADIENT ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §3</span>
+        <span class="section-title">Gradient</span>
+      </div>
+      <p class="section-subtitle">Pressure · maintenance · the seed crystal.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q3.01</span>Natural pressure</label>
+        <textarea id="q3_01" placeholder="What does this structure want to become if unblocked?"></textarea>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q3.02</span>Maintenance energy</label>
+        <textarea id="q3_02" placeholder="What is being spent to hold the blockage in place?"></textarea>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q3.03</span>Supersaturation point</label>
+        <input type="text" id="q3_03" placeholder="Where has pressure built longest without release?">
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q3.04</span>Pressure duration</label>
+        <select id="q3_04">
+          <option value="unclear">unclear</option>
+          <option value="decades">decades</option>
+          <option value="years">years</option>
+          <option value="months">months</option>
+          <option value="recent">recent</option>
+        </select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q3.05</span>Seed crystal<span class="req">*</span></label>
+        <textarea id="q3_05" placeholder="The minimum intervention. Placed at the stratum where the blockage is held."></textarea>
+        <select id="q3_05_stratum" style="margin-top:0.4rem;">
+          <option value="">— stratum —</option>
+          <option value="INDIVIDUAL">1 — Individual</option>
+          <option value="RELATIONSHIP">2 — Relationship</option>
+          <option value="INSTITUTION">3 — Institution</option>
+          <option value="ENVIRONMENT">4 — Environment</option>
+          <option value="SOUL">5 — Soul</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ═══ SIGNAL CHAIN ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-01 · §3 SC</span>
+        <span class="section-title">Signal Chain</span>
+      </div>
+      <p class="section-subtitle">First break = where the seed crystal goes.</p>
+
+      <div class="field">
+        <label><span class="q-id">Q4.01</span>Signal — information reaching people who need it?</label>
+        <select id="q4_01"><option value="unclear">unclear</option><option value="yes">yes</option><option value="no">no</option><option value="partial">partial</option></select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q4.02</span>Medium — transmission channel not captured?</label>
+        <select id="q4_02"><option value="unclear">unclear</option><option value="yes">yes</option><option value="no">no</option><option value="partial">partial</option></select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q4.03</span>Potential — α × P(detect) > 1?</label>
+        <select id="q4_03"><option value="unclear">unclear</option><option value="yes">yes</option><option value="no">no</option></select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q4.04</span>Phase — local or globally distributed?</label>
+        <select id="q4_04"><option value="unclear">unclear</option><option value="local">local</option><option value="regional">regional</option><option value="global">global</option></select>
+      </div>
+      <div class="field">
+        <label><span class="q-id">Q4.05</span>Break point</label>
+        <select id="q4_05">
+          <option value="none">none</option>
+          <option value="SIGNAL">SIGNAL</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="POTENTIAL">POTENTIAL</option>
+          <option value="PHASE">PHASE</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ═══ VERDICT ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-02</span>
+        <span class="section-title">Verdict</span>
+      </div>
+      <p class="section-subtitle">Derived by the operator. Paste or confirm.</p>
+
+      <div class="field">
+        <label>State<span class="req">*</span></label>
+        <select id="v_state">
+          <option value="INVERTED">INVERTED</option>
+          <option value="SOUND">SOUND</option>
+          <option value="FROZEN">FROZEN</option>
+          <option value="UNGROUNDED">UNGROUNDED</option>
+          <option value="IMMUNE">IMMUNE</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Diagnosis</label>
+        <textarea id="v_diagnosis" placeholder="One plain sentence — state, who pays, why it persists"></textarea>
+      </div>
+      <div class="field">
+        <label>Treatment</label>
+        <textarea id="v_treatment" placeholder="The seed crystal — one sentence"></textarea>
+      </div>
+      <div class="field">
+        <label>Call to action</label>
+        <textarea id="v_call_to_action" placeholder="One sentence — who, what, when, where"></textarea>
+      </div>
+      <div class="field">
+        <label>Capture immunity path</label>
+        <textarea id="v_immunity_path" placeholder="How far from immune, what's next"></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.65rem;">
+          <input type="checkbox" id="flag_a" style="accent-color:var(--amber);">
+          <span id="flag_a_label" style="color:var(--amber-dim);">FLAG A — NOMINALLY CONSTANT</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.65rem;">
+          <input type="checkbox" id="flag_b" style="accent-color:var(--amber);">
+          <span id="flag_b_label" style="color:var(--amber-dim);">FLAG B — PRELIMINARY</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.65rem;">
+          <input type="checkbox" id="flag_c" style="accent-color:var(--amber);">
+          <span id="flag_c_label" style="color:var(--amber-dim);">FLAG C — STRATUM MISMATCH</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ═══ FIELD LAYER ═══ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-num">ORP-03 · Field</span>
+        <span class="section-title">What happened</span>
+      </div>
+      <p class="section-subtitle">Updated after acting in the real world.</p>
+
+      <div class="field">
+        <label>Action taken<span class="req">*</span></label>
+        <select id="f_action_taken">
+          <option value="pending">Not yet — verdict just received</option>
+          <option value="yes">Yes — acted on it</option>
+          <option value="no">No — decided not to</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>What you observed</label>
+        <textarea id="f_observed" placeholder="What the real world showed. What held, what didn't, what surprised you."></textarea>
+      </div>
+      <div class="field">
+        <label>Signal update</label>
+        <textarea id="f_signal_update" placeholder="What you know now that you didn't when you filed. Becomes felt sense for next run."></textarea>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitRecord()" disabled>Connect to sign and publish</button>
+    <div class="msg" id="submit-msg"></div>
+
+  </div>
+
+  <!-- ══════ LEDGER PANEL ══════ -->
+  <div id="panel-ledger" class="panel">
+    <div class="feed-controls">
+      <button class="feed-btn active" onclick="filterFeed('all', this)">All</button>
+      <button class="feed-btn" onclick="filterFeed('INVERTED', this)">Inverted</button>
+      <button class="feed-btn" onclick="filterFeed('SOUND', this)">Sound</button>
+      <button class="feed-btn" onclick="filterFeed('FROZEN', this)">Frozen</button>
+      <button class="feed-btn" onclick="filterFeed('IMMUNE', this)">Immune</button>
+      <button class="feed-btn" onclick="loadFeed()">↻</button>
+    </div>
+    <div id="feed-container"><div class="loading-state">Loading records from Nostr relays...</div></div>
+  </div>
+
+  <!-- ══════ ABOUT PANEL ══════ -->
+  <div id="panel-about" class="panel">
+    <div class="form-section">
+      <div class="section-header"><span class="section-title">What this is</span></div>
+      <p class="about-prose">The Signal Ledger is the reference implementation of the <strong>Open Ring Protocol v2</strong> stack — ORP-01 (questions), ORP-02 (verdict), ORP-03 (Field record).</p>
+      <p class="about-prose">Records are signed Nostr events of kind 1337 — owned by the person who filed them, verifiable by anyone, stored across the relay network.</p>
+      <p class="about-prose">The framework holds itself to its own condition: α × P(detect) &gt; 1. A signed Nostr event satisfies both. A Google Sheet satisfies neither.</p>
+    </div>
+    <div class="form-section">
+      <div class="section-header"><span class="section-title">The protocol stack</span></div>
+      <div class="code-block">ORP-01 v2   Question Protocol
+             §0 Observer · §1 Input · §2 Inversion + Stratum Map
+             §3 Gradient + Signal Chain · §4 Immunity + Orientation
+
+ORP-02      Verdict Protocol
+             State · Diagnosis · Treatment · Call to Action
+             Three flags: A (nominally constant) · B (preliminary) · C (stratum mismatch)
+
+ORP-03      Field Protocol
+             Signed record on Nostr kind 1337
+             Observer · Stratum map · Immunity · Verdict · Field layer</div>
+      <div class="link-row">
+        <a href="https://github.com/bitcoinkook/the-open-ring" target="_blank">→ github.com/bitcoinkook/the-open-ring</a>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="section-header"><span class="section-title">How to connect</span></div>
+      <p class="about-prose">Uses <strong>NIP-07</strong> — a browser extension that holds your Nostr private key and signs events without exposing the key.</p>
+      <p class="about-prose">Compatible: Alby, nos2x, Nostore (iOS), Kiwi Browser + nos2x (Android).</p>
+    </div>
+    <div>
+      <div class="section-header"><span class="section-title">Reference relays</span></div>
+      <div class="code-block">wss://relay.damus.io
+wss://relay.nostr.band
+wss://nos.lol
+wss://relay.snort.social</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Signal Ledger · ORP stack v2 · MIT</span>
+    <a href="https://github.com/bitcoinkook/the-open-ring" target="_blank">github.com/bitcoinkook/the-open-ring</a>
+  </div>
+
+</div>
+
+<script type="module">
+  import { SimplePool, nip19 } from 'https://esm.sh/nostr-tools@2.3.1'
+
+  // ── CONSTANTS ──
+  const STRATA = [
+    { name: 'INDIVIDUAL',   short: 'IND',  pillars: ['awareness','capacity','energy','identity'] },
+    { name: 'RELATIONSHIP', short: 'REL',  pillars: ['transparency','trust','reciprocity','status'] },
+    { name: 'INSTITUTION',  short: 'INST', pillars: ['education','distribution','finance','authority'] },
+    { name: 'ENVIRONMENT',  short: 'ENV',  pillars: ['visibility','infrastructure','commons','regulation'] },
+    { name: 'SOUL',         short: 'SOL',  pillars: ['story','language','value','meaning'] },
+  ]
+  const IMMUNITY_KEYS = ['education','distribution','finance','legitimacy']
+  const STATE_CYCLE = { U:'A', A:'I', I:'D', D:'U' }
+  const RELAYS = ['wss://relay.damus.io','wss://relay.nostr.band','wss://nos.lol','wss://relay.snort.social']
+  const KIND = 1337
+
+  // ── STATE ──
+  let pubkey = null
+  let pool = null
+  let allRecords = []
+  let activeFilter = 'all'
+
+  // Stratum map state: { STRATUM_NAME: { pillar: 'A'|'I'|'D'|'U' } }
+  const stratumMap = {}
+  STRATA.forEach(s => {
+    stratumMap[s.name] = {}
+    s.pillars.forEach(p => { stratumMap[s.name][p] = 'U' })
+  })
+
+  // Immunity state: { key: 'capturable'|'free' }
+  const immunityState = {}
+  IMMUNITY_KEYS.forEach(k => { immunityState[k] = 'capturable' })
+
+  // ── INIT ──
+  window.addEventListener('load', () => {
+    pool = new SimplePool()
+    buildStratumMapUI()
+    buildImmunityDotsUI()
+    loadFeed()
+  })
+
+  // ── BUILD STRATUM MAP UI ──
+  function buildStratumMapUI() {
+    const container = document.getElementById('stratum-map-ui')
+    STRATA.forEach(s => {
+      const row = document.createElement('div')
+      row.className = 'stratum-row'
+      row.innerHTML = `<div class="stratum-row-label">${s.name}</div><div class="stratum-pillars" id="pillars-${s.name}"></div>`
+      container.appendChild(row)
+      const pillarsDiv = row.querySelector('.stratum-pillars')
+      s.pillars.forEach(p => {
+        const group = document.createElement('div')
+        group.className = 'pillar-btn-group'
+        const btn = document.createElement('button')
+        btn.className = 'pillar-btn state-U'
+        btn.textContent = 'U'
+        btn.title = `${s.name} · ${p}`
+        btn.onclick = () => cyclePillar(s.name, p, btn)
+        const lbl = document.createElement('div')
+        lbl.className = 'pillar-label'
+        lbl.textContent = p.slice(0,4).toUpperCase()
+        group.appendChild(btn)
+        group.appendChild(lbl)
+        pillarsDiv.appendChild(group)
+      })
+    })
+  }
+
+  function cyclePillar(stratum, pillar, btn) {
+    const cur = stratumMap[stratum][pillar]
+    const next = STATE_CYCLE[cur]
+    stratumMap[stratum][pillar] = next
+    btn.textContent = next
+    btn.className = `pillar-btn state-${next}`
+  }
+
+  function setPillar(stratum, pillar, value) {
+    if (!stratumMap[stratum]) return
+    stratumMap[stratum][pillar] = value
+    // Update button
+    const pillarsDiv = document.getElementById(`pillars-${stratum}`)
+    if (!pillarsDiv) return
+    const idx = STRATA.find(s => s.name === stratum)?.pillars.indexOf(pillar)
+    if (idx === undefined || idx < 0) return
+    const btn = pillarsDiv.querySelectorAll('.pillar-btn')[idx]
+    if (btn) { btn.textContent = value; btn.className = `pillar-btn state-${value}` }
+  }
+
+  // ── BUILD IMMUNITY DOTS UI ──
+  function buildImmunityDotsUI() {
+    const container = document.getElementById('immunity-dots-ui')
+    IMMUNITY_KEYS.forEach(k => {
+      const group = document.createElement('div')
+      group.className = 'immunity-btn-group'
+      const btn = document.createElement('button')
+      btn.className = 'immunity-btn state-capturable'
+      btn.textContent = 'CAP'
+      btn.id = `immunity-btn-${k}`
+      btn.onclick = () => toggleImmunity(k, btn)
+      const lbl = document.createElement('div')
+      lbl.className = 'immunity-label'
+      lbl.textContent = k.slice(0,4).toUpperCase()
+      group.appendChild(btn)
+      group.appendChild(lbl)
+      container.appendChild(group)
+    })
+  }
+
+  function toggleImmunity(key, btn) {
+    const next = immunityState[key] === 'capturable' ? 'free' : 'capturable'
+    immunityState[key] = next
+    btn.textContent = next === 'free' ? 'FREE' : 'CAP'
+    btn.className = `immunity-btn state-${next}`
+  }
+
+  function setImmunity(key, value) {
+    immunityState[key] = value
+    const btn = document.getElementById(`immunity-btn-${key}`)
+    if (btn) { btn.textContent = value === 'free' ? 'FREE' : 'CAP'; btn.className = `immunity-btn state-${value}` }
+  }
+
+  // ── TABS ──
+  window.switchTab = function(tab, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+    document.getElementById('panel-' + tab).classList.add('active')
+    el.classList.add('active')
+    if (tab === 'ledger') loadFeed()
+  }
+
+  // ── IMPORT ──
+  window.openImportModal = function() {
+    document.getElementById('import-modal').style.display = 'flex'
+    document.getElementById('import-msg').style.display = 'none'
+    setTimeout(() => document.getElementById('import-text').focus(), 100)
+  }
+  window.closeImportModal = function() {
+    document.getElementById('import-modal').style.display = 'none'
+    document.getElementById('import-text').value = ''
+    document.getElementById('import-msg').style.display = 'none'
+  }
+
+  window.applyImport = function() {
+    const text = document.getElementById('import-text').value
+    const msg = document.getElementById('import-msg')
+    if (!text.trim()) { msg.className='import-msg error'; msg.textContent='Paste the map block first.'; return }
+    try {
+      const parsed = parseMapBlock(text)
+      const count = fillFormFromMapBlock(parsed)
+      if (count === 0) { msg.className='import-msg error'; msg.textContent='No fields matched. Check the map block format.'; return }
+      msg.className = 'import-msg success'
+      msg.textContent = '✓ Filled ' + count + ' fields. Switching to review mode…'
+      setTimeout(() => { closeImportModal(); enterReviewMode() }, 900)
+    } catch(e) {
+      msg.className = 'import-msg error'
+      msg.textContent = 'Parse error: ' + e.message
+    }
+  }
+
+  function parseMapBlock(text) {
+    // Strip code fences
+    text = text.replace(/```[^\n]*\n?/g, '').replace(/```/g, '')
+    const result = {}
+    // Parse key: value pairs
+    const lines = text.split('\n')
+    lines.forEach(line => {
+      const m = line.match(/^\s*([a-zA-Z_0-9.]+)\s*:\s*(.+)$/)
+      if (m) {
+        result[m[1].trim().toLowerCase()] = m[2].trim()
+      }
+    })
+    // Parse stratum map lines like "   awareness:        A"
+    STRATA.forEach(s => {
+      s.pillars.forEach(p => {
+        const key = p + ':'
+        const line = lines.find(l => l.trim().toLowerCase().startsWith(key))
+        if (line) {
+          const val = line.split(':')[1]?.trim().toUpperCase()
+          if (['A','I','D','U'].includes(val)) {
+            result[`stratum_${s.name}_${p}`] = val
+          }
+        }
+      })
+    })
+    return result
+  }
+
+  function fillFormFromMapBlock(p) {
+    let filled = 0
+    const s = (id, val) => {
+      const el = document.getElementById(id)
+      if (!el || !val) return
+      if (el.tagName === 'SELECT') {
+        const v = val.toLowerCase()
+        for (const opt of el.options) {
+          if (opt.value.toLowerCase() === v || v.startsWith(opt.value.toLowerCase())) {
+            el.value = opt.value; filled++; return
+          }
+        }
+      } else { el.value = val; filled++ }
+    }
+
+    // Observer
+    if (p.position) s('q0_01', p.position)
+    if (p.relationship) s('q0_02', p.relationship)
+    if (p.signal_channel) s('q0_03', p.signal_channel)
+
+    // Structure
+    if (p.name) s('q1_01', p.name)
+
+    // Verdict fields
+    if (p.state) s('v_state', p.state)
+    if (p.diagnosis) { const el=document.getElementById('v_diagnosis'); if(el){el.value=p.diagnosis;filled++} }
+    if (p.treatment) { const el=document.getElementById('v_treatment'); if(el){el.value=p.treatment;filled++} }
+    if (p.call_to_action) { const el=document.getElementById('v_call_to_action'); if(el){el.value=p.call_to_action;filled++} }
+
+    // Seed crystal
+    if (p.description) { const el=document.getElementById('q3_05'); if(el){el.value=p.description;filled++} }
+    if (p.placement) s('q3_05_stratum', p.placement.toUpperCase())
+
+    // Signal chain
+    if (p.signal) s('q4_01', p.signal)
+    if (p.medium) s('q4_02', p.medium)
+    if (p.potential) s('q4_03', p.potential)
+    if (p.phase) s('q4_04', p.phase)
+    if (p.break_point) s('q4_05', p.break_point)
+
+    // Gradient direction
+    if (p.direction) { const el=document.getElementById('q3_01'); if(el){el.value=p.direction;filled++} }
+
+    // Flags
+    if (p.flag_a === 'true') { document.getElementById('flag_a').checked = true; filled++ }
+    if (p.flag_b === 'true') { document.getElementById('flag_b').checked = true; filled++ }
+    if (p.flag_c === 'true') { document.getElementById('flag_c').checked = true; filled++ }
+
+    // Stratum map dots
+    STRATA.forEach(st => {
+      st.pillars.forEach(pl => {
+        const val = p[`stratum_${st.name}_${pl}`]
+        if (val && ['A','I','D','U'].includes(val)) {
+          setPillar(st.name, pl, val)
+          filled++
+        }
+      })
+    })
+
+    // Immunity
+    IMMUNITY_KEYS.forEach(k => {
+      const val = p[k]
+      if (val === 'capturable' || val === 'free') {
+        setImmunity(k, val); filled++
+      }
+    })
+
+    // Field layer
+    if (p.action_taken) s('f_action_taken', p.action_taken)
+
+    return filled
+  }
+
+  window.enterReviewMode = function() {
+    document.getElementById('review-banner').classList.add('visible')
+    document.getElementById('review-banner').scrollIntoView({ behavior:'smooth', block:'start' })
+  }
+  window.exitReviewMode = function() {
+    document.getElementById('review-banner').classList.remove('visible')
+  }
+
+  // ── CONNECT ──
+  window.connectNostr = async function() {
+    const btn = document.getElementById('conn-btn')
+    const dot = document.getElementById('conn-dot')
+    const label = document.getElementById('conn-label')
+    if (!window.nostr) { showMsg('submit-msg','error','No NIP-07 extension found. Install Alby or nos2x.'); return }
+    try {
+      btn.textContent = 'Connecting...'
+      pubkey = await window.nostr.getPublicKey()
+      dot.classList.add('connected')
+      label.textContent = 'Connected'
+      btn.textContent = 'Disconnect'
+      btn.onclick = disconnectNostr
+      document.getElementById('pubkey-display').textContent = nip19.npubEncode(pubkey)
+      document.getElementById('pubkey-display').style.display = 'block'
+      document.getElementById('submit-btn').disabled = false
+      document.getElementById('submit-btn').textContent = 'Sign and publish to Nostr'
+    } catch(e) {
+      dot.classList.add('error')
+      label.textContent = 'Connection failed'
+      btn.textContent = 'Try again'
+      showMsg('submit-msg','error','Connection failed: ' + e.message)
+    }
+  }
+
+  window.disconnectNostr = function() {
+    pubkey = null
+    document.getElementById('conn-dot').classList.remove('connected','error')
+    document.getElementById('conn-label').textContent = 'Not connected — connect your Nostr key to sign records'
+    const btn = document.getElementById('conn-btn')
+    btn.textContent = 'Connect'; btn.onclick = connectNostr
+    document.getElementById('pubkey-display').style.display = 'none'
+    document.getElementById('submit-btn').disabled = true
+    document.getElementById('submit-btn').textContent = 'Connect to sign and publish'
+  }
+
+  // ── SUBMIT ──
+  window.submitRecord = async function() {
+    if (!pubkey) return
+    const v = id => { const el=document.getElementById(id); return el?(el.value||'').trim():'' }
+
+    const required = ['q1_01','q1_05','q2_01','q2_02','q2_03','q3_05']
+    const missing = required.filter(k => !v(k))
+    if (missing.length) { showMsg('submit-msg','error','Missing required fields: '+missing.join(', ')); return }
+
+    // Derive signal weight
+    const expMap = { years:'STRONG', months:'ADEQUATE', occasional:'ADEQUATE', observer:'THIN' }
+    const signal_weight = expMap[v('q1_05')] || 'THIN'
+    // Observer signal weight
+    const obsPos = v('q0_01'), obsRel = v('q0_02'), obsChan = v('q0_03')
+    let obs_signal_weight = signal_weight
+    if (obsPos==='INSIDE' && obsRel==='PAYING' && (obsChan==='BODY'||obsChan==='FINANCIAL')) obs_signal_weight = 'STRONG'
+    else if (obsPos==='OUTSIDE' && obsChan==='RESEARCH') obs_signal_weight = 'THIN'
+
+    const state = v('v_state') || 'INVERTED'
+    const break_point = v('q4_05') || 'none'
+    const inversion_type = v('q2_05') || 'unclear'
+
+    const content = {
+      orp_stack_version: '2',
+      observer: {
+        position: obsPos,
+        relationship: obsRel,
+        signal_channel: obsChan,
+        signal_weight: obs_signal_weight
+      },
+      identification: {
+        structure: v('q1_01'),
+        domain: v('q1_02'),
+        what_feels_wrong: v('q1_03'),
+        what_feels_right: v('q1_04'),
+        direct_experience: v('q1_05')
+      },
+      stratum_map: JSON.parse(JSON.stringify(stratumMap)),
+      immunity: { ...immunityState },
+      inversion: {
+        what_is_fixed: v('q2_01'),
+        what_varies: v('q2_02'),
+        who_bears_cost: v('q2_03'),
+        cost_description: v('q2_03_cost') || null,
+        cost_magnitude: v('q2_04'),
+        capture_type: inversion_type,
+        capture_evidence: v('q2_05_evidence') || null,
+        alpha: v('q2_06_alpha') || null,
+        p_detect: v('q2_06_pdetect') || null
+      },
+      gradient: {
+        natural_pressure: v('q3_01') || null,
+        maintenance_energy: v('q3_02') || null,
+        supersaturation_point: v('q3_03') || null,
+        pressure_duration: v('q3_04') || null,
+        seed_crystal: v('q3_05'),
+        seed_crystal_stratum: v('q3_05_stratum') || null
+      },
+      signalchain: {
+        signal_node: v('q4_01') || null,
+        medium_node: v('q4_02') || null,
+        potential_node: v('q4_03') || null,
+        phase_node: v('q4_04') || null,
+        break_point
+      },
+      verdict: {
+        state,
+        diagnosis: v('v_diagnosis') || null,
+        treatment: v('v_treatment') || null,
+        call_to_action: v('v_call_to_action') || null,
+        capture_immunity_path: v('v_immunity_path') || null,
+        signal_weight,
+        inversion_type,
+        break_point
+      },
+      flags: {
+        nominally_constant: document.getElementById('flag_a').checked,
+        preliminary: document.getElementById('flag_b').checked,
+        stratum_mismatch: document.getElementById('flag_c').checked
+      },
+      field: {
+        action_taken: v('f_action_taken'),
+        what_observed: v('f_observed') || null,
+        signal_update: v('f_signal_update') || null,
+        filed_at: new Date().toISOString()
+      }
+    }
+
+    const tags = [
+      ['t','signal-ledger'],['t','open-ring'],['t','orp-03'],
+      ['orp_stack_version','2'],
+      ['structure', v('q1_01')],
+      ['domain', v('q1_02')],
+      ['state', state],
+      ['inversion_type', inversion_type],
+      ['signal_weight', signal_weight],
+      ['break', break_point],
+      ['observer_position', obsPos],
+      ['action_taken', v('f_action_taken')],
+      ['client','signal-ledger']
+    ]
+    if (content.flags.preliminary)        tags.push(['preliminary','true'])
+    if (content.flags.nominally_constant) tags.push(['nominally_constant','true'])
+    if (content.flags.stratum_mismatch)   tags.push(['stratum_mismatch','true'])
+
+    const eventTemplate = { kind:KIND, created_at:Math.floor(Date.now()/1000), tags, content:JSON.stringify(content), pubkey }
+
+    showMsg('submit-msg','loading','Signing event...')
+    document.getElementById('submit-btn').disabled = true
+
+    try {
+      const signedEvent = await window.nostr.signEvent(eventTemplate)
+      showMsg('submit-msg','loading','Publishing to relays...')
+      await Promise.any(pool.publish(RELAYS, signedEvent))
+      showMsg('submit-msg','success',
+        '✓ Filed. State: '+state+' · Break: '+break_point+' · Weight: '+signal_weight+
+        '\nEvent: '+signedEvent.id.slice(0,16)+'...')
+      allRecords.unshift(signedEvent)
+    } catch(e) {
+      showMsg('submit-msg','error','Publish failed: '+(e.message||'relay rejected'))
+    } finally {
+      document.getElementById('submit-btn').disabled = false
+    }
+  }
+
+  // ── FEED ──
+  window.loadFeed = async function() {
+    const container = document.getElementById('feed-container')
+    container.innerHTML = '<div class="loading-state">Querying relays...</div>'
+    try {
+      const events = await new Promise(resolve => {
+        const collected = []
+        const timeout = setTimeout(() => resolve(collected), 6000)
+        pool.subscribeMany(RELAYS, [{ kinds:[KIND], '#t':['signal-ledger'], limit:50 }], {
+          onevent(ev) { collected.push(ev) },
+          oneose()    { clearTimeout(timeout); resolve(collected) }
+        })
+      })
+      allRecords = events.sort((a,b) => b.created_at - a.created_at)
+      renderFeed(filterRecords(allRecords, activeFilter))
+    } catch(e) {
+      container.innerHTML = '<div class="empty-state">Could not reach relays.<br>Check connection and try again.</div>'
+    }
+  }
+
+  window.filterFeed = function(filter, btn) {
+    activeFilter = filter
+    document.querySelectorAll('.feed-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    renderFeed(filterRecords(allRecords, filter))
+  }
+
+  function filterRecords(records, filter) {
+    if (filter === 'all') return records
+    return records.filter(e => getTag(e,'state') === filter)
+  }
+
+  function renderFeed(records) {
+    const container = document.getElementById('feed-container')
+    if (!records.length) {
+      container.innerHTML = '<div class="empty-state">No records yet.<br>Be the first to file a signal.</div>'
+      return
+    }
+    container.innerHTML = records.map((e,i) => {
+      let c = {}
+      try { c = JSON.parse(e.content) } catch(_) {}
+      const v = c.verdict || {}
+      const f = c.flags || {}
+      const obs = c.observer || {}
+      const sm = c.stratum_map || {}
+
+      const structure   = v.structure || c.identification?.structure || getTag(e,'structure') || '—'
+      const state       = v.state     || getTag(e,'state')    || '—'
+      const brk         = v.break_point || getTag(e,'break')  || '—'
+      const weight      = v.signal_weight || getTag(e,'signal_weight') || '—'
+      const invType     = v.inversion_type || getTag(e,'inversion_type') || '—'
+      const obsPos      = obs.position || getTag(e,'observer_position') || ''
+
+      const date = new Date(e.created_at*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+      const npub = (() => { try { return nip19.npubEncode(e.pubkey) } catch(_) { return e.pubkey } })()
+
+      // Build mini stratum dots
+      let miniDots = ''
+      if (Object.keys(sm).length > 0) {
+        miniDots = '<div class="stratum-mini">'
+        STRATA.forEach(s => {
+          s.pillars.forEach(p => {
+            const val = sm[s.name]?.[p] || 'U'
+            miniDots += `<div class="stratum-mini-dot dot-${val}" title="${s.name}·${p}·${val}"></div>`
+          })
+        })
+        miniDots += '</div>'
+      }
+
+      const flags = []
+      if (f.preliminary)        flags.push('<span class="flag-badge flag-warning">PRELIMINARY</span>')
+      if (f.nominally_constant) flags.push('<span class="flag-badge flag-warning">NOMINALLY CONST</span>')
+      if (f.stratum_mismatch)   flags.push('<span class="flag-badge flag-info">STRATUM MISMATCH</span>')
+
+      const diagnosis = v.diagnosis || c.verdict?.v06_diagnosis || c.gradient?.seed_crystal || '—'
+      const treatment = v.treatment || c.gradient?.seed_crystal || '—'
+
+      return `
+        <div class="record">
+          <div class="record-header">
+            <div class="record-structure">${esc(structure)}</div>
+            <div class="record-meta">${date}${obsPos ? '<br>'+obsPos : ''}</div>
+          </div>
+          <div class="record-flags">
+            <span class="flag-badge flag-state ${state}">${state}</span>
+            <span class="flag-badge flag-info">${invType}</span>
+            <span class="flag-badge flag-info">BREAK: ${brk}</span>
+            <span class="flag-badge flag-info">SIG: ${weight}</span>
+            ${flags.join('')}
+          </div>
+          ${miniDots}
+          <div class="record-field" style="margin-top:0.6rem;">
+            <div class="record-field-label">Diagnosis</div>
+            <div class="record-field-value">${esc(diagnosis)}</div>
+          </div>
+          <div class="record-full" id="full-${i}">
+            <div class="record-field">
+              <div class="record-field-label">What feels wrong</div>
+              <div class="record-field-value">${esc(c.identification?.what_feels_wrong || c.identification?.felt_sense || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">What feels right</div>
+              <div class="record-field-value">${esc(c.identification?.what_feels_right || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">Seed crystal</div>
+              <div class="record-field-value">${esc(treatment)}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">Call to action</div>
+              <div class="record-field-value">${esc(v.call_to_action || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">Capture immunity path</div>
+              <div class="record-field-value">${esc(v.capture_immunity_path || '—')}</div>
+            </div>
+            <div class="record-field">
+              <div class="record-field-label">Action taken</div>
+              <div class="record-field-value">${esc(c.field?.action_taken || '—')}</div>
+            </div>
+            ${c.field?.what_observed ? `<div class="record-field"><div class="record-field-label">What happened</div><div class="record-field-value">${esc(c.field.what_observed)}</div></div>` : ''}
+            ${c.field?.signal_update ? `<div class="record-field"><div class="record-field-label">Signal update</div><div class="record-field-value">${esc(c.field.signal_update)}</div></div>` : ''}
+            <div class="record-pubkey">${npub}</div>
+          </div>
+          <button class="record-toggle" onclick="toggleRecord(${i})">+ expand</button>
+        </div>`
+    }).join('')
+  }
+
+  window.toggleRecord = function(i) {
+    const full = document.getElementById('full-'+i)
+    const btn = full.nextElementSibling
+    const open = full.classList.toggle('open')
+    btn.textContent = open ? '− collapse' : '+ expand'
+  }
+
+  // ── HELPERS ──
+  function getTag(event, name) { const t=event.tags.find(x=>x[0]===name); return t?t[1]:null }
+  function esc(str) { return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+  function showMsg(id,type,text) { const el=document.getElementById(id); el.className='msg '+type; el.textContent=text }
+</script>
+</body>
+</html>
