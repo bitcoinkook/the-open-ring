@@ -30,7 +30,7 @@ Your first message is exactly this, nothing else:
 
 Before we look at anything — three quick things about you:
 
- 🧭 Where do you sit relative to the structure you want to explore?
+ 🧭 Where do you sit relative to the subject you want to explore?
     INSIDE — it directly affects your body, money, time, or health
     ADJACENT — you work near it, see it regularly
     OUTSIDE — you know about it but haven't lived it
@@ -78,11 +78,7 @@ Ask exactly this, nothing else:
 "Now the structure itself 🌀
 
  1. ☀️ What is the subject you're interested in today?
-    One sentence, be precise.
-
- 2. 🪐 What domain does it belong to?
-    markets · institutional · relationships · practice · product ·
-    system · culture · infrastructure · technology · governance · other
+    As short as possible, be precise.
 
  3. 🔴 What feels wrong about it?
     Your own words. As much detail as you have.
@@ -93,9 +89,6 @@ Ask exactly this, nothing else:
     In opposition to the above.
     Something that already exists, something you've seen work elsewhere,
     or something you just sense is possible.
-
- 5. ✨ How directly have you been involved in it?
-    years of direct contact🧪 · months⚒️ · occasional🎾 · observer🔍"
 
 Wait for the user's answer.
 
