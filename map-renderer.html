@@ -1184,77 +1184,84 @@ window.fileToLedger=function(){window.open('signal-ledger-nostr.html','_blank')}
 
 window.loadExample=function(){
   document.getElementById('paste-input').value=`OBSERVER
+OBSERVER
 position:           INSIDE
 relationship:       PAYING
-signal_channel:     BODY
+signal_channel:     FINANCIAL
 signal_weight:      STRONG
 
 STRUCTURE
-name:               Daily alcohol habit
+name:               Long-term rental housing in coastal tourist towns
 
 STRATUM MAP
 
 1. INDIVIDUAL
-   awareness:        I
+   awareness:        A
    capacity:         I
    energy:           I
-   identity:         D
+   identity:         I
 
 2. RELATIONSHIP
    transparency:     I
-   trust:            D
-   reciprocity:      D
-   status:           U
+   trust:            I
+   reciprocity:      I
+   status:           I
 
 3. INSTITUTION
-   education:        I
+   education:        D
    distribution:     I
    finance:          I
    authority:        I
 
 4. ENVIRONMENT
    visibility:       I
-   infrastructure:   I
-   commons:          D
-   regulation:       D
+   infrastructure:   D
+   commons:          I
+   regulation:       I
 
 5. SOUL
    story:            I
-   language:         I
-   value:            D
-   meaning:          D
+   language:         D
+   value:            I
+   meaning:          I
 
 IMMUNITY
-   education:        capturable
+   education:        free
    distribution:     capturable
    finance:          capturable
-   legitimacy:       capturable
+   legitimacy:       free
 
 SIGNAL CHAIN
    signal:           no
    medium:           partial
    potential:        no
-   phase:            global
+   phase:            local
    break_point:      SIGNAL
 
 SEED CRYSTAL
-   placement:        INDIVIDUAL
-   pillar:           awareness
-   description:      A documented honest account of what daily drinking actually costs — written by someone who stopped.
+   placement:        ENVIRONMENT
+   pillar:           visibility
+   description:      A public, append-only, tenant-sourced record of units flipped from long-term to short-term, searchable by address before signing a lease.
 
 GRADIENT
-   direction:        Toward honest self-assessment and then free choice.
+   direction:        A town where the people who do the work can also live in it, with rents referenced to local wages rather than peak tourist yield.
 
 VERDICT
    state:            INVERTED
-   diagnosis:        The habit is fixed as default; honest information about its cost is suppressed by the culture that profits from it.
-   treatment:        One honest first-person account placed where the person can find it without being judged.
-   call_to_action:   Write down what it costs you this week — time, money, energy, clarity — and read it back.
+   diagnosis:        Yield expectation is held fixed and residency varies, so the people who make the town function pay the cost while lying about the arrangement is free.
+   treatment:        Make displacement patterns visible to newcomers before they sign, via a channel no single actor can silence.
+   call_to_action:   Post one verified displacement record this week to the existing Telegram group, in a format others can copy.
 
 FLAGS
-   flag_a:           false
+   flag_a:           true
    flag_b:           false
-   flag_c:           false`
+   flag_c:           false
+
+FIELD LAYER
+   action_taken:     pending
+   what_observed:    
+   signal_update:
+
   document.getElementById('paste-msg').style.display='none'
 }
 
